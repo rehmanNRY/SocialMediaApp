@@ -1,0 +1,90 @@
+// friendRequest.controller.js
+import { FriendRequest } from '../models/friendRequests.model.js';
+import { User } from '../models/user.model.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import { ApiError } from '../utils/ApiError.js';
+import { ApiResponse } from '../utils/ApiResponse.js';
+
+// Send a friend request to another user
+export const sendFriendRequest = asyncHandler(async (req, res, next) => {
+  const senderId = req.user.id;
+  const { receiverId } = req.body;
+
+  if (senderId === receiverId) {
+    return next(new ApiError(400, 'You cannot send a friend request to yourself'));
+  }
+
+  // Check if a request already exists
+  const existingRequest = await FriendRequest.findOne({ sender: senderId, receiver: receiverId });
+  if (existingRequest) {
+    return next(new ApiError(400, 'Friend request already sent'));
+  }
+
+  // Create the friend request
+  const friendRequest = await FriendRequest.create({ sender: senderId, receiver: receiverId });
+
+  res.status(201).json(new ApiResponse(201, 'Friend request sent successfully', friendRequest));
+});
+
+// Accept a friend request
+export const acceptFriendRequest = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const { requestId } = req.body;
+
+  // Find the request
+  const friendRequest = await FriendRequest.findOne({ _id: requestId, receiver: userId });
+  if (!friendRequest) {
+    return next(new ApiError(404, 'Friend request not found'));
+  }
+
+  // Add each other as friends
+  await User.findByIdAndUpdate(userId, { $addToSet: { friends: friendRequest.sender } });
+  await User.findByIdAndUpdate(friendRequest.sender, { $addToSet: { friends: userId } });
+
+  // Remove the friend request
+  await friendRequest.deleteOne();
+
+  res.status(200).json(new ApiResponse(200, 'Friend request accepted successfully'));
+});
+
+// Reject or delete a friend request
+export const rejectFriendRequest = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const { requestId } = req.body;
+
+  // Find and delete the request
+  const friendRequest = await FriendRequest.findOneAndDelete({ _id: requestId, receiver: userId });
+  if (!friendRequest) {
+    return next(new ApiError(404, 'Friend request not found'));
+  }
+
+  res.status(200).json(new ApiResponse(200, 'Friend request rejected successfully'));
+});
+
+// Get list of all requests sent by the user
+export const getSentRequests = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+
+  const sentRequests = await FriendRequest.find({ sender: userId }).populate('receiver', 'name email');
+  res.status(200).json(new ApiResponse(200, 'Sent friend requests fetched successfully', sentRequests));
+});
+
+// Get list of all requests received by the user
+export const getReceivedRequests = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+
+  const receivedRequests = await FriendRequest.find({ receiver: userId }).populate('sender', 'name email');
+  res.status(200).json(new ApiResponse(200, 'Received friend requests fetched successfully', receivedRequests));
+});
+
+// Get the list of all friends of the logged-in user
+export const getFriendsList = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+
+  const user = await User.findById(userId).populate('friends', 'name email');
+  if (!user) {
+    return next(new ApiError(404, 'User not found'));
+  }
+
+  res.status(200).json(new ApiResponse(200, 'Friends list fetched successfully', user.friends));
+});
