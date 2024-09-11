@@ -61,7 +61,7 @@ const PostForm = () => {
       </div>
 
       <textarea
-        className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300 shadow-sm placeholder:italic placeholder-gray-400"
+        className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-300 shadow-sm placeholder:italic placeholder-gray-400"
         rows="3"
         placeholder={`Share your thoughts ${userDetails?.fullName}...`}
         value={content}
@@ -71,7 +71,7 @@ const PostForm = () => {
 
       <div className="mt-4 flex justify-between items-center space-x-2">
         <label
-          className="text-sm text-blue-600 hover:underline cursor-pointer flex items-center transition-all duration-200 ease-in-out"
+          className="text-sm text-indigo-600 hover:underline cursor-pointer flex items-center transition-all duration-200 ease-in-out"
           onClick={() => setShowImageInput(!showImageInput)}
         >
           <AiOutlinePicture className="mr-1 text-lg" />
@@ -97,7 +97,7 @@ const PostForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="bg-blue-600 text-white px-6 py-3 rounded-full shadow-lg hover:bg-blue-700 transition duration-300 flex items-center space-x-2"
+          className="bg-indigo-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center space-x-2"
         >
           {loading ? (
             <BiLoaderCircle className="w-6 h-6 animate-spin" />
@@ -111,11 +111,11 @@ const PostForm = () => {
       </div>
 
       <div className="mt-4 flex space-x-3 items-center">
-        <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition duration-200">
+        <button className="flex items-center space-x-2 text-gray-500 hover:text-indigo-600 transition duration-200">
           <AiFillSmile className="w-5 h-5" />
           <span>Feelings</span>
         </button>
-        <button className="flex items-center space-x-2 text-gray-500 hover:text-blue-600 transition duration-200">
+        <button className="flex items-center space-x-2 text-gray-500 hover:text-indigo-600 transition duration-200">
           <RiEmotionLaughLine className="w-5 h-5" />
           <span>Emoji</span>
         </button>

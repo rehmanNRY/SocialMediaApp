@@ -1,22 +1,49 @@
-import React from 'react'
-import { AiOutlineSend } from "react-icons/ai";
+"use client";
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { postComment } from '@/redux/comments/commentsSlice';
+import { fetchUserDetails } from '@/redux/auth/authSlice';
 
-const CommentForm = () => {
+const CommentForm = ({ postId }) => {
+  const dispatch = useDispatch();
+  const [content, setContent] = useState('');
+  const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchUserDetails());
+    }
+  }, [isLoggedIn, dispatch]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (content.trim()) {
+      dispatch(postComment({ post: postId, content }));
+      setContent('');
+    }
+  };
+
   return (
-    <div className="flex items-center border-t pt-3">
-      <textarea
-        placeholder="Write a comment..."
-        rows="2"
-        className="w-full p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-      ></textarea>
+    <form onSubmit={handleSubmit} className="flex items-center space-x-2 mb-4">
+      <img
+        className="w-10 h-10 rounded-full bg-gray-300 object-cover"
+        src={userDetails?.profilePicture}
+      />
+      <input
+        type="text"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        className="flex-1 p-2 border border-gray-300 rounded-lg"
+        placeholder="Add a comment..."
+      />
       <button
-        className="ml-3 p-3 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"
-        aria-label="Post Comment"
+        type="submit"
+        className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
       >
-        <AiOutlineSend className="text-lg" />
+        Comment
       </button>
-    </div>
-  )
-}
+    </form>
+  );
+};
 
-export default CommentForm
+export default CommentForm;

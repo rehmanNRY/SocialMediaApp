@@ -1,46 +1,48 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosInstance from '../../api/axiosInstance'; // Import your configured axios instance
+import axiosInstance from '@/api/axiosInstance';
 
+// Async thunk to post a comment
 // Async thunk to post a comment
 export const postComment = createAsyncThunk(
   'comments/postComment',
   async ({ post, content }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/comments/post', { post, content });
-      return response.data;
+      return { postId: post, comment: response.data.data }; // Return both postId and the new comment
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
+
 
 // Async thunk to edit a comment
 export const editComment = createAsyncThunk(
   'comments/editComment',
-  async ({ commentId, content }, { rejectWithValue }) => {
+  async ({ commentId, postId, content }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.put('/comments/edit', { commentId, content });
-      return response.data;
+      return { postId, comment: response.data.data }; // Return both postId and updated comment
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
 
+
 // Async thunk to delete a comment
 export const deleteComment = createAsyncThunk(
   'comments/deleteComment',
-  async (commentId, { rejectWithValue }) => {
+  async ({ commentId, postId }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.delete('/comments/delete', {
-        data: { commentId },
-      });
-      return response.data;
+      await axiosInstance.delete('/comments/delete', { data: { commentId } });
+      return { postId, commentId }; // Return both postId and commentId
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
+
 
 // Async thunk to get all comments of a specific post
 export const getCommentsByPost = createAsyncThunk(
@@ -48,7 +50,7 @@ export const getCommentsByPost = createAsyncThunk(
   async (postId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/comments/post/${postId}`);
-      return response.data;
+      return { postId, comments: response.data.data }; // Return both postId and comments
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -58,15 +60,16 @@ export const getCommentsByPost = createAsyncThunk(
 // Async thunk to like or dislike a comment
 export const toggleLikeComment = createAsyncThunk(
   'comments/toggleLikeComment',
-  async (commentId, { rejectWithValue }) => {
+  async ({ commentId, postId }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/comments/like', { commentId });
-      return response.data;
+      return { postId, comment: response.data.data }; // Return both postId and updated comment
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
   }
 );
+
 
 // Async thunk to get the list of all users who liked a comment
 export const getUsersWhoLikedComment = createAsyncThunk(
@@ -82,57 +85,47 @@ export const getUsersWhoLikedComment = createAsyncThunk(
 );
 
 const commentsSlice = createSlice({
-  name: 'comments',
+  name: "comments",
   initialState: {
-    comments: [],
-    status: 'idle',
+    commentsByPostId: {}, // Store comments for each post separately
+    status: "idle",
     error: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(postComment.fulfilled, (state, action) => {
-        state.comments.push(action.payload.data);
+    .addCase(postComment.fulfilled, (state, action) => {
+      const { postId, comment } = action.payload;
+      if (state.commentsByPostId[postId]) {
+        state.commentsByPostId[postId].push(comment);
+      } else {
+        state.commentsByPostId[postId] = [comment];
+      }
+    })
+      .addCase(getCommentsByPost.fulfilled, (state, action) => {
+        const { postId, comments } = action.payload;
+        state.commentsByPostId[postId] = comments;
       })
       .addCase(editComment.fulfilled, (state, action) => {
-        const index = state.comments.findIndex(
-          (comment) => comment._id === action.payload.data._id
-        );
+        const { postId, comment } = action.payload;
+        const index = state.commentsByPostId[postId]?.findIndex((c) => c._id === comment._id);
         if (index !== -1) {
-          state.comments[index] = action.payload.data;
+          state.commentsByPostId[postId][index] = comment; // Update the comment in the state
         }
-      })
-      .addCase(deleteComment.fulfilled, (state, action) => {
-        state.comments = state.comments.filter(
-          (comment) => comment._id !== action.meta.arg
-        );
-      })
-      .addCase(getCommentsByPost.fulfilled, (state, action) => {
-        state.comments = action.payload.data;
       })
       .addCase(toggleLikeComment.fulfilled, (state, action) => {
-        const index = state.comments.findIndex(
-          (comment) => comment._id === action.payload.data._id
-        );
+        const { postId, comment } = action.payload;
+        const index = state.commentsByPostId[postId]?.findIndex((c) => c._id === comment._id);
         if (index !== -1) {
-          state.comments[index] = action.payload.data;
+          state.commentsByPostId[postId][index] = comment; // Update the liked/unliked comment in the state
         }
-      })
-      .addCase(getUsersWhoLikedComment.fulfilled, (state, action) => {
-        const comment = state.comments.find(
-          (comment) => comment._id === action.meta.arg
+      })  
+      .addCase(deleteComment.fulfilled, (state, action) => {
+        const { postId, commentId } = action.payload;
+        state.commentsByPostId[postId] = state.commentsByPostId[postId]?.filter(
+          (comment) => comment._id !== commentId
         );
-        if (comment) {
-          comment.likes = action.payload.data;
-        }
-      })
-      .addMatcher(
-        (action) => action.type.endsWith('/rejected'),
-        (state, action) => {
-          state.status = 'failed';
-          state.error = action.payload || action.error.message;
-        }
-      );
+      });      
   },
 });
 

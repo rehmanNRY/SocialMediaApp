@@ -20,7 +20,7 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
     <div className="flex justify-around items-center text-gray-600 border-t border-b py-3 mb-4">
       <button
         onClick={handleToggleLike}
-        className={`flex items-center transition ${userHasLiked ? "text-blue-500" : "hover:text-blue-500"}`}
+        className={`flex items-center transition ${userHasLiked ? "text-indigo-500" : "hover:text-indigo-500"}`}
       >
         {!userHasLiked ? <AiOutlineLike className="mr-1 text-xl" /> : <AiFillLike className="mr-1 text-xl" />}
         <span className="mr-1">{userHasLiked ? 'Liked' : 'Like'}</span>
@@ -28,14 +28,14 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
           {post.likes.length}
         </span>
       </button>
-      <button className="flex items-center hover:text-blue-500 transition">
+      <button className="flex items-center hover:text-indigo-500 transition">
         <BiCommentDetail className="mr-1 text-xl" />
         <span className="mr-1">Comment</span>
         <span className="text-xs text-white rounded-full px-2 py-0.5 bg-indigo-500">
           {post.comments?.length || "0"}
         </span>
       </button>
-      <button className="flex items-center hover:text-blue-500 transition">
+      <button className="flex items-center hover:text-indigo-500 transition">
         <BiShareAlt className="mr-1 text-xl" /> Share
       </button>
     </div>

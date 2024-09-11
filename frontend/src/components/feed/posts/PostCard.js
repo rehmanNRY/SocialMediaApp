@@ -2,8 +2,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { FiEdit, FiTrash2, FiBookmark } from "react-icons/fi";
-import { BiShareAlt, BiCommentDetail } from "react-icons/bi";
-import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import CommentForm from "../comment/CommentForm";
 import CommentList from "../comment/CommentList";
 import LikersModal from "../like/LikersModal";
@@ -142,8 +140,8 @@ const PostCard = ({ post }) => {
         handleShowLikers={handleShowLikers}
         likers={likers}
       />
-      <CommentForm />
-      {post.comments?.length > 0 && <CommentList comments={post.comments} />}
+      <CommentForm postId={post._id} />
+      <CommentList postId={post._id} />
 
       {showLikersModal && <LikersModal likers={likers} closeModal={closeModal} />}
     </div>

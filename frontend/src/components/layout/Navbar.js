@@ -5,7 +5,7 @@ import { AiOutlineHome, AiOutlineSetting, AiOutlineUsergroupAdd } from 'react-ic
 import { BsBriefcase, BsThreeDotsVertical } from 'react-icons/bs';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserDetails, setLoggedIn } from '@/redux/auth/authSlice';
+import { fetchUserDetails } from '@/redux/auth/authSlice';
 
 const Header = () => {
   const dispatch = useDispatch();
