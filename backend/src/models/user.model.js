@@ -23,7 +23,7 @@ const UserSchema = new Schema({
   },
   profilePicture: {
     type: String,
-    default: '',
+    default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNpTKcwSR1d8nsU3xEVHSwOYbq9VM9Fz65p8AeAuJEn31XiwoB5ApWSLFq8PTIjWJ0e3Y&usqp=CAU',
   },
   bio: {
     type: String,

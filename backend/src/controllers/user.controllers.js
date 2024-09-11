@@ -71,7 +71,7 @@ export const loginUser = asyncHandler(async (req, res, next) => {
 
   // Generate JWT token
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: '1d',
+    expiresIn: '30d',
   });
 
   res.status(200).json(new ApiResponse(200, 'User logged in successfully', { token }));
