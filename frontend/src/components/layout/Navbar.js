@@ -1,10 +1,20 @@
-import React from 'react';
+"use client"
+import React, {useEffect} from 'react';
 import { FiSearch, FiMessageSquare, FiBell } from 'react-icons/fi';
 import { AiOutlineHome, AiOutlineSetting, AiOutlineUsergroupAdd } from 'react-icons/ai';
 import { BsBriefcase, BsThreeDotsVertical } from 'react-icons/bs';
 import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserDetails, setLoggedIn } from '@/redux/auth/authSlice';
 
 const Header = () => {
+  const dispatch = useDispatch();
+  const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchUserDetails());
+    }
+  }, [isLoggedIn, dispatch]);
   return (
     <div className="h-16 relative z-10">
       <header className="h-16 bg-white shadow-lg border-b border-gray-200 flex items-center justify-between px-4 fixed w-full box-border">
@@ -54,13 +64,12 @@ const Header = () => {
             <FiBell className="w-6 h-6 text-gray-700 hover:text-blue-600 transition transform hover:scale-110" />
             <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full"></span>
           </a>
-          <motion.div
-            className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold"
+          <motion.img
+            className="w-10 h-10 rounded-full bg-gray-300 object-cover"
+            src={userDetails?.profilePicture}
             whileHover={{ rotate: 360 }}
             transition={{ duration: 0.6 }}
-          >
-            JD
-          </motion.div>
+          />
           <a href="#" className="text-gray-700 hover:text-blue-600 transition transform hover:scale-110">
             <BsThreeDotsVertical className="w-6 h-6" />
           </a>

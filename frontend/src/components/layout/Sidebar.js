@@ -1,20 +1,29 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
+"use client"
+import React, { useEffect } from 'react';
 import { logout } from '@/redux/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FiHome, FiUser, FiList, FiAlertCircle, FiSend, FiUserPlus, FiBookmark, FiSettings, FiLogOut, FiMessageSquare } from 'react-icons/fi';
+import { FiHome, FiUser, FiList, FiAlertCircle, FiUserPlus, FiBookmark, FiSettings, FiLogOut } from 'react-icons/fi';
 import { AiOutlineFileText } from 'react-icons/ai';
 import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserDetails, setLoggedIn } from '@/redux/auth/authSlice';
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const { isLoggedIn, userDetails, loading, error } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
     dispatch(logout());
     router.push('/login');
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchUserDetails());
+    }
+  }, [isLoggedIn, dispatch]);
 
   return (
     <div className="w-64">
@@ -22,16 +31,18 @@ const Sidebar = () => {
         {/* Profile Section */}
         <div className="flex items-center p-6 space-x-4 bg-white shadow-md">
           <motion.img
-            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnRba0yhjuus0apDsjQjLkNyV6y4xVsxoyn0IXOOfSqrh0OUQcsPeih9P2S6gR1PbvoEc&usqp=CAU"
+            src={userDetails?.profilePicture}
             alt="Profile"
-            className="w-12 h-12 rounded-full"
+            className="w-12 h-12 rounded-full bg-gray-300"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           />
+          {loading && <p>Loading user details...</p>}
+          {error && <p>Error: {error}</p>}
           <div>
-            <h3 className="font-semibold text-lg">John Doe</h3>
-            <p className="text-sm text-gray-600">@johndoe</p>
+            <h3 className="font-semibold text-lg">{userDetails?.fullName}</h3>
+            <p className="text-sm text-gray-600">@{userDetails?.username}</p>
           </div>
         </div>
 

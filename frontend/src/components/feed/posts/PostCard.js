@@ -1,15 +1,26 @@
 // components/post/PostCard.js
 "use client"
-import React from 'react';
+import React, {useEffect} from 'react';
 import { FiEdit, FiTrash2, FiBookmark } from "react-icons/fi";
-import { AiOutlineSend, AiOutlineHeart } from "react-icons/ai";
+import { AiOutlineHeart } from "react-icons/ai";
 import { BiShareAlt, BiCommentDetail } from "react-icons/bi";
 import CommentForm from '../comment/CommentForm';
 import CommentList from '../comment/CommentList';
 import { timeAgo } from '@/utility/timeAgo';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserDetails } from '@/redux/auth/authSlice';
 
 const PostCard = ({ post }) => {
+  const dispatch = useDispatch();
+  const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
   const timePassed = (date) => timeAgo(date);
+  console.log(post)
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchUserDetails());
+    }
+  }, [isLoggedIn, dispatch]);
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-lg mb-6 relative transition-transform transform hover:scale-105 hover:shadow-2xl">
@@ -17,7 +28,7 @@ const PostCard = ({ post }) => {
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
           <img
-            src={post.image}
+            src={post.user?.profilePicture}
             alt="User Avatar"
             className="w-12 h-12 rounded-full mr-4"
           />
@@ -28,12 +39,14 @@ const PostCard = ({ post }) => {
         </div>
         {/* Edit, Delete, and Bookmark Options */}
         <div className="flex space-x-4 text-gray-600">
-          <button className="hover:text-blue-500 transition text-xl">
-            <FiEdit />
-          </button>
-          <button className="hover:text-red-500 transition text-xl">
-            <FiTrash2 />
-          </button>
+          {userDetails?._id === post.user._id && <>
+            <button className="hover:text-blue-500 transition text-xl">
+              <FiEdit />
+            </button>
+            <button className="hover:text-red-500 transition text-xl">
+              <FiTrash2 />
+            </button>
+          </>}
           <button className="hover:text-yellow-500 transition text-xl">
             <FiBookmark />
           </button>

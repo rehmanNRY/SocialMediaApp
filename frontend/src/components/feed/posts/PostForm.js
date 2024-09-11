@@ -1,19 +1,27 @@
 "use client"
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { createPost } from '@/redux/posts/postsSlice';
 import { AiOutlinePicture, AiOutlineCloseCircle } from 'react-icons/ai';
 import { FaUserCircle } from 'react-icons/fa';
 import { MdAddPhotoAlternate } from 'react-icons/md';
 import { BiLoaderCircle } from 'react-icons/bi';
+import { fetchUserDetails } from '@/redux/auth/authSlice';
 
 const PostForm = () => {
   const dispatch = useDispatch();
+  const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
   const [showImageInput, setShowImageInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchUserDetails());
+    }
+  }, [isLoggedIn, dispatch]);
 
   // Function to validate the input
   const validate = () => {
@@ -51,13 +59,13 @@ const PostForm = () => {
   return (
     <form onSubmit={handleSubmit} className="bg-white p-6 rounded-xl shadow-lg transition-transform hover:scale-105">
       <div className="flex items-center mb-4">
-        <FaUserCircle className="w-12 h-12 text-gray-400 mr-3" />
+        <img className="w-12 h-12 mr-3 object-cover rounded-full shadow-md" src={userDetails?.profilePicture} />
         <h4 className="font-semibold text-gray-800 text-lg">What's on your mind?</h4>
       </div>
       <textarea
         className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300 shadow-sm"
         rows="4"
-        placeholder="Share your thoughts..."
+        placeholder={`Share your thoughts ${userDetails?.fullName}...`}
         value={content}
         onChange={(e) => setContent(e.target.value)}
       />
