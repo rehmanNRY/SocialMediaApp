@@ -20,10 +20,7 @@ export const createPost = asyncHandler(async (req, res, next) => {
       .populate('likes', 'fullName') // Populate post's likes with user details
       .lean();
 
-    // Add an empty comments array
-    const postWithComments = { ...populatedPost, comments: [] };
-
-    res.status(201).json(new ApiResponse(201, 'Post created successfully', postWithComments));
+    res.status(201).json(new ApiResponse(201, 'Post created successfully', populatedPost));
   } catch (error) {
     next(new ApiError(500, 'Failed to create post'));
   }
@@ -39,20 +36,7 @@ export const getAllPosts = asyncHandler(async (req, res, next) => {
       .populate('likes', 'fullName') // Populate post's likes with user details
       .lean(); // Use .lean() for better performance and mutability
 
-    // Map through each post to get the comments and their respective user details
-    const postsWithComments = await Promise.all(
-      posts.map(async (post) => {
-        // Fetch comments for the current post and populate the user details
-        const comments = await Comment.find({ post: post._id })
-          .populate('user', 'fullName') // Populate comment's user details
-          .lean();
-
-        // Add the comments array to each post
-        return { ...post, comments };
-      })
-    );
-
-    res.status(200).json(new ApiResponse(200, 'All posts fetched successfully', postsWithComments));
+    res.status(200).json(new ApiResponse(200, 'All posts fetched successfully', posts));
   } catch (error) {
     next(new ApiError(500, 'Failed to fetch posts'));
   }
@@ -94,7 +78,10 @@ export const deletePost = asyncHandler(async (req, res, next) => {
     return next(new ApiError(404, 'Post not found or you are not authorized to delete this post'));
   }
 
-  res.status(200).json(new ApiResponse(200, 'Post deleted successfully'));
+  // Delete all comments associated with the deleted post
+  await Comment.deleteMany({ post: postId });
+
+  res.status(200).json(new ApiResponse(200, 'Post and its comments deleted successfully'));
 });
 
 // Like or unlike a post

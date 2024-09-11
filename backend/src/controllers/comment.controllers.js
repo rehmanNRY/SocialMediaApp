@@ -14,7 +14,11 @@ export const postComment = asyncHandler(async (req, res, next) => {
         content,
     });
 
-    res.status(201).json(new ApiResponse(201, 'Comment posted successfully', comment));
+    const populatedComment = await Comment.findById(comment._id)
+    .populate('user', 'fullName profilePicture') // Populate post's user details
+    .lean();
+
+    res.status(201).json(new ApiResponse(201, 'Comment posted successfully', populatedComment));
 });
 
 // Controller to edit a comment
@@ -32,7 +36,11 @@ export const editComment = asyncHandler(async (req, res, next) => {
     comment.content = content;
     await comment.save();
 
-    res.status(200).json(new ApiResponse(200, 'Comment updated successfully', comment));
+    const populatedComment = await Comment.findById(comment._id)
+    .populate('user', 'fullName profilePicture') // Populate post's user details
+    .lean();
+
+    res.status(200).json(new ApiResponse(200, 'Comment updated successfully', populatedComment));
 });
 
 // Controller to delete a comment
@@ -54,7 +62,7 @@ export const getCommentsByPost = asyncHandler(async (req, res, next) => {
     const { postId } = req.params;
 
     // Fetch all comments for the given post
-    const comments = await Comment.find({ post: postId }).populate('user', 'name');
+    const comments = await Comment.find({ post: postId }).populate('user', 'fullName profilePicture');
 
     res.status(200).json(new ApiResponse(200, 'Comments fetched successfully', comments));
 });
@@ -82,7 +90,11 @@ export const toggleLikeComment = asyncHandler(async (req, res, next) => {
 
     await comment.save();
 
-    res.status(200).json(new ApiResponse(200, isLiked ? 'Comment disliked' : 'Comment liked', comment));
+    const populatedComment = await Comment.findById(comment._id)
+    .populate('user', 'fullName profilePicture') // Populate post's user details
+    .lean();
+
+    res.status(200).json(new ApiResponse(200, isLiked ? 'Comment disliked' : 'Comment liked', populatedComment));
 });
 
 // Controller to get the list of all users who liked a comment
@@ -90,7 +102,7 @@ export const getUsersWhoLikedComment = asyncHandler(async (req, res, next) => {
     const { commentId } = req.params;
 
     // Find the comment and populate the likes with user details
-    const comment = await Comment.findById(commentId).populate('likes', 'name email');
+    const comment = await Comment.findById(commentId).populate('likes', 'fullName profilePicture');
     if (!comment) {
         return next(new ApiError(404, 'Comment not found'));
     }

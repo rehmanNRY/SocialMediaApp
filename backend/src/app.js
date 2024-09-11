@@ -21,7 +21,7 @@ import postRoute from "./routes/post.routes.js"
 import saves from "./routes/saves.routes.js"
 import userRoute from "./routes/user.routes.js"
 
-app.use("/api/comment", commentRoute);
+app.use("/api/comments", commentRoute);
 app.use("/api/friendRequests", friendRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/saves", saves);
