@@ -84,34 +84,29 @@ const PostCard = ({ post }) => {
             <p className="text-xs text-gray-600">{timePassed(post.createdAt)}</p>
           </div>
         </div>
-        <div className="flex space-x-4 text-gray-600">
-          {userDetails?._id === post.user._id && (
-            <>
-              {!isEditing ? <button
-                onClick={handleEditPost}
-                className="hover:text-blue-500 transition text-xl"
-              >
-                <FiEdit />
-              </button> : <button
-                type="submit"
-                onClick={handleEditPost}
-                className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg hover:bg-blue-700 transition duration-300 flex items-center space-x-2 text-sm"
-              >
-                <FiEdit className="w-4 h-4" />
-                <span>Save changes</span>
-              </button>}
-              <button
-                onClick={handleDeletePost}
-                className="hover:text-red-500 transition text-xl"
-              >
-                <FiTrash2 />
-              </button>
-            </>
-          )}
-          <button className="hover:text-yellow-500 transition text-xl">
-            <FiBookmark />
-          </button>
-        </div>
+        {userDetails?._id === post.user._id && (
+          <div className="flex space-x-4 text-gray-600">
+            {!isEditing ? <button
+              onClick={handleEditPost}
+              className="hover:text-blue-500 transition text-xl"
+            >
+              <FiEdit />
+            </button> : <button
+              type="submit"
+              onClick={handleEditPost}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg hover:bg-blue-700 transition duration-300 flex items-center space-x-2 text-sm"
+            >
+              <FiEdit className="w-4 h-4" />
+              <span>Save changes</span>
+            </button>}
+            <button
+              onClick={handleDeletePost}
+              className="hover:text-red-500 transition text-xl"
+            >
+              <FiTrash2 />
+            </button>
+          </div>
+        )}
       </div>
 
       {isEditing ? (

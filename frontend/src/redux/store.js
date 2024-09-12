@@ -4,6 +4,7 @@ import friendRequestsReducer from './friendRequests/friendRequestsSlice';
 import postsReducer from './posts/postsSlice';
 import authReducer  from './auth/authSlice';
 import commentsReducer  from './comments/commentsSlice';
+import savedItemsReducer  from './savedItems/savedItemsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     posts: postsReducer,
     auth: authReducer,
     comments: commentsReducer,
+    savedItems: savedItemsReducer,
   },
 });
 

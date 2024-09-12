@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getCommentsByPost } from "@/redux/comments/commentsSlice";
-import CommentItem from "./CommentItem"; // Use the updated Comment component
+import CommentItem from "./CommentItem";
 
 const CommentList = ({ postId }) => {
   const dispatch = useDispatch();

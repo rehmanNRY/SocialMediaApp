@@ -1,7 +1,18 @@
+"use client"
 import PostForm from "@/components/feed/posts/PostForm";
 import PostList from "@/components/feed/posts/PostList";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllPosts } from '@/redux/posts/postsSlice';
 
 export default function Home() {
+  const dispatch = useDispatch();
+  const posts = useSelector((state) => state.posts.posts);
+
+  useEffect(() => {
+    dispatch(getAllPosts());
+  }, [dispatch]);
+
   return (
     <main className="bg-[#F5F6FA] mx-auto p-4 space-y-6 w-full">
       <div className="flex mb-4">
@@ -21,7 +32,7 @@ export default function Home() {
         </ul>
       </div>
       <PostForm />
-      <PostList />
+      <PostList posts={posts} />
     </main>
   );
 }

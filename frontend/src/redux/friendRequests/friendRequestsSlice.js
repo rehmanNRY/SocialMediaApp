@@ -9,8 +9,7 @@ export const sendFriendRequest = createAsyncThunk(
   async (receiverId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/friendRequests/send', { receiverId });
-      console.log(response.data);
-      return response.data;
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -23,7 +22,8 @@ export const acceptFriendRequest = createAsyncThunk(
   async (requestId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/friendRequests/accept', { requestId });
-      return response.data;
+      return {data: response.data, requestId};
+
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -35,8 +35,8 @@ export const rejectFriendRequest = createAsyncThunk(
   'friendRequests/rejectFriendRequest',
   async (requestId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post('/friendRequests/reject', { requestId });
-      return response.data;
+      const response = await axiosInstance.delete('/friendRequests/reject', { data: { requestId } });
+      return {data: response.data, requestId};
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -49,7 +49,6 @@ export const fetchSentRequests = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get('/friendRequests/sent');
-      console.log("fds",response.data)
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -83,6 +82,33 @@ export const fetchFriendsList = createAsyncThunk(
   }
 );
 
+// Cancel a sent friend request
+export const cancelSentRequest = createAsyncThunk(
+  'friendRequests/cancelSentRequest',
+  async (requestId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.delete('/friendRequests/cancel', { data: { requestId } });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Unfriend a friend
+export const unfriend = createAsyncThunk(
+  'friendRequests/unfriend',
+  async (friendId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.delete('/friendRequests/unfriend', { data: { friendId } });
+      return { data: response.data, friendId };
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+
 const friendRequestsSlice = createSlice({
   name: 'friendRequests',
   initialState: {
@@ -99,16 +125,19 @@ const friendRequestsSlice = createSlice({
         state.sentRequests.push(action.payload);
       })
       .addCase(acceptFriendRequest.fulfilled, (state, action) => {
+        const acceptedRequestId = action.payload.requestId;
         state.receivedRequests = state.receivedRequests.filter(
-          (req) => req.id !== action.payload.requestId
+          (req) => req._id !== acceptedRequestId
         );
-        state.friendsList.push(action.payload);
+        state.friendsList.push(action.payload.data);
       })
       .addCase(rejectFriendRequest.fulfilled, (state, action) => {
+        const rejectedRequestId = action.payload.requestId;
         state.receivedRequests = state.receivedRequests.filter(
-          (req) => req.id !== action.payload.requestId
+          (req) => req._id !== rejectedRequestId
         );
       })
+
       .addCase(fetchSentRequests.fulfilled, (state, action) => {
         state.sentRequests = action.payload;
       })
@@ -117,6 +146,18 @@ const friendRequestsSlice = createSlice({
       })
       .addCase(fetchFriendsList.fulfilled, (state, action) => {
         state.friendsList = action.payload;
+      })
+      .addCase(cancelSentRequest.fulfilled, (state, action) => {
+        const canceledRequestId = action.meta.arg;
+        state.sentRequests = state.sentRequests.filter(
+          (req) => req._id !== canceledRequestId
+        );
+      })
+      .addCase(unfriend.fulfilled, (state, action) => {
+        const removedFriendId = action.payload.friendId;
+        state.friendsList = state.friendsList.filter(
+          (friend) => friend._id !== removedFriendId
+        );
       })
       .addMatcher(
         (action) => action.type.endsWith('/rejected'),
