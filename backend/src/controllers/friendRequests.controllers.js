@@ -65,7 +65,8 @@ export const rejectFriendRequest = asyncHandler(async (req, res, next) => {
 export const getSentRequests = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  const sentRequests = await FriendRequest.find({ sender: userId }).populate('receiver', 'name email');
+  const sentRequests = await FriendRequest.find({ sender: userId }).populate('receiver', 'fullName username bio profilePicture');
+
   res.status(200).json(new ApiResponse(200, 'Sent friend requests fetched successfully', sentRequests));
 });
 
@@ -73,7 +74,7 @@ export const getSentRequests = asyncHandler(async (req, res, next) => {
 export const getReceivedRequests = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  const receivedRequests = await FriendRequest.find({ receiver: userId }).populate('sender', 'name email');
+  const receivedRequests = await FriendRequest.find({ receiver: userId }).populate('sender', 'fullName username bio profilePicture');
   res.status(200).json(new ApiResponse(200, 'Received friend requests fetched successfully', receivedRequests));
 });
 
@@ -81,10 +82,50 @@ export const getReceivedRequests = asyncHandler(async (req, res, next) => {
 export const getFriendsList = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  const user = await User.findById(userId).populate('friends', 'name email');
+  const user = await User.findById(userId).populate('friends', 'fullName username bio profilePicture');
   if (!user) {
     return next(new ApiError(404, 'User not found'));
   }
 
   res.status(200).json(new ApiResponse(200, 'Friends list fetched successfully', user.friends));
+});
+
+
+// Cancel a sent friend request
+export const cancelSentRequest = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const { requestId } = req.body;
+
+  // Find and delete the sent friend request
+  const friendRequest = await FriendRequest.findOneAndDelete({
+    _id: requestId,
+    sender: userId,
+  });
+
+  if (!friendRequest) {
+    return next(new ApiError(404, 'Friend request not found or already cancelled'));
+  }
+
+  res.status(200).json(new ApiResponse(200, 'Friend request cancelled successfully'));
+});
+
+
+// Unfriend a friend
+export const unfriend = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const { friendId } = req.body;
+
+  // Check if the friend exists in the user's friends list
+  const user = await User.findById(userId);
+  const friend = await User.findById(friendId);
+
+  if (!user || !friend) {
+    return next(new ApiError(404, 'User or friend not found'));
+  }
+
+  // Remove each other from friends list
+  await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } });
+  await User.findByIdAndUpdate(friendId, { $pull: { friends: userId } });
+
+  res.status(200).json(new ApiResponse(200, 'Friend removed successfully'));
 });

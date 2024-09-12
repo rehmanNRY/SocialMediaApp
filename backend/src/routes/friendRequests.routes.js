@@ -7,7 +7,9 @@ import {
   rejectFriendRequest,
   getSentRequests,
   getReceivedRequests,
-  getFriendsList
+  getFriendsList,
+  cancelSentRequest,
+  unfriend,
 } from '../controllers/friendRequests.controllers.js';
 
 const router = express.Router();
@@ -29,5 +31,11 @@ router.get('/received', fetchUser, getReceivedRequests);
 
 // Route to get list of all friends
 router.get('/friends', fetchUser, getFriendsList);
+
+// Route to cancel a sent friend request
+router.delete('/cancel', fetchUser, cancelSentRequest);
+
+// Route to unfriend a friend
+router.delete('/unfriend', fetchUser, unfriend);
 
 export default router;
