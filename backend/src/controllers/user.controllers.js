@@ -5,6 +5,7 @@ import { User } from '../models/user.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import { FriendRequest } from '../models/friendRequests.model.js';
 
 // Register a new user
 export const registerUser = asyncHandler(async (req, res, next) => {
@@ -44,15 +45,35 @@ export const getUserDetails = asyncHandler(async (req, res, next) => {
 
 // Get details of the user using id
 export const userDetails = asyncHandler(async (req, res, next) => {
-  const {userId} = req.body;
-  console.log(userId)
+  // Access userId from the URL parameters
+  const { userId } = req.params;
+
+  // Fetch the user from the database
   const user = await User.findById(userId).select('-password');
+
+  // Check if user exists
   if (!user) {
     return next(new ApiError(404, 'User not found'));
   }
 
-  res.status(200).json(new ApiResponse(200, 'User details fetched successfully', user));
+  // Get the list of users who have sent friend requests to this user (followers)
+  const followers = await FriendRequest.find({ receiver: userId }).select('sender');
+  const followersList = followers.map((request) => request.sender);
+
+  // Get the list of users to whom this user has sent friend requests (following)
+  const following = await FriendRequest.find({ sender: userId }).select('receiver');
+  const followingList = following.map((request) => request.receiver);
+
+  // Send the user details along with followers and following lists in the response
+  res.status(200).json(
+    new ApiResponse(200, 'User details fetched successfully', {
+      ...user.toObject(),
+      followers: followersList,
+      following: followingList,
+    })
+  );
 });
+
 
 // Login a user
 export const loginUser = asyncHandler(async (req, res, next) => {
@@ -117,3 +138,4 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
 
   res.status(200).json(new ApiResponse(200, 'All users fetched successfully', users));
 });
+

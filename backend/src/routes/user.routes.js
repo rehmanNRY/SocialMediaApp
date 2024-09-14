@@ -23,7 +23,7 @@ router.post('/login', loginUser);
 router.get('/me', fetchUser, getUserDetails);
 
 // Route to get details of user using id
-router.get('/userDetails', userDetails);
+router.get('/userDetails/:userId', userDetails);
 
 // Route to reset the password
 router.put('/reset-password', fetchUser, resetPassword);
