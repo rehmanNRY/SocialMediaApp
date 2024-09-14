@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { setLoggedIn } from "@/redux/auth/authSlice";
 import Link from "next/link";
+import UnAuthRedirect from "@/components/UnAuthRedirect";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -77,6 +78,7 @@ export default function LoginPage() {
   };
 
   return (
+    <UnAuthRedirect>
     <div className="min-h-screen flex items-center justify-center bg-indigo-100 p-6 w-screen">
       <form
         onSubmit={handleSubmit}
@@ -138,5 +140,6 @@ export default function LoginPage() {
         </p>
       </form>
     </div>
+    </UnAuthRedirect>
   );
 }

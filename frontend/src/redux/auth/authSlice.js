@@ -24,8 +24,7 @@ export const fetchUserDetails = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get('/user/me');
-      // console.log(response.data);
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data || 'Failed to fetch user details');
     }
@@ -58,11 +57,17 @@ const authSlice = createSlice({
       })
       .addCase(fetchUserDetails.fulfilled, (state, action) => {
         state.loading = false;
-        state.userDetails = action.payload;
+        state.userDetails = action.payload.data;
       })
       .addCase(fetchUserDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        // Check for specific error message and set logged-in state accordingly
+        if (action.payload?.error === 'Pls authenticate using a valid token') {
+          state.isLoggedIn = false;
+          localStorage.removeItem('authToken');
+          state.userDetails = null;
+        }
       });
   },
 });

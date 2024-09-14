@@ -8,8 +8,10 @@ const CommentForm = ({ postId }) => {
   const dispatch = useDispatch();
   const [content, setContent] = useState('');
   const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     if (isLoggedIn) {
       dispatch(fetchUserDetails());
     }
@@ -23,26 +25,31 @@ const CommentForm = ({ postId }) => {
     }
   };
 
+  if (!isClient) {
+    return null; // Render nothing until client-side rendering is confirmed
+  }
   return (
-    <form onSubmit={handleSubmit} className="flex items-center space-x-2 mb-4">
-      <img
-        className="w-10 h-10 rounded-full bg-gray-300 object-cover"
-        src={userDetails?.profilePicture}
-      />
-      <input
-        type="text"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        className="flex-1 p-2 border border-gray-300 rounded-lg"
-        placeholder="Add a comment..."
-      />
-      <button
-        type="submit"
-        className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
-      >
-        Comment
-      </button>
-    </form>
+    <>
+      {isLoggedIn && <form onSubmit={handleSubmit} className={`flex items-center space-x-2 mb-4`}>
+        <img
+          className="w-10 h-10 rounded-full bg-gray-300 object-cover"
+          src={userDetails?.profilePicture}
+        />
+        <input
+          type="text"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          className="flex-1 p-2 border border-gray-300 rounded-lg"
+          placeholder="Add a comment..."
+        />
+        <button
+          type="submit"
+          className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+        >
+          Comment
+        </button>
+      </form>}
+    </>
   );
 };
 

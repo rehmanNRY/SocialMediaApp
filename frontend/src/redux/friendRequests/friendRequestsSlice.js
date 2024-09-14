@@ -6,9 +6,10 @@ import axiosInstance from '@/api/axiosInstance';
 // Send a friend request
 export const sendFriendRequest = createAsyncThunk(
   'friendRequests/sendFriendRequest',
-  async (receiverId, { rejectWithValue }) => {
+  async (receiverId, { rejectWithValue, dispatch }) => {
     try {
       const response = await axiosInstance.post('/friendRequests/send', { receiverId });
+      dispatch(fetchSentRequests()); // Ensure this is called only after successful request
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -16,13 +17,14 @@ export const sendFriendRequest = createAsyncThunk(
   }
 );
 
+
 // Accept a friend request
 export const acceptFriendRequest = createAsyncThunk(
   'friendRequests/acceptFriendRequest',
   async (requestId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post('/friendRequests/accept', { requestId });
-      return {data: response.data, requestId};
+      return { data: response.data, requestId };
 
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -36,7 +38,7 @@ export const rejectFriendRequest = createAsyncThunk(
   async (requestId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.delete('/friendRequests/reject', { data: { requestId } });
-      return {data: response.data, requestId};
+      return { data: response.data, requestId };
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
@@ -121,9 +123,10 @@ const friendRequestsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(sendFriendRequest.fulfilled, (state, action) => {
-        state.sentRequests.push(action.payload);
-      })
+    builder
+    .addCase(sendFriendRequest.fulfilled, (state, action) => {
+      state.sentRequests.push(action.payload);
+    })    
       .addCase(acceptFriendRequest.fulfilled, (state, action) => {
         const acceptedRequestId = action.payload.requestId;
         state.receivedRequests = state.receivedRequests.filter(

@@ -16,8 +16,11 @@ const PostForm = () => {
   const [showImageInput, setShowImageInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isClient, setIsClient] = useState(false);
+
 
   useEffect(() => {
+    setIsClient(true); // Mark component as client-rendered
     if (isLoggedIn) {
       dispatch(fetchUserDetails());
     }
@@ -49,11 +52,14 @@ const PostForm = () => {
       setLoading(false);
     }
   };
-
+  if (!isClient) {
+    return null; // Render nothing until client-side rendering is confirmed
+  }
   return (
-    <form 
+    <>
+    {isLoggedIn && <form 
       onSubmit={handleSubmit} 
-      className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 transform hover:scale-[1.02] transition-all duration-300"
+      className={`bg-white p-6 rounded-xl shadow-lg border border-gray-200`}
     >
       <div className="flex items-center mb-4 space-x-3">
         <img className="w-12 h-12 object-cover rounded-full shadow-md" src={userDetails?.profilePicture} />
@@ -122,7 +128,8 @@ const PostForm = () => {
       </div>
 
       {errors.api && <p className="text-red-500 text-sm mt-2">{errors.api}</p>}
-    </form>
+    </form>}
+    </>  
   );
 };
 
