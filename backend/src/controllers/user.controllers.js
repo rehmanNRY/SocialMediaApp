@@ -31,6 +31,29 @@ export const registerUser = asyncHandler(async (req, res, next) => {
   res.status(201).json(new ApiResponse(201, 'User registered successfully', { id: user._id }));
 });
 
+// Login a user
+export const loginUser = asyncHandler(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return next(new ApiError(400, 'Invalid credentials'));
+  }
+
+  // Check the password
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    return next(new ApiError(400, 'Invalid credentials'));
+  }
+
+  // Generate JWT token
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+
+  res.status(200).json(new ApiResponse(200, 'User logged in successfully', { token }));
+});
+
 // Get details of the logged-in user
 export const getUserDetails = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
@@ -74,64 +97,6 @@ export const userDetails = asyncHandler(async (req, res, next) => {
   );
 });
 
-
-// Login a user
-export const loginUser = asyncHandler(async (req, res, next) => {
-  const { email, password } = req.body;
-
-  const user = await User.findOne({ email });
-  if (!user) {
-    return next(new ApiError(400, 'Invalid credentials'));
-  }
-
-  // Check the password
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    return next(new ApiError(400, 'Invalid credentials'));
-  }
-
-  // Generate JWT token
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  });
-
-  res.status(200).json(new ApiResponse(200, 'User logged in successfully', { token }));
-});
-
-// Reset password
-export const resetPassword = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id;
-  const { newPassword } = req.body;
-
-  const user = await User.findById(userId);
-  if (!user) {
-    return next(new ApiError(404, 'User not found'));
-  }
-
-  // Hash the new password
-  user.password = await bcrypt.hash(newPassword, 10);
-  await user.save();
-
-  res.status(200).json(new ApiResponse(200, 'Password reset successfully'));
-});
-
-// Update user details (name and bio)
-export const updateUserDetails = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id;
-  const { fullName, bio } = req.body;
-
-  const user = await User.findById(userId);
-  if (!user) {
-    return next(new ApiError(404, 'User not found'));
-  }
-
-  user.fullName = fullName || user.fullName;
-  user.bio = bio || user.bio;
-  await user.save();
-
-  res.status(200).json(new ApiResponse(200, 'User details updated successfully', user));
-});
-
 // Get all users
 export const getAllUsers = asyncHandler(async (req, res, next) => {
   const users = await User.find().select('-password -email');
@@ -139,3 +104,45 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, 'All users fetched successfully', users));
 });
 
+// Update user profile
+export const updateUser = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;  // Assuming the user is authenticated and the ID is in `req.user`
+  const {
+    username,
+    fullName,
+    email,
+    password,
+    profilePicture,
+    coverImage,
+    location,
+    bio,
+    dob,
+  } = req.body;
+
+  // Find the user in the database
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new ApiError(404, 'User not found'));
+  }
+
+  // Update fields if provided
+  if (username) user.username = username;
+  if (fullName) user.fullName = fullName;
+  if (email) user.email = email;
+  if (profilePicture) user.profilePicture = profilePicture;
+  if (coverImage) user.coverImage = coverImage;
+  if (location) user.location = location;
+  if (bio) user.bio = bio;
+  if (dob) user.dob = dob;
+
+  // Hash the new password if provided
+  if (password) {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+  }
+
+  // Save the updated user
+  await user.save();
+
+  res.status(200).json(new ApiResponse(200, 'User updated successfully', user));
+});

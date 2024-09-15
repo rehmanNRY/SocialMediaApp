@@ -5,10 +5,9 @@ import {
   registerUser,
   getUserDetails,
   loginUser,
-  resetPassword,
-  updateUserDetails,
   getAllUsers,
   userDetails,
+  updateUser,
 } from '../controllers/user.controllers.js';
 
 const router = express.Router();
@@ -25,13 +24,10 @@ router.get('/me', fetchUser, getUserDetails);
 // Route to get details of user using id
 router.get('/userDetails/:userId', userDetails);
 
-// Route to reset the password
-router.put('/reset-password', fetchUser, resetPassword);
-
-// Route to update user details (name and bio)
-router.put('/update', fetchUser, updateUserDetails);
-
 // Route to get all users
 router.get('/', getAllUsers);
+
+// Route to update the user profile
+router.put('/update', fetchUser, updateUser); 
 
 export default router;

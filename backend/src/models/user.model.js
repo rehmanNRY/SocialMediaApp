@@ -25,10 +25,21 @@ const UserSchema = new Schema({
     type: String,
     default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNpTKcwSR1d8nsU3xEVHSwOYbq9VM9Fz65p8AeAuJEn31XiwoB5ApWSLFq8PTIjWJ0e3Y&usqp=CAU',
   },
+  coverImage: {
+    type: String,
+    default: 'https://ih1.redbubble.net/cover.4093136.2400x600.jpg',
+  },
   bio: {
     type: String,
     maxLength: 160,
     default: "Using MERN app by Abdul Rehman",
+  },
+  location: {
+    type: String,
+    trim: true,
+  },
+  dob: {
+    type: Date,
   },
   friends: [{
     type: Schema.Types.ObjectId,
