@@ -84,7 +84,7 @@ const FriendsSuggestion = () => {
       >
         <h2 className="text-3xl font-bold text-gray-800 mb-8">People You May Know</h2>
         {users.length > 0 ? (
-          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <ul className="grid grid-cols-1 gap-4">
             {users.map((user) => {
               const isFriend = friendsList.some((friend) => friend._id === user._id);
               const hasSentRequest = sentRequests.some((req) => req.receiver._id === user._id);
@@ -95,7 +95,7 @@ const FriendsSuggestion = () => {
               return (
                 <li
                   key={user._id}
-                  className="flex items-center justify-between p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 w-full"
+                  className="flex items-center justify-between p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 w-full flex-wrap"
                 >
                   <div className="flex items-center">
                     <img

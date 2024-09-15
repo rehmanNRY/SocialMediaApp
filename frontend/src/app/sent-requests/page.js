@@ -54,13 +54,13 @@ const SentRequests = () => {
                 <div className="flex space-x-4">
                   <button
                     onClick={() => handleCancelRequest(user._id)}
-                    className="flex items-center px-5 py-3 text-sm font-medium text-red-600 border border-red-600 rounded-full hover:bg-red-50 transition duration-300"
+                    className="flex items-center px-4 py-2 text-sm font-medium bg-red-600 border border-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
                   >
                     <FiUserCheck className="mr-2 w-5 h-5" />
                     Cancel
                   </button>
                   <Link href={`profile/${user.receiver._id}`}>
-                    <button className="flex items-center px-5 py-3 text-sm font-medium text-blue-600 border border-blue-600 rounded-full hover:bg-blue-50 transition duration-300">
+                    <button className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition duration-300">
                       <FiEye className="mr-2 w-5 h-5" />
                       View Profile
                     </button>

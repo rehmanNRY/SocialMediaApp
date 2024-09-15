@@ -71,7 +71,7 @@ const PostCard = ({ post }) => {
   const userHasLiked = likers.some((liker) => liker._id === userDetails?._id);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg mb-6 relative hover:shadow-2xl">
+    <div className="bg-white p-6 rounded-xl shadow-md mb-6 relative hover:shadow-2xl">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
           <img
@@ -125,7 +125,7 @@ const PostCard = ({ post }) => {
         <img
           src={post.image}
           alt="Post"
-          className="w-full rounded-lg mb-4 object-cover"
+          className="w-full rounded-lg mb-4 object-cover max-h-[28rem]"
         />
       )}
       <LikeSection
