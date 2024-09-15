@@ -1,8 +1,9 @@
-'use client'; // Required for Next.js App Router to use client-side hooks
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation'; // Next.js 14 App Router useRouter
+import Loading from './Loading';
 
 const AuthRedirect = ({ children }) => {
   const { isLoggedIn } = useSelector((state) => state.auth);
@@ -19,7 +20,7 @@ const AuthRedirect = ({ children }) => {
   }, [isLoggedIn, router]);
 
   if (!isClient) {
-    return <div className='h-screen w-screen fixed top-0 left-0 z-10 flex items-center justify-center font-bold text-white bg-black text-3xl'>Hey, Building page for you ;-)</div>;
+    return <Loading />;
   }
 
   return <>{isLoggedIn && children}</>;

@@ -1,127 +1,85 @@
-import React from 'react';
 import AuthRedirect from '@/components/AuthRedirect';
 
-const ContactPage = () => {
+export default function ContactPage() {
+  const socialMedia = [
+    { 
+      name: 'LinkedIn', 
+      link: 'https://www.linkedin.com/in/rehman-nry', 
+      icon: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png', 
+      description: 'Let’s connect professionally.', 
+      username: 'rehman-nry',
+    },
+    { 
+      name: 'GitHub', 
+      link: 'https://github.com/rehmanNRY', 
+      icon: 'https://cdn-icons-png.flaticon.com/512/25/25231.png', 
+      description: 'Check out my code and repositories.', 
+      username: 'rehmanNRY',
+    },
+    { 
+      name: 'Instagram', 
+      link: 'https://www.instagram.com/rehman_nry/',
+      icon: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Instagram_icon.png/2048px-Instagram_icon.png', 
+      description: 'Get a glimpse of my visual life.', 
+      username: 'rehman_nry',
+    },
+    { 
+      name: 'WhatsApp', 
+      link: 'https://wa.link/fcyw8d', 
+      icon: 'https://static.vecteezy.com/system/resources/thumbnails/016/716/480/small/whatsapp-icon-free-png.png', 
+      description: "Let's talk about programming!", 
+      username: '+923014340329', 
+    },
+  ];
+
   return (
     <AuthRedirect>
-      <div className="min-h-screen bg-gray-100 flex flex-col items-center p-6">
-        <h1 className="text-4xl font-bold text-gray-800 mb-8">Contact Us</h1>
-
-        <div className="w-full max-w-6xl bg-white rounded-lg shadow-lg p-8 grid md:grid-cols-2 gap-8">
-          {/* Contact Form */}
-          <form className="space-y-6">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Your Name"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-                Message
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                rows="4"
-                className="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Your message..."
-                required
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              className="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition duration-300"
+    <main className="bg-[#F5F6FA] text-gray-900 flex items-center justify-center px-6"
+    style={{ minHeight: "calc(100vh - 4.5rem)" }}
+    >
+      <div className="w-full max-w-6xl mx-auto text-center py-20">
+        <h1 className="text-2xl md:text-4xl font-bold mb-12 text-gray-800">
+          Let's Connect✨
+        </h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          {socialMedia.map((media) => (
+            <a
+              key={media.name}
+              href={media.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group p-6 bg-white rounded-xl border-2 border-gray-200 shadow-lg hover:shadow-2xl hover:border-blue-400 transition-all duration-300 transform hover:scale-105 cursor-pointer"
             >
-              Send Message
-            </button>
-          </form>
+              <div className="flex flex-col items-center">
+                <div className="p-4 rounded-full bg-blue-100">
+                  {/* Replace below with relevant SVG icons or images */}
+                  <img
+                    src={`${media.icon}`}
+                    alt={media.name}
+                    className="w-12 h-12"
+                  />
+                </div>
+                <h2 className="mt-4 text-2xl font-semibold group-hover:text-blue-600 transition-all">
+                  {media.name}
+                </h2>
+                <p className="mt-2 text-gray-600 group-hover:text-gray-900 transition-all">
+                  {media.description}
+                </p>
+                <p className="mt-1 text-sm font-medium text-gray-500 group-hover:text-gray-700">
+                  @{media.username}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
 
-          {/* Contact Details */}
-          <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-800">Get in Touch</h2>
-            <p className="text-gray-600">
-              We would love to hear from you! Whether you have a question about features, trials, pricing,
-              need a demo, or anything else, our team is ready to answer all your questions.
-            </p>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <svg
-                  className="w-6 h-6 text-blue-500 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M16 2a6 6 0 016 6v8a6 6 0 01-6 6H8a6 6 0 01-6-6V8a6 6 0 016-6h8z"
-                  ></path>
-                </svg>
-                <span className="text-gray-700">+1 (234) 567-890</span>
-              </div>
-              <div className="flex items-center">
-                <svg
-                  className="w-6 h-6 text-blue-500 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M16 12H8m4 8l-4-4h8l-4 4zM4 4l8 8-8 8"
-                  ></path>
-                </svg>
-                <span className="text-gray-700">contact@example.com</span>
-              </div>
-              <div className="flex items-center">
-                <svg
-                  className="w-6 h-6 text-blue-500 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 8v4l3 3m6-3.1V21H3V3h18v5.9M19 10l-5-5m0 0v8m0-8H6"
-                  ></path>
-                </svg>
-                <span className="text-gray-700">1234 Street Name, City, State, 56789</span>
-              </div>
-            </div>
-          </div>
+        <div className="mt-12">
+          <a target='_blank' href="https://rehman-nry.netlify.app/" className="px-8 py-4 bg-blue-500 text-white font-semibold rounded-full shadow-md hover:bg-blue-600 hover:shadow-xl transition-all duration-300">
+            Visit Portfolio
+          </a>
         </div>
       </div>
+    </main>
     </AuthRedirect>
   );
-};
-
-export default ContactPage;
+}

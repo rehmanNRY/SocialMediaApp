@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-.sidebar-item:hover .sidebar-item-border{
-  opacity: 1;
+.preLoader svg path,
+.preLoader svg rect{
+  fill: #6366F1;
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.svg-rotate {
+  animation: rotate 0.6s linear infinite;
+}
+
+.rightBar::-webkit-scrollbar{
+  display: none;
 }

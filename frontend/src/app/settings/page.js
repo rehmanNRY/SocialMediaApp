@@ -1,201 +1,252 @@
 "use client"
-import React from 'react';
-import { FaUserCog, FaLock, FaBell, FaEye, FaShieldAlt, FaLanguage, FaKey, FaUserSlash, FaUserShield } from 'react-icons/fa';
-import { FiEdit, FiChevronRight, FiEye } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import React, { useState } from "react";
+import axios from "axios";
+import {
+  FaUserCog,
+  FaEnvelope,
+  FaBirthdayCake,
+  FaMapMarkerAlt,
+  FaUserFriends,
+  FaUserPlus,
+  FaUserMinus,
+  FaInfoCircle,
+  FaUserEdit,
+  FaCamera,
+  FaImage,
+  FaAddressCard,
+  FaKey,
+} from "react-icons/fa";
+import { motion } from "framer-motion";
+import { FiChevronRight, FiSave, FiX } from "react-icons/fi";
+import AuthRedirect from '@/components/AuthRedirect';
+import { useDispatch } from "react-redux";
+import { updateUserDetails } from "@/redux/auth/authSlice";
 
 const SettingsPage = () => {
-  return (
-    <div className="settings-page min-h-screen bg-gray-100">
-      <div className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
-        <div className="settings-categories grid grid-cols-1 gap-6 p-8">
+  const [activeField, setActiveField] = useState(null);
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    fullName: "",
+    profilePicture: "",
+    coverImage: "",
+    dob: "",
+    location: "",
+    bio: "",
+  });
 
-          {/* Account Settings */}
-          <motion.div
-            className="setting-item bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
+  const handleEdit = (field) => {
+    setActiveField(field);
+  };
+
+  const handleCancel = () => {
+    setActiveField(null);
+  };
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [activeField]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    try {
+      const authToken = localStorage.getItem("authToken");
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/update`,
+        { ...formData },
+        {
+          headers: {
+            "auth-token": authToken,
+          },
+        }
+      );
+      console.log(response.data);
+      dispatch(updateUserDetails(response.data.data));
+      setActiveField(null);
+    } catch (error) {
+      console.error("Error updating user details:", error);
+    }
+  };
+
+  const renderEditForm = (field) => {
+    if (activeField !== field) return null;
+
+    return (
+      <div className="mt-4 p-4 bg-gray-200 rounded-lg">
+        <input
+          type="text"
+          placeholder={`Enter new ${field} ${field === 'dob' ? 'DD/MM/YYYY' : ''}`}
+          className="w-full p-2 mb-4 border border-gray-400 rounded-lg"
+          value={formData[field]}
+          onChange={handleInputChange}
+        />
+        <div className="flex gap-4">
+          <button
+            onClick={handleSave}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg"
           >
-            <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <FaUserCog className="text-blue-600" /> Account Settings
-            </h2>
-            <ul className="space-y-3">
-              {[
-                { title: 'Edit Profile', action: 'Edit', icon: <FiEdit /> },
-                { title: 'Change Password', action: 'Change', icon: <FaKey /> },
-                { title: 'Two-Factor Authentication', action: 'Manage', icon: <FaUserShield /> },
-                { title: 'Deactivate Account', action: 'Deactivate', danger: true, icon: <FaUserSlash /> },
-              ].map((item, index) => (
-                <motion.li
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition duration-200"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <span className="flex items-center gap-3">
-                    {item.icon}
-                     {item.title}
-                  </span>
-                  <button
-                    className={`text-sm font-semibold ${item.danger ? 'text-red-600' : 'text-blue-600'
-                      } hover:underline`}
-                  >
-                    {item.action}
-                  </button>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Privacy Settings */}
-          <motion.div
-            className="setting-item bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
+            <FiSave className="inline mr-1" /> Save Changes
+          </button>
+          <button
+            onClick={handleCancel}
+            className="bg-gray-400 text-white px-4 py-2 rounded-lg"
           >
-            <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <FaLock className="text-blue-600" /> Privacy Settings
-            </h2>
-            <ul className="space-y-3">
-              {[
-                { title: 'Profile Visibility', action: 'Edit', icon: <FaEye /> },
-                { title: 'Blocked Users', action: 'Manage', icon: <FaUserSlash /> },
-                { title: 'Activity Status', action: 'Edit', icon: <FiEdit /> },
-              ].map((item, index) => (
-                <motion.li
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition duration-200"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <span className="flex items-center gap-3">
-                    {item.icon}
-                     {item.title}
-                  </span>
-                  <button className="text-blue-600 font-semibold text-sm hover:underline">{item.action}</button>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Notification Settings */}
-          <motion.div
-            className="setting-item bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <FaBell className="text-blue-600" /> Notification Settings
-            </h2>
-            <ul className="space-y-3">
-              {[
-                { title: 'Push Notifications', action: 'Edit', icon: <FaBell /> },
-                { title: 'Email Notifications', action: 'Edit', icon: <FaBell /> },
-                { title: 'SMS Notifications', action: 'Edit', icon: <FaBell /> },
-              ].map((item, index) => (
-                <motion.li
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition duration-200"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <span className="flex items-center gap-3">
-                    {item.icon}
-                     {item.title}
-                  </span>
-                  <button className="text-blue-600 font-semibold text-sm hover:underline">{item.action}</button>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Appearance Settings */}
-          <motion.div
-            className="setting-item bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <FaEye className="text-blue-600" /> Appearance
-            </h2>
-            <ul className="space-y-3">
-              {[
-                { title: 'Theme', action: 'Change', icon: <FaEye /> },
-                { title: 'Font Size', action: 'Edit', icon: <FiEdit /> },
-              ].map((item, index) => (
-                <motion.li
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition duration-200"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <span className="flex items-center gap-3">
-                    {item.icon}
-                     {item.title}
-                  </span>
-                  <button className="text-blue-600 font-semibold text-sm hover:underline">{item.action}</button>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Security Settings */}
-          <motion.div
-            className="setting-item bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <FaShieldAlt className="text-blue-600" /> Security Settings
-            </h2>
-            <ul className="space-y-3">
-              {[
-                { title: 'Login Alerts', action: 'Manage', icon: <FaShieldAlt /> },
-                { title: 'Recent Login Activity', action: 'View', icon: <FiEye /> },
-              ].map((item, index) => (
-                <motion.li
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition duration-200"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <span className="flex items-center gap-3">
-                    {item.icon}
-                     {item.title}
-                  </span>
-                  <button className="text-blue-600 font-semibold text-sm hover:underline">{item.action}</button>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          {/* Language & Region */}
-          <motion.div
-            className="setting-item bg-gray-50 p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.2 }}
-          >
-            <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
-              <FaLanguage className="text-blue-600" /> Language & Region
-            </h2>
-            <ul className="space-y-3">
-              {[
-                { title: 'Language', action: 'Edit', icon: <FaLanguage /> },
-                { title: 'Time Zone', action: 'Edit', icon: <FaLanguage /> },
-              ].map((item, index) => (
-                <motion.li
-                  key={index}
-                  className="flex justify-between items-center p-3 bg-white rounded-lg hover:bg-gray-100 transition duration-200"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  <span className="flex items-center gap-3">
-                    {item.icon}
-                     {item.title}
-                  </span>
-
-                  <button className="text-blue-600 font-semibold text-sm hover:underline">{item.action}</button>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
+            <FiX className="inline mr-1" /> Cancel
+          </button>
         </div>
       </div>
-    </div>
+    );
+  };
+
+  return (
+    <AuthRedirect>
+      <div className="mx-auto bg-[#F5F6FA] shadow-lg rounded-lg overflow-hidden min-h-screen w-full">
+          <div className="settings-categories grid grid-cols-1 gap-6 p-8">
+            <motion.div
+              className="setting-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                <FaUserCog className="text-blue-600" /> Account Information
+              </h2>
+              <ul className="space-y-3">
+                {[
+                  { title: "Username", icon: <FaUserEdit />, field: "username" },
+                  { title: "Email Address", icon: <FaEnvelope />, field: "email" },
+                  { title: "Password", icon: <FaKey />, field: "password" },
+                ].map((item, index) => (
+                  <motion.li
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-200"
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => handleEdit(item.field)}
+                  >
+                    <span className="flex items-center gap-3">
+                      {item.icon}
+                      {item.title}
+                    </span>
+                    <button className="text-blue-600 font-semibold text-sm hover:underline">
+                      Modify
+                    </button>
+                  </motion.li>
+                ))}
+              </ul>
+              {renderEditForm("username")}
+              {renderEditForm("email")}
+              {renderEditForm("password")}
+            </motion.div>
+
+            <motion.div
+              className="setting-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                <FaAddressCard className="text-blue-600" /> Personal Details
+              </h2>
+              <ul className="space-y-3">
+                {[
+                  { title: "Full Name", icon: <FaUserEdit />, field: "fullName" },
+                  {
+                    title: "Profile Picture",
+                    icon: <FaCamera />,
+                    field: "profilePicture",
+                  },
+                  { title: "Cover Image", icon: <FaImage />, field: "coverImage" },
+                ].map((item, index) => (
+                  <motion.li
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-200"
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => handleEdit(item.field)}
+                  >
+                    <span className="flex items-center gap-3">
+                      {item.icon}
+                      {item.title}
+                    </span>
+                    <button className="text-blue-600 font-semibold text-sm hover:underline">
+                      Adjust
+                    </button>
+                  </motion.li>
+                ))}
+              </ul>
+              {renderEditForm("fullName")}
+              {renderEditForm("profilePicture")}
+              {renderEditForm("coverImage")}
+            </motion.div>
+
+            <motion.div
+              className="setting-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                <FaInfoCircle className="text-blue-600" /> Demographic Information
+              </h2>
+              <ul className="space-y-3">
+                {[
+                  {
+                    title: "Date of Birth",
+                    icon: <FaBirthdayCake />,
+                    field: "dob",
+                  },
+                  { title: "Location", icon: <FaMapMarkerAlt />, field: "location" },
+                  { title: "Bio/Description", icon: <FaInfoCircle />, field: "bio" },
+                ].map((item, index) => (
+                  <motion.li
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-200"
+                    whileHover={{ scale: 1.02 }}
+                    onClick={() => handleEdit(item.field)}
+                  >
+                    <span className="flex items-center gap-3">
+                      {item.icon}
+                      {item.title}
+                    </span>
+                    <button className="text-blue-600 font-semibold text-sm hover:underline">
+                      Revise
+                    </button>
+                  </motion.li>
+                ))}
+              </ul>
+              {renderEditForm("dob")}
+              {renderEditForm("location")}
+              {renderEditForm("bio")}
+            </motion.div>
+
+            <motion.div
+              className="setting-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition duration-200"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-4">
+                <FaUserFriends className="text-blue-600" /> Social Connections
+              </h2>
+              <ul className="space-y-3">
+                {[
+                  { title: "Friends", icon: <FaUserPlus /> },
+                  { title: "Followers", icon: <FaUserMinus /> },
+                  { title: "Following", icon: <FaUserFriends /> },
+                ].map((item, index) => (
+                  <motion.li
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-200"
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <span className="flex items-center gap-3">
+                      {item.icon}
+                      {item.title}
+                    </span>
+                    <FiChevronRight className="text-gray-600" />
+                  </motion.li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+      </div>
+    </AuthRedirect>
   );
 };
 

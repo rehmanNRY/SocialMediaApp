@@ -31,6 +31,7 @@ const UserProfile = ({ params }) => {
   const users = useSelector((state) => state.users.users);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activeSection, setActiveSection] = useState('Profile'); // Track the active section
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
   const userPosts = posts.filter((post) => post.user._id === user?._id);
@@ -97,9 +98,41 @@ const UserProfile = ({ params }) => {
     dispatch(fetchFriendsList());
   };
 
+  const renderSection = () => {
+    switch (activeSection) {
+      case 'Profile':
+        return (
+          <>
+            <StatsSection user={user} />
+            <ProfileInfo user={user} />
+            <FriendList users={users} user={user} />
+            <Followers users={users} user={user} />
+            <Following users={users} user={user} />
+            <Posts userPosts={userPosts} loggedInUserId={loggedInUserId} user={user} />
+          </>
+        );
+      case 'Profile Info':
+        return <ProfileInfo user={user} />;
+      case 'Friend List':
+        return <FriendList users={users} user={user} />;
+      case 'Followers':
+        return <Followers users={users} user={user} />;
+      case 'Following':
+        return <Following users={users} user={user} />;
+      case 'Posts':
+        return <Posts userPosts={userPosts} loggedInUserId={loggedInUserId} user={user} />;
+      default:
+        return null;
+    }
+  };
+
+  const handleMenuClick = (section) => {
+    setActiveSection(section);
+  };
+
   return (
     <AuthRedirect>
-      <div className="min-h-screen bg-[#F5F6FA] flex justify-center items-center p-3">
+      <div className="min-h-screen bg-[#F5F6FA] flex justify-center p-3">
         <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Header section */}
           <motion.div
@@ -109,7 +142,7 @@ const UserProfile = ({ params }) => {
             transition={{ duration: 0.8 }}
           >
             <img
-              src="https://ih1.redbubble.net/cover.4093136.2400x600.jpg"
+              src={user.coverImage || "https://via.placeholder.com/150"}
               alt="Cover"
               className="w-full h-full object-cover"
             />
@@ -182,25 +215,23 @@ const UserProfile = ({ params }) => {
             <ul className="flex space-x-4">
               {menuItems.map((item) => (
                 <li key={item.label} className="relative group">
-                  <a
-                    href={item.href}
-                    className="flex items-center px-6 py-3 text-sm font-medium rounded-lg hover:bg-[#F6F8FF] hover:text-blue-700 transition duration-300"
+                  <button
+                    className={`flex items-center px-6 py-3 text-sm font-medium rounded-t-lg transition duration-300 ${activeSection === item.label
+                      ? 'bg-[#F6F8FF] text-blue-700 border-b-2 border-blue-500'
+                      : 'hover:bg-[#F6F8FF] hover:text-blue-700 hover:border-b-2 hover:border-blue-500'
+                      }`}
+                    onClick={() => handleMenuClick(item.label)}
                   >
                     {item.icon}
                     <span className="ml-4">{item.label}</span>
-                  </a>
-                  <div className="absolute left-0 bottom-0 h-0.5 w-full bg-blue-500 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                  </button>
                 </li>
               ))}
             </ul>
           </nav>
 
-          <StatsSection user={user} />
-          <ProfileInfo user={user} />
-          <FriendList users={users} user={user} />
-          <Followers users={users} user={user} />
-          <Following users={users} user={user} />
-          <Posts userPosts={userPosts} loggedInUserId={loggedInUserId} user={user} />
+          {/* Render the active section */}
+          <div>{renderSection()}</div>
         </div>
       </div>
     </AuthRedirect>
@@ -211,32 +242,26 @@ const UserProfile = ({ params }) => {
 const menuItems = [
   {
     label: 'Profile',
-    href: '/',
     icon: <FiHome className="w-6 h-6 text-blue-500" />,
   },
   {
     label: 'Profile Info',
-    href: '/',
     icon: <FiUser className="w-6 h-6 text-green-500" />,
   },
   {
     label: 'Friend List',
-    href: '/friends',
     icon: <FiList className="w-6 h-6 text-orange-500" />,
   },
   {
     label: 'Followers',
-    href: '/pending-requests',
     icon: <FiAlertCircle className="w-6 h-6 text-yellow-500" />,
   },
   {
     label: 'Following',
-    href: '/sent-requests',
     icon: <AiOutlineFileText className="w-6 h-6 text-teal-500" />,
   },
   {
     label: 'Posts',
-    href: '/people',
     icon: <FiUserPlus className="w-6 h-6 text-pink-500" />,
   },
 ];

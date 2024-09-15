@@ -3,15 +3,18 @@ import React, { useEffect, useState } from 'react';
 import { logout } from '@/redux/auth/authSlice';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FiHome, FiUser, FiList, FiAlertCircle, FiUserPlus, FiBookmark, FiSettings, FiLogOut } from 'react-icons/fi';
-import { AiOutlineFileText } from 'react-icons/ai';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchUserDetails, setLoggedIn } from '@/redux/auth/authSlice';
+import { fetchUserDetails } from '@/redux/auth/authSlice';
 
 const Sidebar = () => {
   const dispatch = useDispatch();
   const [isClient, setIsClient] = useState(false);
+  const [activeIcon, setActiveIcon] = useState(null);
+  const [minimize, setMinimize] = useState(false)
+  const changeActive = (activeIndex) => {
+    setActiveIcon(activeIndex);
+  }
 
   const router = useRouter();
   const { isLoggedIn, userDetails, loading, error } = useSelector((state) => state.auth);
@@ -31,17 +34,25 @@ const Sidebar = () => {
   if (!isClient) {
     return null; // Render nothing until client-side rendering is confirmed
   }
-
+  const toggleSidebar = ()=>{
+    setMinimize(!minimize);
+  }
   return (
     <>
-      {isLoggedIn && <div className={`w-64`}>
-        <div className="sidebar bg-gradient-to-b from-white via-gray-50 to-blue-50 text-gray-900 flex flex-col border-r border-gray-200 shadow-xl fixed w-64 overflow-y-auto" style={{ height: "calc(100vh - 4rem)" }}>
+      {isLoggedIn && <div className={`${minimize ? 'w-[5.5rem]' : 'w-64'}`}>
+        <div className={`sidebar from-white via-gray-50 to-blue-50 text-gray-900 flex flex-col border-r border-gray-200 shadow-xl fixed overflow-y-auto ${minimize ? 'w-[5.5rem]' : 'w-64 bg-gradient-to-b'}`} style={{ height: "calc(100vh - 4.5rem)" }}>
+          <button
+            className="absolute right-0 bottom-32 bg-white text-black border border-gray-200 shadow-md p-2 rounded-l-lg z-10"
+            onClick={toggleSidebar}
+          >
+            {minimize ? '>>' : '<<'}
+          </button>
           {/* Profile Section */}
-          <div className="flex items-center p-6 space-x-4 bg-white shadow-md">
+          <Link href={`/profile/${userDetails?._id}`} className={`flex items-center space-x-4 shadow-sm border-b border-gray-200 bg-gray-50  ${minimize ? 'justify-center py-6' : 'p-6'}`}>
             <motion.img
               src={userDetails?.profilePicture}
               alt="Profile"
-              className="w-12 h-12 rounded-full bg-gray-300"
+              className={`rounded-full bg-gray-300 ${minimize ? 'w-10 h-10' : 'w-12 h-12'}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -49,16 +60,16 @@ const Sidebar = () => {
             {loading && <p>Loading user details...</p>}
             {error && <p>Error: {error.message || JSON.stringify(error)}</p>}
 
-            <div>
+            <div className={`${minimize ? 'hidden' : ''}`}>
               <h3 className="font-semibold text-lg">{userDetails?.fullName}</h3>
               <p className="text-sm text-gray-600">@{userDetails?.username}</p>
             </div>
-          </div>
+          </Link>
 
           {/* Navigation Menu */}
-          <nav className="flex-1 py-4">
-            <ul className="space-y-2.5 overflow-hidden">
-              {menuItems.map((item) => (
+          <nav className="flex-1 py-3">
+            <ul className="space-y-1.5 overflow-hidden">
+              {menuItems.map((item, index) => (
                 <motion.li
                   key={item.label}
                   className="relative group"
@@ -67,17 +78,18 @@ const Sidebar = () => {
                 >
                   <Link
                     href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
-                    className="flex items-center px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-gradient-to-r from-blue-50 to-blue-200 hover:text-blue-700"
+                    className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 from-blue-50 to-blue-200 hover:text-blue-700 ${activeIcon === index ? 'bg-gradient-to-r text-blue-700' : ''}  ${minimize ? 'justify-center py-3' : 'px-6 py-3 hover:bg-gradient-to-r'}`}
+                    onClick={() => changeActive(index)}
                   >
-                    {item.icon}
-                    <span className="ml-4">{item.label}</span>
+                    <img src={item.iconSrc} className={`select-none ${minimize ? 'w-9' : 'w-8' }`} alt={`${item.label}`} />
+                    <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>{item.label}</span>
                     {item.isNew && (
-                      <span className="ml-2 bg-green-200 text-green-800 text-xs font-semibold px-2 py-1 rounded-full animate-pulse">
+                      <span className={`ml-2 bg-green-200 text-green-800 text-xs font-semibold px-2 py-1 rounded-full animate-pulse ${minimize ? 'hidden' : ''}`}>
                         NEW
                       </span>
                     )}
                   </Link>
-                  <div className="absolute right-0 top-0 h-full w-1 bg-blue-500 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+                  <div className={`absolute right-0 top-0 h-full w-1 bg-blue-500 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-300 ${activeIcon === index ? 'opacity-100' : ''}  ${minimize ? 'hidden' : ''}`}></div>
                 </motion.li>
               ))}
             </ul>
@@ -85,23 +97,24 @@ const Sidebar = () => {
 
           {/* Settings and Support */}
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               <li>
                 <Link
                   href="/contact"
-                  className="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-blue-50 hover:text-blue-700"
+                  className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 ${activeIcon === 'contact' ? 'bg-blue-50 text-blue-700' : ''}  ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-blue-50 hover:text-blue-700'}`}
+                  onClick={() => changeActive('contact')}
                 >
-                  <FiUser className="mr-3 w-6 h-6 text-purple-500" />
-                  Contact
+                  <img src="https://res.cloudinary.com/datvbo0ey/image/upload/v1726327946/Microsoft-Fluentui-Emoji-3d-E-Mail-3d.1024_qzqrs2.png" className="w-8" alt="contact" />
+                  <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>Contact</span>
                 </Link>
               </li>
               <li>
                 <button
-                  className="flex items-center p-3 text-sm font-medium rounded-lg transition-all duration-200 hover:bg-red-100 hover:text-red-500 w-full text-left"
+                  className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 w-full text-left ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-red-100 hover:text-red-500'}`}
                   onClick={handleLogout}
                 >
-                  <FiLogOut className="mr-3 w-6 h-6 text-red-500" />
-                  Logout
+                  <img src="https://cdn-icons-png.flaticon.com/512/1828/1828304.png" className="w-8 h-8" alt="logout" />
+                  <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>Logout</span>
                 </button>
               </li>
             </ul>
@@ -117,49 +130,48 @@ const menuItems = [
   {
     label: 'Home',
     href: '/',
-    icon: <FiHome className="w-6 h-6 text-blue-500" />,
+    iconSrc: 'https://res.cloudinary.com/datvbo0ey/image/upload/v1726327946/home-3d-illustration-download-in-png-blend-fbx-gltf-file-formats--house-property-building-estate-architecture-user-interface-pack-illustrations-3307683_w702ca.png',
   },
   {
     label: 'User Profile',
-    // href: {userprofile?._id},
     myProfile: true,
-    icon: <FiUser className="w-6 h-6 text-green-500" />,
+    iconSrc: 'https://cdn-icons-png.flaticon.com/512/15786/15786272.png',
   },
   {
     label: 'Friend List',
     href: '/friends',
-    icon: <FiList className="w-6 h-6 text-orange-500" />,
+    iconSrc: 'https://cdn-icons-png.flaticon.com/512/15430/15430330.png',
   },
   {
     label: 'Pending Requests',
     href: '/pending-requests',
-    icon: <FiAlertCircle className="w-6 h-6 text-yellow-500" />,
+    iconSrc: 'https://cdn-icons-png.flaticon.com/512/5509/5509916.png',
   },
   {
     label: 'Sent Requests',
     href: '/sent-requests',
-    icon: <AiOutlineFileText className="w-6 h-6 text-teal-500" />,
+    iconSrc: 'https://cdn-icons-png.flaticon.com/512/5509/5509730.png',
   },
   {
     label: 'Suggestions',
     href: '/people',
-    icon: <FiUserPlus className="w-6 h-6 text-pink-500" />,
+    iconSrc: 'https://cdn-icons-png.flaticon.com/256/5509/5509446.png',
   },
   {
     label: 'Bookmarks',
     href: '/bookmarks',
-    icon: <FiBookmark className="w-6 h-6 text-purple-500" />,
+    iconSrc: 'https://cdn-icons-png.freepik.com/512/5300/5300640.png',
     isNew: true,
   },
   {
     label: 'My Posts',
     href: '/my-posts',
-    icon: <AiOutlineFileText className="w-6 h-6 text-cyan-500" />,
+    iconSrc: 'https://res.cloudinary.com/datvbo0ey/image/upload/v1726328461/social-media-post-3d-icon-download-in-png-blend-fbx-gltf-file-formats--like-logo-user-network-miscellaneous-pack-icons-5753373_imunlr.png',
   },
   {
     label: 'Settings',
     href: '/settings',
-    icon: <FiSettings className="w-6 h-6 text-indigo-500" />,
+    iconSrc: 'https://cdn-icons-png.flaticon.com/512/2698/2698011.png',
   },
 ];
 

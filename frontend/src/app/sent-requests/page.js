@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { fetchSentRequests, cancelSentRequest } from '@/redux/friendRequests/friendRequestsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import AuthRedirect from '@/components/AuthRedirect';
+import Link from 'next/link';
 
 const SentRequests = () => {
   const dispatch = useDispatch();
@@ -21,14 +22,16 @@ const SentRequests = () => {
 
   return (
     <AuthRedirect>
-      <section className="sent-requests bg-gradient-to-b from-white to-gray-100 p-8 rounded-xl shadow-xl w-full h-full">
+      <section className="sent-requests bg-[#F5F6FA] p-8 w-full h-full"
+      style={{ minHeight: "calc(100vh - 4.5rem)" }}
+      >
         <h2 className="text-3xl font-bold text-gray-800 mb-8">Sent Friend Requests</h2>
         {sentRequests.length > 0 ? (
           <ul className="grid grid-cols-1 gap-6">
             {sentRequests.map((user) => (
               <motion.li
                 key={user._id}
-                className="flex items-center justify-between p-5 bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+                className="flex items-center justify-between p-6 bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:bg-gray-100 transform hover:-translate-y-1"
                 whileHover={{ scale: 1.02 }}
               >
                 {/* User Info */}
@@ -43,29 +46,37 @@ const SentRequests = () => {
                   />
                   <div>
                     <h3 className="font-semibold text-gray-700 text-lg">{user.receiver.fullName}</h3>
-                    <p className="text-sm text-gray-500">{user.receiver.username}</p>
-                    <p className="text-xs text-gray-400">{user.receiver.bio}</p>
+                    <p className="text-sm text-gray-500">@{user.receiver.username}</p>
+                    <p className="text-xs text-gray-400 italic mt-1">{user.receiver.bio}</p>
                   </div>
                 </div>
                 {/* Action Buttons */}
                 <div className="flex space-x-4">
                   <button
                     onClick={() => handleCancelRequest(user._id)}
-                    className="flex items-center px-4 py-2 text-sm font-medium text-red-600 border border-red-600 rounded-full hover:bg-red-50 transition duration-200"
+                    className="flex items-center px-5 py-3 text-sm font-medium text-red-600 border border-red-600 rounded-full hover:bg-red-50 transition duration-300"
                   >
                     <FiUserCheck className="mr-2 w-5 h-5" />
                     Cancel
                   </button>
-                  <button className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-full hover:bg-blue-50 transition duration-200">
-                    <FiEye className="mr-2 w-5 h-5" />
-                    View Profile
-                  </button>
+                  <Link href={`profile/${user.receiver._id}`}>
+                    <button className="flex items-center px-5 py-3 text-sm font-medium text-blue-600 border border-blue-600 rounded-full hover:bg-blue-50 transition duration-300">
+                      <FiEye className="mr-2 w-5 h-5" />
+                      View Profile
+                    </button>
+                  </Link>
                 </div>
               </motion.li>
             ))}
           </ul>
         ) : (
-          <p className="text-lg text-gray-500">No sent friend requests</p>
+          <div className="flex flex-col items-center justify-center h-full text-center p-10">
+            <FiUserCheck className="text-gray-300 text-6xl mb-4" />
+            <p className="text-xl text-gray-500">No Sent Friend Requests</p>
+            <p className="text-sm text-gray-400 mt-2">
+              You haven't sent any friend requests yet. Start connecting with others to grow your network!
+            </p>
+          </div>
         )}
       </section>
     </AuthRedirect>

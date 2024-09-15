@@ -31,7 +31,7 @@ export const fetchUserDetails = createAsyncThunk(
   }
 );
 
-// Create the auth slice
+// Add this to the authSlice
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -48,6 +48,10 @@ const authSlice = createSlice({
       localStorage.removeItem('authToken');
       state.userDetails = null;
     },
+    // Add this new reducer
+    updateUserDetails(state, action) {
+      state.userDetails = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -62,7 +66,6 @@ const authSlice = createSlice({
       .addCase(fetchUserDetails.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        // Check for specific error message and set logged-in state accordingly
         if (action.payload?.error === 'Pls authenticate using a valid token') {
           state.isLoggedIn = false;
           localStorage.removeItem('authToken');
@@ -72,6 +75,6 @@ const authSlice = createSlice({
   },
 });
 
-// Export actions and reducer
-export const { setLoggedIn, logout } = authSlice.actions;
+// Export the new action
+export const { setLoggedIn, logout, updateUserDetails } = authSlice.actions;
 export default authSlice.reducer;
