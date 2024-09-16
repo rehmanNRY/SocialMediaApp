@@ -7,6 +7,7 @@ import { MdAddPhotoAlternate } from 'react-icons/md';
 import { BiLoaderCircle } from 'react-icons/bi';
 import { RiEmotionLaughLine } from 'react-icons/ri';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
+import { BsHash } from 'react-icons/bs';
 
 const PostForm = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,13 @@ const PostForm = () => {
   const [errors, setErrors] = useState({});
   const [isClient, setIsClient] = useState(false);
 
+  // State for Hashtags and emojis
+  const [showHashtags, setShowHashtags] = useState(false);
+  const [showEmojis, setShowEmojis] = useState(false);
+
+  // Sample hashtags and emojis
+  const hashtags = ['#trending', '#dev', '#nature', '#love', '#blessed'];
+  const emojis = ['😊', '😂', '😢', '😍', '👍'];
 
   useEffect(() => {
     setIsClient(true); // Mark component as client-rendered
@@ -52,84 +60,154 @@ const PostForm = () => {
       setLoading(false);
     }
   };
+
+  // Handle hashtag click
+  const handleHashtagClick = (hashtag) => {
+    setContent((prevContent) => prevContent + ' ' + hashtag);
+    setShowHashtags(false);
+  };
+
+  // Handle emoji click
+  const handleEmojiClick = (emoji) => {
+    setContent((prevContent) => prevContent + ' ' + emoji);
+    setShowEmojis(false);
+  };
+
   if (!isClient) {
     return null; // Render nothing until client-side rendering is confirmed
   }
+
   return (
     <>
-    {isLoggedIn && <form 
-      onSubmit={handleSubmit} 
-      className={`bg-white p-6 rounded-xl shadow-lg border border-gray-200`}
-    >
-      <div className="flex items-center mb-4 space-x-3">
-        <img className="w-12 h-12 object-cover rounded-full shadow-md" src={userDetails?.profilePicture} />
-        <h4 className="font-semibold text-gray-800 text-lg">What's on your mind?</h4>
-      </div>
-
-      <textarea
-        className="w-full p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-300 shadow-sm placeholder:italic placeholder-gray-400"
-        rows="3"
-        placeholder={`Share your thoughts ${userDetails?.fullName}...`}
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-      {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content}</p>}
-
-      <div className="mt-4 flex justify-between items-center space-x-2">
-        <label
-          className="text-sm text-indigo-600 hover:underline cursor-pointer flex items-center transition-all duration-200 ease-in-out"
-          onClick={() => setShowImageInput(!showImageInput)}
+      {isLoggedIn && (
+        <form
+          onSubmit={handleSubmit}
+          className={`bg-white p-6 rounded-xl shadow-lg border border-gray-200`}
         >
-          <AiOutlinePicture className="mr-1 text-lg" />
-          {showImageInput ? 'Remove Photo/Video' : 'Add Photo/Video'}
-        </label>
-
-        {showImageInput && (
-          <div className="w-full mt-2 flex items-center border border-gray-300 rounded-lg overflow-hidden animate-slideIn">
-            <input
-              type="text"
-              placeholder="Enter image link"
-              className="w-full p-2 border-none focus:outline-none"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-            />
-            <AiOutlineCloseCircle
-              className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-200"
-              onClick={() => setImage('')}
-            />
+          <div className="flex items-center mb-4 space-x-3">
+            <img className="w-12 h-12 object-cover rounded-full shadow-md" src={userDetails?.profilePicture} />
+            <h4 className="font-semibold text-gray-800 text-lg">What's on your mind?</h4>
           </div>
-        )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-indigo-500 text-white px-6 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center space-x-2"
-        >
-          {loading ? (
-            <BiLoaderCircle className="w-6 h-6 animate-spin" />
-          ) : (
-            <>
-              <MdAddPhotoAlternate className="w-5 h-5" />
-              <span>Post</span>
-            </>
+          <textarea
+            className="bg-[#F8F8F9] w-full p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-300 shadow-sm placeholder:italic placeholder-gray-400"
+            rows="3"
+            placeholder={`Share your thoughts ${userDetails?.fullName}..`}
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+          />
+          {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content}</p>}
+
+          <div className="mt-2 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <button
+                className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600 transition duration-200"
+                type="button"
+                onClick={() => setShowImageInput(!showImageInput)}
+              >
+                <AiOutlinePicture className="w-5 h-5 text-indigo-500" />
+                <span>{showImageInput ? 'Remove Photo' : 'Add Photo'}</span>
+              </button>
+              <button
+                className="flex items-center space-x-0.5 text-gray-500 hover:text-indigo-600 transition duration-200"
+                type="button"
+                onClick={() => setShowHashtags(!showHashtags)}
+              >
+                <BsHash className="w-5 h-5 text-green-500" />
+                <span>Hashtags</span>
+              </button>
+              <button
+                className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600 transition duration-200"
+                type="button"
+                onClick={() => setShowEmojis(!showEmojis)}
+              >
+                <RiEmotionLaughLine className="w-5 h-5 text-yellow-500" />
+                <span>Emoji</span>
+              </button>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-indigo-500 text-white px-5 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center space-x-2"
+            >
+              {loading ? (
+                <BiLoaderCircle className="w-6 h-6 animate-spin" />
+              ) : (
+                <>
+                  <MdAddPhotoAlternate className="w-5 h-5" />
+                  <span>Post</span>
+                </>
+              )}
+            </button>
+          </div>
+          {/* Image imput */}
+          {showImageInput && (
+            <div className="w-full mt-2 flex items-center border border-gray-300 rounded-lg overflow-hidden animate-slideIn">
+              <input
+                type="text"
+                placeholder="Enter image link"
+                className="w-full p-2 border-none focus:outline-none"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+              />
+              <AiOutlineCloseCircle
+                className="pr-3 w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-200"
+                onClick={() => setImage('')}
+              />
+            </div>
           )}
-        </button>
-      </div>
+          {/* Hashtags list */}
+          {showHashtags && (
+            <div className="mt-4 p-3 bg-gray-100 rounded-lg shadow-lg">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold">Select a hashtag:</span>
+                <AiOutlineCloseCircle
+                  className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-200"
+                  onClick={() => setShowHashtags(false)}
+                />
+              </div>
+              <div className="mt-2 flex space-x-2">
+                {hashtags.map((hashtag) => (
+                  <button
+                    key={hashtag}
+                    className="bg-indigo-500 text-white px-3 py-1 rounded-full shadow-sm hover:bg-indigo-700 transition duration-200"
+                    onClick={() => handleHashtagClick(hashtag)}
+                  >
+                    {hashtag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-      <div className="mt-4 flex space-x-3 items-center">
-        <button className="flex items-center space-x-2 text-gray-500 hover:text-indigo-600 transition duration-200">
-          <AiFillSmile className="w-5 h-5" />
-          <span>Feelings</span>
-        </button>
-        <button className="flex items-center space-x-2 text-gray-500 hover:text-indigo-600 transition duration-200">
-          <RiEmotionLaughLine className="w-5 h-5" />
-          <span>Emoji</span>
-        </button>
-      </div>
+          {/* Emojis list */}
+          {showEmojis && (
+            <div className="mt-4 p-3 bg-gray-100 rounded-lg shadow-lg">
+              <div className="flex justify-between items-center">
+                <span className="font-semibold">Select an emoji:</span>
+                <AiOutlineCloseCircle
+                  className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-200"
+                  onClick={() => setShowEmojis(false)}
+                />
+              </div>
+              <div className="mt-2 flex space-x-2">
+                {emojis.map((emoji) => (
+                  <button
+                    key={emoji}
+                    className="text-2xl"
+                    onClick={() => handleEmojiClick(emoji)}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-      {errors.api && <p className="text-red-500 text-sm mt-2">{errors.api}</p>}
-    </form>}
-    </>  
+          {errors.api && <p className="text-red-500 text-sm mt-2">{errors.api}</p>}
+        </form>
+      )}
+    </>
   );
 };
 

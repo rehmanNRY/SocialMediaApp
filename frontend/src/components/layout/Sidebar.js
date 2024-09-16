@@ -52,7 +52,7 @@ const Sidebar = () => {
             <motion.img
               src={userDetails?.profilePicture}
               alt="Profile"
-              className={`rounded-full bg-gray-300 ${minimize ? 'w-10 h-10' : 'w-12 h-12'}`}
+              className={`object-cover rounded-full bg-gray-300 ${minimize ? 'w-10 h-10' : 'w-12 h-12'}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -61,14 +61,14 @@ const Sidebar = () => {
             {error && <p>Error: {error.message || JSON.stringify(error)}</p>}
 
             <div className={`${minimize ? 'hidden' : ''}`}>
-              <h3 className="font-semibold text-lg">{userDetails?.fullName}</h3>
-              <p className="text-sm text-gray-600">@{userDetails?.username}</p>
+              <h3 className="text-lg HelvM">{userDetails?.fullName}</h3>
+              <p className="text-sm text-gray-700 HelvR">@{userDetails?.username}</p>
             </div>
           </Link>
 
           {/* Navigation Menu */}
-          <nav className="flex-1 py-3">
-            <ul className="space-y-1.5 overflow-hidden">
+          <nav className="flex-1 py-1">
+            <ul className="space-y-1 overflow-hidden">
               {menuItems.map((item, index) => (
                 <motion.li
                   key={item.label}
@@ -78,7 +78,7 @@ const Sidebar = () => {
                 >
                   <Link
                     href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
-                    className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 from-blue-50 to-blue-200 hover:text-blue-700 ${activeIcon === index ? 'bg-gradient-to-r text-blue-700' : ''}  ${minimize ? 'justify-center py-3' : 'px-6 py-3 hover:bg-gradient-to-r'}`}
+                    className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 from-indigo-50 to-indigo-200 hover:text-indigo-700 ${activeIcon === index ? 'bg-gradient-to-r text-indigo-700' : ''}  ${minimize ? 'justify-center py-3' : 'px-6 py-3 hover:bg-gradient-to-r'}`}
                     onClick={() => changeActive(index)}
                   >
                     <img src={item.iconSrc} className={`select-none ${minimize ? 'w-9' : 'w-8' }`} alt={`${item.label}`} />
@@ -89,7 +89,7 @@ const Sidebar = () => {
                       </span>
                     )}
                   </Link>
-                  <div className={`absolute right-0 top-0 h-full w-1 bg-blue-500 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-300 ${activeIcon === index ? 'opacity-100' : ''}  ${minimize ? 'hidden' : ''}`}></div>
+                  <div className={`absolute right-0 top-0 h-full w-1 bg-indigo-500 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-300 ${activeIcon === index ? 'opacity-100' : ''}  ${minimize ? 'hidden' : ''}`}></div>
                 </motion.li>
               ))}
             </ul>
@@ -97,7 +97,7 @@ const Sidebar = () => {
 
           {/* Settings and Support */}
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            <ul className="space-y-2">
+            <ul className="space-y-1">
               <li>
                 <Link
                   href="/contact"

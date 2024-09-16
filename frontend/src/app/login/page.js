@@ -64,7 +64,7 @@ export default function LoginPage() {
 
       // Store the token in localStorage
       localStorage.setItem("authToken", response.data.data.token);
-      
+
       // Set the logged-in status in Redux
       dispatch(setLoggedIn(true, response.data.data.token));
 
@@ -79,67 +79,67 @@ export default function LoginPage() {
 
   return (
     <UnAuthRedirect>
-    <div className="min-h-screen flex items-center justify-center bg-indigo-100 p-6 w-screen">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-md bg-white shadow-lg rounded-lg p-8 space-y-4"
-      >
-        <h2 className="text-2xl font-semibold text-indigo-600 text-center">
-          Login
-        </h2>
-
-        {errors.general && (
-          <p className="text-red-500 text-center text-sm">{errors.general}</p>
-        )}
-
-        <div>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-              errors.email ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {errors.email && (
-            <p className="text-red-500 text-xs mt-1">{errors.email}</p>
-          )}
-        </div>
-
-        <div>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
-              errors.password ? "border-red-500" : "border-gray-300"
-            }`}
-          />
-          {errors.password && (
-            <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          className="w-full py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition duration-200"
-          disabled={isSubmitting}
+      <div className="registerPage min-h-screen flex items-center justify-center bg-indigo-100 p-6 w-screen">
+        <form
+          onSubmit={handleSubmit}
+          className="w-full max-w-lg bg-white shadow-xl rounded-xl border border-gray-200 p-10 space-y-6 z-10"
         >
-          {isSubmitting ? "Logging In..." : "Login"}
-        </button>
+          <div className="text-center mb-6">
+            <h1 className="text-4xl font-bold text-gray-800">Welcome Back!</h1>
+            <p className="text-lg text-gray-600 mt-2">Please login to your account</p>
+          </div>
 
-        <p className="text-sm text-center text-gray-600">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-indigo-600 hover:underline">
-            Sign Up here
-          </Link>
-        </p>
-      </form>
-    </div>
+          {errors.general && (
+            <p className="text-red-500 text-center text-base mb-4">{errors.general}</p>
+          )}
+
+          <div>
+            <input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={handleChange}
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.email ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-2">{errors.email}</p>
+            )}
+          </div>
+
+          <div>
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+            />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-2">{errors.password}</p>
+            )}
+          </div>
+
+          <button
+            type="submit"
+            className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-200"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Logging In..." : "Login"}
+          </button>
+
+          <p className="text-base text-center text-gray-600">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-indigo-600 hover:underline">
+              Sign Up here
+            </Link>
+          </p>
+        </form>
+
+      </div>
     </UnAuthRedirect>
   );
 }

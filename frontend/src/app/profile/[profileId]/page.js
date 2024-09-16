@@ -24,14 +24,15 @@ import FriendList from '@/components/userProfile/FriendList';
 import Followers from '@/components/userProfile/Followers';
 import Following from '@/components/userProfile/Following';
 import Posts from '@/components/userProfile/Posts';
-import StatsSection from '@/components/userProfile/StatsSection';
+// import StatsSection from '@/components/userProfile/StatsSection';
+import Link from 'next/link';
 
 const UserProfile = ({ params }) => {
   const [user, setUser] = useState(null);
   const users = useSelector((state) => state.users.users);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeSection, setActiveSection] = useState('Profile'); // Track the active section
+  const [activeSection, setActiveSection] = useState('Profile');
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
   const userPosts = posts.filter((post) => post.user._id === user?._id);
@@ -103,12 +104,11 @@ const UserProfile = ({ params }) => {
       case 'Profile':
         return (
           <>
-            <StatsSection user={user} />
-            <ProfileInfo user={user} />
+            {/* <StatsSection user={user} />
             <FriendList users={users} user={user} />
             <Followers users={users} user={user} />
-            <Following users={users} user={user} />
-            <Posts userPosts={userPosts} loggedInUserId={loggedInUserId} user={user} />
+            <Following users={users} user={user} /> */}
+            <Posts userPosts={userPosts} loggedInUserId={loggedInUserId} user={user} usersList={users} />
           </>
         );
       case 'Profile Info':
@@ -120,7 +120,7 @@ const UserProfile = ({ params }) => {
       case 'Following':
         return <Following users={users} user={user} />;
       case 'Posts':
-        return <Posts userPosts={userPosts} loggedInUserId={loggedInUserId} user={user} />;
+        return <Posts userPosts={userPosts} loggedInUserId={loggedInUserId} user={user} usersList={false} />;
       default:
         return null;
     }
@@ -133,10 +133,10 @@ const UserProfile = ({ params }) => {
   return (
     <AuthRedirect>
       <div className="min-h-screen bg-[#F5F6FA] flex justify-center p-3">
-        <div className="w-full bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="w-full bg-white rounded-lg shadow-md overflow-hidden">
           {/* Header section */}
           <motion.div
-            className="relative h-80 bg-gradient-to-r from-blue-500 to-purple-600"
+            className="relative h-80 bg-gray-300"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -146,21 +146,32 @@ const UserProfile = ({ params }) => {
               alt="Cover"
               className="w-full h-full object-cover"
             />
+            {loggedInUserId === user._id && (
+              <div className="absolute bottom-4 right-4 flex space-x-2">
+                <Link href="/settings" className="px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition duration-300">
+                  Edit Cover Image
+                </Link>
+                <Link href="/settings" className="px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition duration-300">
+                  Edit Profile Picture
+                </Link>
+              </div>
+            )}
           </motion.div>
 
-          <motion.div className="relative p-6 flex items-center" whileHover={{ scale: 1.05 }}>
+          <motion.div className="relative px-4 pt-4 pb-12 flex items-center">
             <div className="absolute -top-24 left-6">
               <img
                 src={user.profilePicture || "https://via.placeholder.com/150"}
                 alt={user.fullName}
-                className="w-52 h-52 rounded-full border-4 border-white shadow-lg hover:scale-105 transition-transform"
+                className="w-52 h-52 rounded-full border-4 border-white shadow-lg hover:scale-105 transition-transform object-cover"
               />
             </div>
             <div className="ml-56 mr-7 flex justify-between items-center flex-1">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">{user.fullName}</h1>
-                <p className="text-sm text-gray-500">Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
-                <p className="text-md text-gray-700">{user.bio}</p>
+              <div className='ml-2'>
+                <h1 className="text-3xl HelvB">{user.fullName}.</h1>
+                <h1 className="text-lg HelvR">@{user.username}</h1>
+                <p className="text-base HelvR text-gray-800">{user.bio}</p>
+                <p className="text-base text-gray-700 HelvR">Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
               </div>
               {loggedInUserId === user._id && (
                 <button className="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
@@ -211,7 +222,7 @@ const UserProfile = ({ params }) => {
             </div>
           </motion.div>
 
-          <nav className="border-b border-gray-200 mb-2 mt-2">
+          <nav className="border-b border-gray-200 mt-2">
             <ul className="flex space-x-4">
               {menuItems.map((item) => (
                 <li key={item.label} className="relative group">
@@ -229,7 +240,6 @@ const UserProfile = ({ params }) => {
               ))}
             </ul>
           </nav>
-
           {/* Render the active section */}
           <div>{renderSection()}</div>
         </div>

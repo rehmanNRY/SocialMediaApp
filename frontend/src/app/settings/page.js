@@ -21,6 +21,7 @@ import { FiChevronRight, FiSave, FiX } from "react-icons/fi";
 import AuthRedirect from '@/components/AuthRedirect';
 import { useDispatch } from "react-redux";
 import { updateUserDetails } from "@/redux/auth/authSlice";
+import Link from "next/link";
 
 const SettingsPage = () => {
   const [activeField, setActiveField] = useState(null);
@@ -226,21 +227,21 @@ const SettingsPage = () => {
               </h2>
               <ul className="space-y-3">
                 {[
-                  { title: "Friends", icon: <FaUserPlus /> },
-                  { title: "Followers", icon: <FaUserMinus /> },
-                  { title: "Following", icon: <FaUserFriends /> },
+                  { title: "Friends", icon: <FaUserPlus />, href: "/friends" },
+                  { title: "Followers", icon: <FaUserMinus />, href: "/pending-requests" },
+                  { title: "Following", icon: <FaUserFriends />, href: "/sent-requests" },
                 ].map((item, index) => (
-                  <motion.li
+                  <Link
                     key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition duration-200"
-                    whileHover={{ scale: 1.02 }}
+                    href={item.href}
+                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 hover:scale-105 transition duration-200"
                   >
                     <span className="flex items-center gap-3">
                       {item.icon}
                       {item.title}
                     </span>
                     <FiChevronRight className="text-gray-600" />
-                  </motion.li>
+                  </Link>
                 ))}
               </ul>
             </motion.div>

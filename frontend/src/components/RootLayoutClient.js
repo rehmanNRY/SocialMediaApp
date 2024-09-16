@@ -20,7 +20,7 @@ function LayoutWrapper({ children }) {
       <Navbar />
       <div className="flex w-full h-full">
         <Sidebar />
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 max-w-full overflow-hidden">
           {children}
         </div>
         <Rightbar />

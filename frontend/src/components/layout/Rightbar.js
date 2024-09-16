@@ -16,6 +16,7 @@ const Rightbar = () => {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const users = useSelector((state) => state.users.users);
+  const reversedUsers = users.slice().reverse();
 
   useEffect(() => {
     setIsClient(true);
@@ -71,18 +72,18 @@ const Rightbar = () => {
                     className="rounded-full h-12 w-12 mr-2 object-cover"
                   />
                   <div className="flex flex-col">
-                    <p className="text-black text-base">{user?.fullName}</p>
-                    <span className="text-xs text-gray-500">@{user?.username}</span>
+                    <p className="text-black text-base HelvM">{user?.fullName}</p>
+                    <span className="text-xs text-gray-500 HelvR">@{user?.username}</span>
                   </div>
                 </Link>
               ))}
             </div>
 
             {/* Suggested Users with Show More */}
-            <div className="flex flex-col gap-3 border-t pt-3">
+            <div className="flex flex-col gap-3 border-t py-3">
               <h4 className="text-md font-semibold text-gray-800">Suggested Users</h4>
               <AnimatePresence>
-                {(showMore ? users : users.slice(0, 3)).map((user, index) => (
+                {(showMore ? reversedUsers : reversedUsers.slice(0, 3)).map((user, index) => (
                   <Link
                     href={`profile/${user?._id}`}
                     key={index}
@@ -99,8 +100,8 @@ const Rightbar = () => {
                       className="rounded-full h-12 w-12 mr-2 object-cover"
                     />
                     <div className="flex flex-col">
-                      <p className="text-black text-base">{user?.fullName}</p>
-                      <span className="text-xs text-gray-500">@{user?.username}</span>
+                      <p className="text-black text-base HelvM">{user?.fullName}</p>
+                      <span className="text-xs text-gray-500 HelvR">@{user?.username}</span>
                     </div>
                   </Link>
                 ))}

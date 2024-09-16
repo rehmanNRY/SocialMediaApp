@@ -1,12 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
+/* Fonts */
+@font-face {
+  font-family: HelvR;
+  src: url("../../public/fonts/HelveticaNowDisplay-Regular.ttf");
+}
+@font-face {
+  font-family: HelvM;
+  src: url("../../public/fonts/HelveticaNowDisplay-Medium.ttf");
+}
+@font-face {
+  font-family: HelvB;
+  src: url("../../public/fonts/HelveticaNowDispBd.ttf");
+}
+.HelvR{
+  font-family: HelvR !important;
+}
+.HelvM{
+  font-family: HelvM !important;
+}
+.HelvB{
+  font-family: HelvB !important;
+}
+/* Pre Loader */
 .preLoader svg path,
 .preLoader svg rect{
   fill: #6366F1;
 }
-
 @keyframes rotate {
   0% {
     transform: rotate(0deg);
@@ -15,11 +36,26 @@
     transform: rotate(360deg);
   }
 }
-
 .svg-rotate {
   animation: rotate 0.6s linear infinite;
 }
-
-.rightBar::-webkit-scrollbar{
+/* Scrollbars hidden */
+.rightBar::-webkit-scrollbar,
+.sidebar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar{
   display: none;
+}
+.sidebar,
+.rightBar,
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+
+/* Registeration pages */
+.registerPage{
+  background-image: url(https://cdn.dribbble.com/users/9699739/screenshots/19642851/media/4ae6e50916384149e7e927b315141ac5.jpg);
+  background-position: center;
+  background-size: cover;
 }

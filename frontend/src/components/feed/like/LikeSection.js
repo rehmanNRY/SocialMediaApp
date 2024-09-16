@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { AiFillLike, AiOutlineLike } from "react-icons/ai";
 import { BiCommentDetail } from "react-icons/bi";
-import { FiBookmark, FiShare2 } from "react-icons/fi";
+import { FiBookmark } from "react-icons/fi";
 import { BsFillBookmarkFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { getCommentsByPost } from "@/redux/comments/commentsSlice";
@@ -37,7 +37,7 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
   }, [dispatch, post._id]);
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+    <div className="bg-white pb-4">
       {/* Likers Section */}
       <div className="flex items-center space-x-2 mb-2 cursor-pointer" onClick={handleShowLikers}>
         {likers.slice(0, 3).map((liker) => (
@@ -45,7 +45,7 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
             key={liker._id}
             src={liker.profilePicture}
             alt={liker.fullName}
-            className="w-6 h-6 rounded-full shadow-sm transition-transform transform hover:scale-110"
+            className="w-6 h-6 rounded-full shadow-sm transition-transform transform hover:scale-110 object-cover"
           />
         ))}
         {likers.length > 0 && (
@@ -60,9 +60,8 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
         {/* Like Button */}
         <button
           onClick={handleToggleLike}
-          className={`flex items-center space-x-1 transition ${
-            userHasLiked ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
-          }`}
+          className={`flex items-center space-x-1 transition ${userHasLiked ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
+            }`}
         >
           {userHasLiked ? <AiFillLike className="text-2xl" /> : <AiOutlineLike className="text-2xl" />}
           <span className="font-semibold">{userHasLiked ? "Liked" : "Like"}</span>
@@ -83,9 +82,8 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
         {/* Bookmark Button */}
         <button
           onClick={handleToggleBookmark}
-          className={`flex items-center space-x-1 transition ${
-            isBookmarked ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
-          }`}
+          className={`flex items-center space-x-1 transition ${isBookmarked ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
+            }`}
         >
           {isBookmarked ? <BsFillBookmarkFill className="text-2xl" /> : <FiBookmark className="text-2xl" />}
           <span className="font-semibold">{isBookmarked ? "Bookmarked" : "Bookmark"}</span>

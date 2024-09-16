@@ -6,6 +6,7 @@ import { FiEdit, FiTrash2, FiThumbsUp, FiSave } from 'react-icons/fi';
 import { FaEllipsisH } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { RiThumbUpFill } from "react-icons/ri";
+import Link from 'next/link';
 
 const CommentItem = ({ comment }) => {
   const dispatch = useDispatch();
@@ -33,19 +34,21 @@ const CommentItem = ({ comment }) => {
   return (
     <div className="flex items-start p-4 space-x-4 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition duration-300">
       {/* User Avatar */}
-      <motion.img
-        src={comment.user.profilePicture}
-        alt="User Avatar"
-        className="w-12 h-12 rounded-full object-cover cursor-pointer"
-        whileHover={{ scale: 1.1 }}
-        transition={{ type: 'spring', stiffness: 300 }}
-      />
+      <Link href={`/profile/${comment.user._id}`}>
+        <motion.img
+          src={comment.user.profilePicture}
+          alt="User Avatar"
+          className="w-12 h-12 rounded-full object-cover cursor-pointer"
+          whileHover={{ scale: 1.1 }}
+          transition={{ type: 'spring', stiffness: 300 }}
+        />
+      </Link>
 
       {/* Comment Content */}
       <div className="flex-1">
         {/* Header Section */}
         <div className="flex justify-between items-center">
-          <h4 className="font-semibold text-gray-800">{comment.user.fullName}</h4>
+          <Link href={`/profile/${comment.user._id}`} className="font-semibold text-gray-800">{comment.user.fullName}</Link>
           <div className="flex items-center space-x-2">
             {/* Additional Action Buttons */}
             <button

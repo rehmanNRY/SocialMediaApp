@@ -71,17 +71,20 @@ const PostCard = ({ post }) => {
   const userHasLiked = likers.some((liker) => liker._id === userDetails?._id);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-md mb-6 relative hover:shadow-2xl">
+    <div className="bg-white p-6 rounded-xl shadow-md relative hover:shadow-xl">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center">
           <img
             src={post.user?.profilePicture}
             alt="User Avatar"
-            className="w-12 h-12 rounded-full mr-4"
+            className="w-12 h-12 rounded-full mr-4 object-cover"
           />
           <div>
-            <h4 className="font-semibold text-gray-900">{post.user?.fullName}</h4>
-            <p className="text-xs text-gray-600">{timePassed(post.createdAt)}</p>
+            <h4 className="HelvM flex">
+              {post.user?.fullName}
+              <span className='shadow-sm bg-gray-100 rounded-md text-gray-600 px-2 ml-2 text-sm HelvR flex items-center'>@{post.user?.username.toLowerCase()}</span>
+            </h4>
+            <p className="HelvR text-gray-700 text-sm">{timePassed(post.createdAt)}</p>
           </div>
         </div>
         {userDetails?._id === post.user._id && (

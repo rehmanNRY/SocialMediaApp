@@ -1,23 +1,44 @@
 import React from 'react';
-import { FiMapPin, FiMail, FiUser } from 'react-icons/fi';
+import { FiMapPin, FiMail, FiUser, FiCalendar, FiUserCheck } from 'react-icons/fi';
+import { MdEdit } from 'react-icons/md';
+import Link from 'next/link'; // Import Link from next/link
 
 const ProfileInfo = ({ user }) => (
   <div className="p-6 bg-white rounded-lg">
-    <h3 className="text-xl font-bold text-gray-800 mb-4">Profile Information</h3>
-    <ul className="space-y-3 text-gray-700">
-      <li className="flex items-center space-x-2">
-        <FiMapPin className="text-gray-500" />
-        <span className="font-semibold">Location: </span> New York, USA
-      </li>
-      <li className="flex items-center space-x-2">
-        <FiMail className="text-gray-500" />
-        <span className="font-semibold">Email: </span> {user.email}
-      </li>
-      <li className="flex items-center space-x-2">
-        <FiUser className="text-gray-500" />
-        <span className="font-semibold">Bio: </span> {user.bio}
-      </li>
-    </ul>
+    <h3 className="text-xl font-bold text-gray-800 flex items-center mt-3">
+      <FiUserCheck className="text-indigo-500 w-6 h-6 mr-2 ml-2" />
+      Profile Information
+    </h3>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 mt-5">
+      <div className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition-colors duration-200 ease-in-out">
+        <FiMapPin className="text-red-500 w-6 h-6" />
+        <div>
+          <span className="font-semibold text-gray-900">Location:</span>
+          <div className="text-gray-600">{user.location || 'Not specified'}</div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition-colors duration-200 ease-in-out">
+        <FiMail className="text-blue-500 w-6 h-6" />
+        <div>
+          <span className="font-semibold text-gray-900">Email:</span>
+          <div className="text-gray-600">{user.email}</div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition-colors duration-200 ease-in-out">
+        <FiUser className="text-green-500 w-6 h-6" />
+        <div>
+          <span className="font-semibold text-gray-900">Bio:</span>
+          <div className="text-gray-600">{user.bio}</div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-3 hover:bg-gray-100 p-2 rounded-md transition-colors duration-200 ease-in-out">
+        <FiCalendar className="text-yellow-500 w-6 h-6" />
+        <div>
+          <span className="font-semibold text-gray-900">Date of Birth:</span>
+          <div className="text-gray-600">{user.dob ? new Date(user.dob).toLocaleDateString() : 'Not specified'}</div>
+        </div>
+      </div>
+    </div>
   </div>
 );
 

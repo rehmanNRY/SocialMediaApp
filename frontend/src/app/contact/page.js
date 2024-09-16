@@ -35,14 +35,14 @@ export default function ContactPage() {
 
   return (
     <AuthRedirect>
-      <main className="bg-[#F5F6FA] text-gray-900 flex items-center justify-center px-6"
+      <main className="bg-[#F5F6FA] text-gray-900 flex items-center justify-center px-2.5"
         style={{ minHeight: "calc(100vh - 4.5rem)" }}
       >
         <div className="w-full max-w-6xl mx-auto text-center py-20">
           <h1 className="text-2xl md:text-4xl font-bold mb-12 text-gray-800">
             Let's Connect✨
           </h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2">
             {socialMedia.map((media) => (
               <a
                 key={media.name}

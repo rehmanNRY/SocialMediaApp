@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import UnAuthRedirect from "@/components/UnAuthRedirect";
+import Link from "next/link";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -84,14 +85,15 @@ export default function SignupForm() {
 
   return (
     <UnAuthRedirect>
-      <div className="min-h-screen flex items-center justify-center bg-indigo-100 p-6 w-screen">
+      <div className="min-h-screen flex items-center justify-center bg-indigo-100 p-6 w-screen registerPage">
         <form
           onSubmit={handleSubmit}
-          className="w-full max-w-md bg-white shadow-lg rounded-lg p-8 space-y-4"
+          className="w-full max-w-lg bg-white shadow-xl rounded-xl border border-gray-200 p-10 space-y-6"
         >
-          <h2 className="text-2xl font-semibold text-indigo-600 text-center">
-            Sign Up
-          </h2>
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-indigo-600">Sign Up</h2>
+            <p className="text-lg text-gray-600 mt-2">Create your account</p>
+          </div>
 
           <div>
             <input
@@ -100,11 +102,11 @@ export default function SignupForm() {
               placeholder="Username"
               value={formData.username}
               onChange={handleChange}
-              className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.username ? "border-red-500" : "border-gray-300"
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.username ? "border-red-500" : "border-gray-300"
                 }`}
             />
             {errors.username && (
-              <p className="text-red-500 text-xs mt-1">{errors.username}</p>
+              <p className="text-red-500 text-sm mt-2">{errors.username}</p>
             )}
           </div>
 
@@ -115,11 +117,11 @@ export default function SignupForm() {
               placeholder="Full Name"
               value={formData.fullName}
               onChange={handleChange}
-              className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.fullName ? "border-red-500" : "border-gray-300"
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.fullName ? "border-red-500" : "border-gray-300"
                 }`}
             />
             {errors.fullName && (
-              <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>
+              <p className="text-red-500 text-sm mt-2">{errors.fullName}</p>
             )}
           </div>
 
@@ -130,11 +132,11 @@ export default function SignupForm() {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.email ? "border-red-500" : "border-gray-300"
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.email ? "border-red-500" : "border-gray-300"
                 }`}
             />
             {errors.email && (
-              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
+              <p className="text-red-500 text-sm mt-2">{errors.email}</p>
             )}
           </div>
 
@@ -145,11 +147,11 @@ export default function SignupForm() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.password ? "border-red-500" : "border-gray-300"
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.password ? "border-red-500" : "border-gray-300"
                 }`}
             />
             {errors.password && (
-              <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+              <p className="text-red-500 text-sm mt-2">{errors.password}</p>
             )}
           </div>
 
@@ -160,29 +162,30 @@ export default function SignupForm() {
               placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className={`w-full px-4 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
                 }`}
             />
             {errors.confirmPassword && (
-              <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+              <p className="text-red-500 text-sm mt-2">{errors.confirmPassword}</p>
             )}
           </div>
 
           <button
             type="submit"
-            className="w-full py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition duration-200"
+            className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg shadow-lg hover:bg-indigo-700 transition duration-200"
             disabled={isSubmitting}
           >
             {isSubmitting ? "Signing Up..." : "Sign Up"}
           </button>
 
-          <p className="text-sm text-center text-gray-600">
+          <p className="text-base text-center text-gray-600">
             Already have an account?{" "}
-            <a href="#" className="text-indigo-600 hover:underline">
+            <Link href="/login" className="text-indigo-600 hover:underline">
               Login here
-            </a>
+            </Link>
           </p>
         </form>
+
       </div>
     </UnAuthRedirect>
   );

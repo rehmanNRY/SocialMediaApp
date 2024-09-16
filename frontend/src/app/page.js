@@ -8,15 +8,17 @@ import { FiFilter } from "react-icons/fi";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import PostForm from "@/components/feed/posts/PostForm";
 import PostList from "@/components/feed/posts/PostList";
+import { BsFillPostcardFill } from "react-icons/bs";
+import StorySection from "@/components/feed/stories/StorySection";
 
 export default function Home() {
   const dispatch = useDispatch();
   const allPosts = useSelector((state) => state.posts.posts);
-  
+
   // State to manage selected hashtags and filters
   const [selectedHashtag, setSelectedHashtag] = useState("");
   const [selectedFilters, setSelectedFilters] = useState([]);
-  
+
   useEffect(() => {
     dispatch(getAllPosts());
   }, [dispatch]);
@@ -47,7 +49,7 @@ export default function Home() {
     const matchesHashtag = selectedHashtag
       ? post.content.toLowerCase().includes(`#${selectedHashtag.toLowerCase()}`)
       : true;
-      
+
     // Filter by additional filters (example: posts with images)
     const matchesFilters = selectedFilters.every((filter) => {
       if (filter === "withImages") return post.image !== "";
@@ -61,18 +63,18 @@ export default function Home() {
 
   return (
     <AuthRedirect>
-      <main className="bg-[#F5F6FA] mx-auto p-4 space-y-8 w-full">
+      <main className="bg-[#F5F6FA] mx-auto p-4 space-y-5 w-full min-h-screen">
+        <StorySection/>
         {/* Hashtag and Actions Section */}
-        <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
+        <div className="items-center justify-between mb-6 flex-wrap gap-2 hidden">
           <ul className="flex gap-2 flex-wrap">
             {["Trending", "Dev", "Nature"].map((tag) => (
               <li
                 key={tag}
-                className={`flex items-center gap-2 border font-semibold text-sm rounded-full px-4 py-1 cursor-pointer transition ${
-                  selectedHashtag === tag
+                className={`flex items-center gap-2 border font-semibold text-sm rounded-full px-4 py-1 cursor-pointer transition ${selectedHashtag === tag
                     ? "bg-indigo-300 text-white"
                     : "bg-indigo-100 text-indigo-900 border-indigo-400"
-                }`}
+                  }`}
                 onClick={() => handleHashtagClick(tag)}
               >
                 {tag === "Trending" && <FaFire className="text-indigo-900" />}
@@ -85,22 +87,20 @@ export default function Home() {
           {/* Additional Actions */}
           <div className="flex items-center gap-2">
             <button
-              className={`flex items-center gap-1 text-sm font-semibold px-4 py-1 transition border rounded-full cursor-pointer ${
-                selectedFilters.includes("withImages")
+              className={`flex items-center gap-1 text-sm font-semibold px-4 py-1 transition border rounded-full cursor-pointer ${selectedFilters.includes("withImages")
                   ? "bg-indigo-300 text-white"
                   : "bg-indigo-100 text-indigo-900 border-indigo-400"
-              }`}
+                }`}
               onClick={() => handleFilterClick("withImages")}
             >
               <FiFilter className="text-indigo-900" />
               With Images
             </button>
             <button
-              className={`flex items-center gap-1 text-sm font-semibold px-4 py-1 transition border rounded-full cursor-pointer ${
-                selectedFilters.includes("liked")
+              className={`flex items-center gap-1 text-sm font-semibold px-4 py-1 transition border rounded-full cursor-pointer ${selectedFilters.includes("liked")
                   ? "bg-indigo-300 text-white"
                   : "bg-indigo-100 text-indigo-900 border-indigo-400"
-              }`}
+                }`}
               onClick={() => handleFilterClick("liked")}
             >
               <FiFilter className="text-indigo-900" />
@@ -116,7 +116,17 @@ export default function Home() {
         </div>
 
         <PostForm />
-        <PostList posts={filteredPosts} />
+        {filteredPosts.length > 0 ? (
+          <PostList posts={filteredPosts} />
+        ) : (
+          <div className="flex flex-col items-center justify-center text-center p-10">
+            <BsFillPostcardFill className="text-gray-300 text-6xl mb-4" />
+            <p className="text-xl text-gray-500">List of Posts.</p>
+            <p className="text-sm text-gray-400 mt-2">
+              No posts to show
+            </p>
+          </div>
+        )}
       </main>
     </AuthRedirect>
   );

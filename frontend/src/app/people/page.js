@@ -95,23 +95,23 @@ const FriendsSuggestion = () => {
               return (
                 <li
                   key={user._id}
-                  className="flex items-center justify-between p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 w-full flex-wrap"
+                  className="flex items-center justify-between px-6 py-4 bg-white rounded-lg shadow-md hover:shadow-lg transition duration-300 w-full flex-wrap"
                 >
-                  <div className="flex items-center">
+                  <Link href={`profile/${user._id}`} className="flex items-center">
                     <img
                       src={user.profilePicture}
                       alt={user.fullName}
-                      className="w-16 h-16 rounded-full border-2 border-blue-400 shadow-sm mr-4"
+                      className="w-16 h-16 rounded-full border-2 border-blue-400 shadow-sm mr-4 object-cover"
                     />
                     <div>
                       <h3 className="font-semibold text-gray-700 text-lg">{user.fullName}</h3>
                       <p className="text-sm text-gray-500">@{user.username}</p>
                       <p className="text-xs text-gray-400">{user.bio.slice(0, 15)}..</p>
                     </div>
-                  </div>
+                  </Link>
                   <div className="flex flex-col space-y-2 w-36">
                     <Link
-                      href={`/${user._id}`}
+                      href={`profile/${user._id}`}
                       className="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition duration-300 text-center"
                     >
                       View Profile
