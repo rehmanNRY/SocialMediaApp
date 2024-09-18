@@ -1,7 +1,7 @@
 // PostCard.js
 "use client";
 import React, { useEffect, useState } from "react";
-import { FiEdit, FiTrash2, FiBookmark } from "react-icons/fi";
+import { FiEdit, FiTrash2 } from "react-icons/fi";
 import CommentForm from "../comment/CommentForm";
 import CommentList from "../comment/CommentList";
 import LikersModal from "../like/LikersModal";
@@ -15,6 +15,7 @@ import {
   toggleLikePost,
   getPostLikers,
 } from "@/redux/posts/postsSlice";
+import Link from "next/link";
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
@@ -73,7 +74,7 @@ const PostCard = ({ post }) => {
   return (
     <div className="bg-white p-6 rounded-xl shadow-md relative hover:shadow-xl">
       <div className="flex justify-between items-center mb-4">
-        <div className="flex items-center">
+        <Link href={`/profile/${post.user?._id}`} className="flex items-center cursor-pointer">
           <img
             src={post.user?.profilePicture}
             alt="User Avatar"
@@ -86,7 +87,7 @@ const PostCard = ({ post }) => {
             </h4>
             <p className="HelvR text-gray-700 text-sm">{timePassed(post.createdAt)}</p>
           </div>
-        </div>
+        </Link>
         {userDetails?._id === post.user._id && (
           <div className="flex space-x-4 text-gray-600">
             {!isEditing ? <button

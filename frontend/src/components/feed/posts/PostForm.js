@@ -99,29 +99,29 @@ const PostForm = () => {
           {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content}</p>}
 
           <div className="mt-2 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <button
-                className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600 transition duration-200"
+                className="space-x-1 hover:text-indigo-600 transition duration-200 shadow-sm bg-gray-100 rounded-md text-gray-600 px-2 py-1 text-sm HelvR flex items-center"
                 type="button"
                 onClick={() => setShowImageInput(!showImageInput)}
               >
-                <AiOutlinePicture className="w-5 h-5 text-indigo-500" />
+                <AiOutlinePicture className="w-4 h-4 text-indigo-500" />
                 <span>{showImageInput ? 'Remove Photo' : 'Add Photo'}</span>
               </button>
               <button
-                className="flex items-center space-x-0.5 text-gray-500 hover:text-indigo-600 transition duration-200"
+                className="space-x-0.5 hover:text-indigo-600 transition duration-200 shadow-sm bg-gray-100 rounded-md text-gray-600 px-2 py-1 text-sm HelvR flex items-center"
                 type="button"
                 onClick={() => setShowHashtags(!showHashtags)}
               >
-                <BsHash className="w-5 h-5 text-green-500" />
+                <BsHash className="w-4 h-4 text-green-500" />
                 <span>Hashtags</span>
               </button>
               <button
-                className="flex items-center space-x-1 text-gray-500 hover:text-indigo-600 transition duration-200"
+                className="flex items-center space-x-1 hover:text-indigo-600 transition duration-200 shadow-sm bg-gray-100 rounded-md text-gray-600 px-2 py-1 text-sm HelvR"
                 type="button"
                 onClick={() => setShowEmojis(!showEmojis)}
               >
-                <RiEmotionLaughLine className="w-5 h-5 text-yellow-500" />
+                <RiEmotionLaughLine className="w-4 h-4 text-yellow-500" />
                 <span>Emoji</span>
               </button>
             </div>

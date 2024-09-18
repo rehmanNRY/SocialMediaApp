@@ -43,9 +43,9 @@ const Rightbar = () => {
             {/* Navigation Menu */}
             <ul className="flex flex-col gap-3">
               <h4 className="text-md font-semibold text-gray-800">Menu</h4>
-              <Link href="/" className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer transition hover:scale-105 duration-300">
+              <Link href="/my-posts" className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer transition hover:scale-105 duration-300">
                 <FiHome className="text-indigo-600" />
-                <span className="text-gray-700">Home</span>
+                <span className="text-gray-700">My Posts</span>
               </Link>
               <Link href="/settings" className="flex items-center gap-3 hover:bg-gray-100 p-2 rounded-md cursor-pointer transition hover:scale-105 duration-300">
                 <BsGear className="text-gray-600" />

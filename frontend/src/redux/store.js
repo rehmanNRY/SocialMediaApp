@@ -5,6 +5,7 @@ import postsReducer from './posts/postsSlice';
 import authReducer  from './auth/authSlice';
 import commentsReducer  from './comments/commentsSlice';
 import savedItemsReducer  from './savedItems/savedItemsSlice';
+import storyReducer  from './story/storySlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     auth: authReducer,
     comments: commentsReducer,
     savedItems: savedItemsReducer,
+    story: storyReducer,
   },
 });
 

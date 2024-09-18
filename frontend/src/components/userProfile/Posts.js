@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 const Posts = ({ userPosts, loggedInUserId, user, usersList }) => (
   <div className="bg-[#F5F6FA] px-4 py-2 shadow-md flex">
-    <div className='flex flex-col flex-1'>
+    <div className='flex flex-col flex-1 space-y-4'>
       {loggedInUserId === user._id && <div className='my-4'><PostForm /></div>}
       {userPosts.length > 0 ? (
         <PostList posts={userPosts} />
@@ -26,7 +26,7 @@ const Posts = ({ userPosts, loggedInUserId, user, usersList }) => (
         {/* List Item */}
         {usersList.map((person, index) => (
           <li key={index} className="flex items-center justify-between">
-            <Link href={`profile/${person._id}`} className="flex items-center cursor pointer">
+            <Link href={`${person._id}`} className="flex items-center cursor pointer">
               <img
                 src={person.profilePicture}
                 alt={person.fullName}

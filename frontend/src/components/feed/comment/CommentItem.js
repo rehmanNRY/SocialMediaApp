@@ -32,7 +32,7 @@ const CommentItem = ({ comment }) => {
   const userHasLiked = comment.likes.includes(userDetails?._id);
 
   return (
-    <div className="flex items-start p-4 space-x-4 bg-white border border-gray-200 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+    <div className="flex items-start space-x-4 px-4 py-3 bg-white border border-gray-200 rounded-xl hover:shadow-lg transition duration-300 shadow-md">
       {/* User Avatar */}
       <Link href={`/profile/${comment.user._id}`}>
         <motion.img
@@ -50,19 +50,12 @@ const CommentItem = ({ comment }) => {
         <div className="flex justify-between items-center">
           <Link href={`/profile/${comment.user._id}`} className="font-semibold text-gray-800">{comment.user.fullName}</Link>
           <div className="flex items-center space-x-2">
-            {/* Additional Action Buttons */}
-            <button
-              className="text-gray-500 hover:text-indigo-500 transition-colors"
-              onClick={() => console.log('Options')}
-            >
-              <FaEllipsisH />
-            </button>
             {/* Edit and Delete for the User's Own Comment */}
             {userDetails?._id === comment.user._id && (
               <>
                 <button
                   onClick={handleEdit}
-                  className="text-indigo-500 hover:bg-blue-100 p-1 rounded-full transition-colors"
+                  className="text-indigo-500 hover:bg-blue-100 rounded-full transition-colors"
                   aria-label="Edit Comment"
                 >
                   {isEditing ? <FiSave /> : <FiEdit />}

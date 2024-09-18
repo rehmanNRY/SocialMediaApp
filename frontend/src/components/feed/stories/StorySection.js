@@ -1,18 +1,23 @@
-import { useRef } from 'react';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+"use client";
+import { useRef, useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllStories } from '@/redux/story/storySlice';
+import { fetchUserDetails } from '@/redux/auth/authSlice';
+import Link from 'next/link';
 
 export default function StorySection() {
-  // Dummy data for stories
-  const stories = [
-    { name: 'Your Story', imageUrl: 'https://img.freepik.com/premium-photo/cartoon-character-with-red-hoodie-blue-hoodie_881695-1657.jpg', isOwnStory: true },
-    { name: 'Justin Rosser', imageUrl: 'https://img.freepik.com/premium-photo/cartoon-character-with-red-hoodie-blue-hoodie_881695-1657.jpg' },
-    { name: 'Davis Dorwart', imageUrl: 'https://img.freepik.com/premium-photo/cartoon-character-with-red-hoodie-blue-hoodie_881695-1657.jpg' },
-    { name: 'Randy Saris', imageUrl: 'https://img.freepik.com/premium-photo/cartoon-character-with-red-hoodie-blue-hoodie_881695-1657.jpg' },
-    { name: 'Charlie Press', imageUrl: 'https://img.freepik.com/premium-photo/cartoon-character-with-red-hoodie-blue-hoodie_881695-1657.jpg' },
-    { name: 'Zaire Herwitz', imageUrl: 'https://img.freepik.com/premium-photo/cartoon-character-with-red-hoodie-blue-hoodie_881695-1657.jpg' },
-    { name: 'Talan Philips', imageUrl: 'https://img.freepik.com/premium-photo/cartoon-character-with-red-hoodie-blue-hoodie_881695-1657.jpg' },
-    { name: 'Corey Gouse', imageUrl: 'https://img.freepik.com/premium-photo/cartoon-character-with-red-hoodie-blue-hoodie_881695-1657.jpg' },
-  ];
+  const dispatch = useDispatch();
+  const { stories, loading } = useSelector((state) => state.story);
+  const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
+
+
+  // Fetch stories on component mount
+  useEffect(() => {
+    dispatch(fetchAllStories());
+    if (isLoggedIn) {
+      dispatch(fetchUserDetails());
+    }
+  }, [isLoggedIn, dispatch]);
 
   const scrollContainerRef = useRef(null);
 
@@ -25,6 +30,20 @@ export default function StorySection() {
       });
     }
   };
+
+  // Create a set to track unique user IDs
+  const uniqueUserStories = [];
+  const seenUserIds = new Set();
+
+  // Iterate through stories to filter out duplicate users
+  if (stories && stories.length > 0) {
+    stories.forEach((story) => {
+      if (!seenUserIds.has(story.user._id)) {
+        uniqueUserStories.push(story);
+        seenUserIds.add(story.user._id);
+      }
+    });
+  }
 
   return (
     <div className="relative w-full max-w-full overflow-hidden scrollbar-hide">
@@ -46,38 +65,48 @@ export default function StorySection() {
 
       <div className="p-4 bg-white rounded-lg shadow-lg overflow-x-auto scrollbar-hide" ref={scrollContainerRef}>
         <div className="flex space-x-4">
-          {stories.map((story, index) => (
-            <div key={index} className="flex-shrink-0 flex flex-col items-center justify-center text-center">
+          {userDetails && <Link href='/stories' className="flex-shrink-0 flex flex-col items-center justify-center text-center cursor-pointer">
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-blue-500 p-[3px]">
+                <img
+                  src={userDetails.profilePicture}
+                  alt={userDetails.fullName}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </div>
+              {/* Display a plus icon if it's the user's story */}
+              <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="2"
+                  stroke="currentColor"
+                  className="w-4 h-4 text-white"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </div>
+            </div>
+            <span className="text-sm mt-2">Add Story</span>
+          </Link>}
+          {uniqueUserStories.map((story) => (
+            <Link href={`story/${story._id}`} key={story._id} className="flex-shrink-0 flex flex-col items-center justify-center text-center cursor-pointer">
               <div className="relative">
                 <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-blue-500 p-[3px]">
                   <img
-                    src={story.imageUrl}
-                    alt={story.name}
+                    src={story.user.profilePicture}
+                    alt={story.user.fullName}
                     className="w-full h-full object-cover rounded-full"
                   />
                 </div>
-                {/* Display a plus icon if it's the user's story */}
-                {story.isOwnStory && (
-                  <div className="absolute bottom-0 right-0 bg-blue-500 rounded-full w-5 h-5 flex items-center justify-center border-2 border-white">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      className="w-4 h-4 text-white"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                  </div>
-                )}
               </div>
-              <span className="text-sm mt-2">{story.name}</span>
-            </div>
+              <span className="text-sm mt-2">{story.user.fullName}</span>
+            </Link>
           ))}
         </div>
         {/* Fixed blue blur effect */}

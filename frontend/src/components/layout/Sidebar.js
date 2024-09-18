@@ -164,8 +164,8 @@ const menuItems = [
     isNew: true,
   },
   {
-    label: 'My Posts',
-    href: '/my-posts',
+    label: 'Stories',
+    href: '/stories',
     iconSrc: 'https://res.cloudinary.com/datvbo0ey/image/upload/v1726328461/social-media-post-3d-icon-download-in-png-blend-fbx-gltf-file-formats--like-logo-user-network-miscellaneous-pack-icons-5753373_imunlr.png',
   },
   {
