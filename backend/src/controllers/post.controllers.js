@@ -16,7 +16,7 @@ export const createPost = asyncHandler(async (req, res, next) => {
 
     // Fetch the new post with populated user details (like in getAllPosts)
     const populatedPost = await Post.findById(post._id)
-      .populate('user', 'fullName profilePicture') // Populate post's user details
+      .populate('user', 'fullName profilePicture username') // Populate post's user details
       .populate('likes', 'fullName') // Populate post's likes with user details
       .lean();
 
@@ -32,7 +32,7 @@ export const getAllPosts = asyncHandler(async (req, res, next) => {
   try {
     // Fetch all posts with populated user and likes fields
     const posts = await Post.find()
-      .populate('user', 'fullName profilePicture')
+      .populate('user', 'fullName profilePicture username')
       .populate('likes', 'fullName') // Populate post's likes with user details
       .lean(); // Use .lean() for better performance and mutability
 
@@ -61,7 +61,7 @@ export const editPost = asyncHandler(async (req, res, next) => {
   await post.save();
 
   const populatedPost = await Post.findById(post._id)
-  .populate('user', 'fullName profilePicture') // Populate post's user details
+  .populate('user', 'fullName profilePicture username') // Populate post's user details
   .lean();
 
   res.status(200).json(new ApiResponse(200, 'Post updated successfully', populatedPost));
@@ -107,7 +107,7 @@ export const toggleLikePost = asyncHandler(async (req, res, next) => {
 
   await post.save();
   const populatedPost = await Post.findById(post._id)
-  .populate('user', 'fullName profilePicture') // Populate post's user details
+  .populate('user', 'fullName profilePicture username') // Populate post's user details
   .lean();
 
   res.status(200).json(new ApiResponse(200, hasLiked ? 'Post unliked' : 'Post liked', populatedPost));
@@ -117,7 +117,7 @@ export const toggleLikePost = asyncHandler(async (req, res, next) => {
 export const getPostLikers = asyncHandler(async (req, res, next) => {
   const { postId } = req.params;
 
-  const post = await Post.findById(postId).populate('likes', 'fullName profilePicture');
+  const post = await Post.findById(postId).populate('likes', 'fullName profilePicture username');
   if (!post) {
     return next(new ApiError(404, 'Post not found'));
   }

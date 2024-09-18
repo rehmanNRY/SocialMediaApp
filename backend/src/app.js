@@ -20,12 +20,14 @@ import friendRoute from "./routes/friendRequests.routes.js"
 import postRoute from "./routes/post.routes.js"
 import saves from "./routes/saves.routes.js"
 import userRoute from "./routes/user.routes.js"
+import storyRoute from "./routes/story.routes.js"
 
 app.use("/api/comments", commentRoute);
 app.use("/api/friendRequests", friendRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/saves", saves);
 app.use("/api/user", userRoute);
+app.use("/api/story", storyRoute);
 
 
 export {app}

@@ -23,7 +23,7 @@ const UserSchema = new Schema({
   },
   profilePicture: {
     type: String,
-    default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNpTKcwSR1d8nsU3xEVHSwOYbq9VM9Fz65p8AeAuJEn31XiwoB5ApWSLFq8PTIjWJ0e3Y&usqp=CAU',
+    default: 'https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg',
   },
   coverImage: {
     type: String,

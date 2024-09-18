@@ -7,6 +7,32 @@ import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { FriendRequest } from '../models/friendRequests.model.js';
 
+const profilePictures = [
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651745/3d%20avatar/1_ijpza2.png",
+  "https://img.freepik.com/premium-photo/3d-avatar-boy-character_914455-603.jpg",
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651746/3d%20avatar/8_ff3tta.png",
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651745/3d%20avatar/3_bmxh2t.png",
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651746/3d%20avatar/9_s4mvtd.png",
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651746/3d%20avatar/7_uimci3.png",
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651745/3d%20avatar/4_d2vuip.png",
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651746/3d%20avatar/5_xhf1vy.png",
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651746/3d%20avatar/6_pksp2n.png",
+  "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651745/3d%20avatar/3_bmxh2t.png",
+];
+
+const coverImages = [
+  "https://t3.ftcdn.net/jpg/05/38/74/02/360_F_538740200_HNOc2ABQarAJshNsLB4c3DXAuiCLl2QI.jpg",
+  "https://t4.ftcdn.net/jpg/05/34/78/37/360_F_534783787_w337He2LnkNIgJ0J26y6CYZpmios8aUk.jpg",
+  "https://img.freepik.com/free-photo/light-background-with-sunset-projector-lamp_53876-128374.jpg",
+  "https://t4.ftcdn.net/jpg/08/26/27/49/360_F_826274943_kQB6Hqf5oQ4lveeRAHuqaQxHQKMYH6h0.jpg",
+  "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsb2ZmaWNlMjBfM2RfbW9kZXJuX3dhdmVfY3VydmVfYWJzdHJhY3RfaGFsZnRvbmVfZ3JhZGllbl8xZTJhY2M3Mi1jZTU3LTQ0NjItOGQzNS1lOTI4YzI5NzcxMTdfMS5qcGc.jpg",
+  "https://t3.ftcdn.net/jpg/05/38/74/02/360_F_538740200_HNOc2ABQarAJshNsLB4c3DXAuiCLl2QI.jpg",
+  "https://t4.ftcdn.net/jpg/05/34/78/37/360_F_534783787_w337He2LnkNIgJ0J26y6CYZpmios8aUk.jpg",
+  "https://img.freepik.com/free-photo/light-background-with-sunset-projector-lamp_53876-128374.jpg",
+  "https://t4.ftcdn.net/jpg/08/26/27/49/360_F_826274943_kQB6Hqf5oQ4lveeRAHuqaQxHQKMYH6h0.jpg",
+  "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsb2ZmaWNlMjBfM2RfbW9kZXJuX3dhdmVfY3VydmVfYWJzdHJhY3RfaGFsZnRvbmVfZ3JhZGllbl8xZTJhY2M3Mi1jZTU3LTQ0NjItOGQzNS1lOTI4YzI5NzcxMTdfMS5qcGc.jpg"
+];
+
 // Register a new user
 export const registerUser = asyncHandler(async (req, res, next) => {
   const { username, fullName, email, password } = req.body;
@@ -17,15 +43,26 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     return next(new ApiError(400, 'User with this email already exists'));
   }
 
+  // Get the current count of users to determine profile picture assignment
+  const userCount = await User.countDocuments();
+
+  // Calculate the profile picture and cover index
+  const profilePictureIndex = userCount % profilePictures.length;
+  const assignedProfilePicture = profilePictures[profilePictureIndex];
+
+  const assignedCoverPicture = coverImages[profilePictureIndex];
+
   // Hash the password before saving
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Create a new user
+  // Create a new user with an assigned profile picture
   const user = await User.create({
     username,
     fullName,
     email,
     password: hashedPassword,
+    profilePicture: assignedProfilePicture || "https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg",
+    coverImage: assignedCoverPicture || "https://t3.ftcdn.net/jpg/05/38/74/02/360_F_538740200_HNOc2ABQarAJshNsLB4c3DXAuiCLl2QI.jpg",
   });
 
   res.status(201).json(new ApiResponse(201, 'User registered successfully', { id: user._id }));
