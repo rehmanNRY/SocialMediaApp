@@ -8,8 +8,8 @@ const PostSchema = new Schema({
   },
   content: {
     type: String,
-    maxLength: 500,
-    required: true
+    maxLength: [100, 'Post cannot exceed 100 characters'],
+    required: true,
   },
   image: {
     type: String,

@@ -8,7 +8,7 @@ const StorySchema = new Schema({
   },
   content: {
     type: String,
-    maxLength: 255,  // Ensure content does not exceed 255 characters
+    maxLength: [100, "Story must be in length 100"],
   },
   image: {
     type: String,

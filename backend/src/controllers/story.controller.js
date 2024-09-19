@@ -10,8 +10,8 @@ export const createStory = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
   // Validate the content length
-  if (content && content.length > 255) {
-    return next(new ApiError(400, 'Content exceeds 255 characters limit'));
+  if (content && content.length > 100) {
+    return next(new ApiError(400, 'Content exceeds 100 characters limit'));
   }
 
   // Create the story

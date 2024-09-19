@@ -24,7 +24,6 @@ export const toggleItemInSaves = asyncHandler(async (req, res, next) => {
 });
 
 // Controller to get all saved items of the logged-in user
-// Controller to get all saved items of the logged-in user
 export const getAllSaves = asyncHandler(async (req, res, next) => {
     const userId = req.user.id; // Retrieved from the fetchUser middleware
 
@@ -34,7 +33,7 @@ export const getAllSaves = asyncHandler(async (req, res, next) => {
             path: 'post',
             populate: {
                 path: 'user',  // Populate the user field within each post
-                select: 'fullName profilePicture',  // Select the necessary fields
+                select: 'fullName profilePicture username',  // Select the necessary fields
             }
         });
 

@@ -6,6 +6,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { FriendRequest } from '../models/friendRequests.model.js';
+import mongoose from 'mongoose';
 
 const profilePictures = [
   "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651745/3d%20avatar/1_ijpza2.png",
@@ -61,11 +62,15 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     fullName,
     email,
     password: hashedPassword,
-    profilePicture: assignedProfilePicture || "https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg",
+    profilePicture: assignedProfilePicture || "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651745/3d%20avatar/1_ijpza2.png",
     coverImage: assignedCoverPicture || "https://t3.ftcdn.net/jpg/05/38/74/02/360_F_538740200_HNOc2ABQarAJshNsLB4c3DXAuiCLl2QI.jpg",
   });
 
-  res.status(201).json(new ApiResponse(201, 'User registered successfully', { id: user._id }));
+  if (!user) {
+    throw new ApiError(500, "Something went wrong while registering a user");
+  }
+
+  return res.status(201).json(new ApiResponse(201, 'User registered successfully', { id: user._id }));
 });
 
 // Login a user
@@ -143,7 +148,7 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
 
 // Update user profile
 export const updateUser = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id;  // Assuming the user is authenticated and the ID is in `req.user`
+  const userId = req.user.id;
   const {
     username,
     fullName,
@@ -156,30 +161,35 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     dob,
   } = req.body;
 
-  // Find the user in the database
   const user = await User.findById(userId);
   if (!user) {
-    return next(new ApiError(404, 'User not found'));
+    return res.status(404).json({ message: 'User not found' });
   }
 
-  // Update fields if provided
-  if (username) user.username = username;
-  if (fullName) user.fullName = fullName;
-  if (email) user.email = email;
-  if (profilePicture) user.profilePicture = profilePicture;
-  if (coverImage) user.coverImage = coverImage;
-  if (location) user.location = location;
-  if (bio) user.bio = bio;
-  if (dob) user.dob = dob;
+  try {
+    if (username) user.username = username;
+    if (fullName) user.fullName = fullName;
+    if (email) user.email = email;
+    if (password) user.password = password;
+    if (profilePicture) user.profilePicture = profilePicture;
+    if (coverImage) user.coverImage = coverImage;
+    if (location) user.location = location;
+    if (bio) user.bio = bio;
+    if (dob) user.dob = dob;
 
-  // Hash the new password if provided
-  if (password) {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
+    await user.save();
+    res.json({ data: user });
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      // Format errors for the frontend
+      const errors = {};
+      for (let field in err.errors) {
+        errors[field] = {
+          message: err.errors[field].message
+        };
+      }
+      return res.status(400).json({ errors });
+    }
+    next(err);
   }
-
-  // Save the updated user
-  await user.save();
-
-  res.status(200).json(new ApiResponse(200, 'User updated successfully', user));
 });
