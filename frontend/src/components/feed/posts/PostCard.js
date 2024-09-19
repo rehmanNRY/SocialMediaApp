@@ -118,6 +118,7 @@ const PostCard = ({ post }) => {
           <textarea
             value={editContent}
             onChange={(e) => setEditContent(e.target.value)}
+            maxLength={100}
             className="w-full p-2 border border-gray-300 rounded-lg mb-2"
           />
         </div>

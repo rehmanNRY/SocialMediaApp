@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { editComment, deleteComment, toggleLikeComment } from '@/redux/comments/commentsSlice';
 import { FiEdit, FiTrash2, FiThumbsUp, FiSave } from 'react-icons/fi';
-import { FaEllipsisH } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import { RiThumbUpFill } from "react-icons/ri";
 import Link from 'next/link';
@@ -86,6 +85,7 @@ const CommentItem = ({ comment }) => {
         {isEditing ? (
           <textarea
             value={newContent}
+            maxLength={100}
             onChange={(e) => setNewContent(e.target.value)}
             className="w-full mt-2 p-2 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-400"
           />

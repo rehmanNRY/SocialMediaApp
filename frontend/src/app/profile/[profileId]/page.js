@@ -133,10 +133,10 @@ const UserProfile = ({ params }) => {
   return (
     <AuthRedirect>
       <div className="min-h-screen bg-[#F5F6FA] flex justify-center p-3">
-        <div className="w-full bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="w-full max-w-6xl bg-white rounded-lg shadow-md overflow-hidden">
           {/* Header section */}
           <motion.div
-            className="relative h-80 bg-gray-300"
+            className="relative h-60 sm:h-80 bg-gray-300"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
@@ -148,93 +148,92 @@ const UserProfile = ({ params }) => {
             />
             {loggedInUserId === user._id && (
               <div className="absolute bottom-4 right-4 flex space-x-2">
-                <Link href="/settings" className="px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition duration-300">
+                <Link href="/settings" className="px-2 sm:px-4 py-1 sm:py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition duration-300">
                   Edit Cover Image
                 </Link>
-                <Link href="/settings" className="px-4 py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition duration-300">
+                <Link href="/settings" className="px-2 sm:px-4 py-1 sm:py-2 bg-slate-700 text-white rounded-md hover:bg-slate-800 transition duration-300">
                   Edit Profile Picture
                 </Link>
               </div>
             )}
           </motion.div>
 
-          <motion.div className="relative px-4 pt-4 pb-12 flex items-center">
-            <div className="absolute -top-24 left-6">
+          <motion.div className="relative px-4 pt-12 pb-6 flex flex-col sm:flex-row items-center sm:items-start sm:pb-12">
+            <div className="absolute -top-16 sm:-top-24 left-6">
               <img
                 src={user.profilePicture || "https://via.placeholder.com/150"}
                 alt={user.fullName}
-                className="w-52 h-52 rounded-full border-4 border-white shadow-lg hover:scale-105 transition-transform object-cover"
+                className="w-36 h-36 sm:w-52 sm:h-52 rounded-full border-4 border-white shadow-lg hover:scale-105 transition-transform object-cover"
               />
             </div>
-            <div className="ml-56 mr-7 flex justify-between items-center flex-1">
-              <div className='ml-2'>
-                <h1 className="text-3xl HelvB">{user.fullName}.</h1>
-                <h1 className="text-lg HelvR">@{user.username}</h1>
-                <p className="text-base HelvR text-gray-800">{user.bio}</p>
-                <p className="text-base text-gray-700 HelvR">Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
+            <div className="ml-0 sm:ml-56 mt-6 sm:mt-0 mr-4 sm:mr-7 flex-1">
+              <div className="ml-2 text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl HelvB">{user.fullName}</h1>
+                <h1 className="text-sm sm:text-lg HelvR">@{user.username}</h1>
+                <p className="text-sm sm:text-base HelvR text-gray-800">{user.bio}</p>
+                <p className="text-sm sm:text-base text-gray-700 HelvR">Joined: {new Date(user.createdAt).toLocaleDateString()}</p>
               </div>
-              {loggedInUserId === user._id && (
-                <button className="px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
-                  Your Profile
-                </button>
-              )}
-              {loggedInUserId !== user._id && (
-                <div className="space-x-2">
-                  {isFriend ? (
-                    <button
-                      className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
-                      onClick={handleUnfriend}
-                    >
-                      Unfriend
-                    </button>
-                  ) : hasReceivedRequest ? (
-                    <>
-                      <button
-                        className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300"
-                        onClick={handleAcceptRequest}
-                      >
-                        Accept
-                      </button>
-                      <button
-                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
-                        onClick={handleRejectRequest}
-                      >
-                        Reject
-                      </button>
-                    </>
-                  ) : hasSentRequest ? (
-                    <button
-                      className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300"
-                      onClick={handleCancelRequest}
-                    >
-                      Cancel Request
-                    </button>
-                  ) : (
-                    <button
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
-                      onClick={handleSendRequest}
-                    >
-                      Add Friend
-                    </button>
-                  )}
-                </div>
-              )}
             </div>
+            {loggedInUserId === user._id ? (
+              <button className="mt-4 sm:mt-0 px-3 sm:px-4 py-1 sm:py-2 bg-indigo-500 text-white rounded-md hover:bg-blue-600 transition duration-300">
+                Your Profile
+              </button>
+            ) : (
+              <div className="space-x-2 mt-4 sm:mt-0">
+                {isFriend ? (
+                  <button
+                    className="px-3 sm:px-4 py-1 sm:py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
+                    onClick={handleUnfriend}
+                  >
+                    Unfriend
+                  </button>
+                ) : hasReceivedRequest ? (
+                  <>
+                    <button
+                      className="px-3 sm:px-4 py-1 sm:py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition duration-300"
+                      onClick={handleAcceptRequest}
+                    >
+                      Accept
+                    </button>
+                    <button
+                      className="px-3 sm:px-4 py-1 sm:py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition duration-300"
+                      onClick={handleRejectRequest}
+                    >
+                      Reject
+                    </button>
+                  </>
+                ) : hasSentRequest ? (
+                  <button
+                    className="px-3 sm:px-4 py-1 sm:py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition duration-300"
+                    onClick={handleCancelRequest}
+                  >
+                    Cancel Request
+                  </button>
+                ) : (
+                  <button
+                    className="px-3 sm:px-4 py-1 sm:py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition duration-300"
+                    onClick={handleSendRequest}
+                  >
+                    Add Friend
+                  </button>
+                )}
+              </div>
+            )}
           </motion.div>
 
           <nav className="border-b border-gray-200 mt-2">
-            <ul className="flex space-x-4">
+            <ul className="flex flex-wrap justify-center sm:justify-start space-x-0 sm:space-x-4">
               {menuItems.map((item) => (
                 <li key={item.label} className="relative group">
                   <button
-                    className={`flex items-center px-6 py-3 text-sm font-medium rounded-t-lg transition duration-300 ${activeSection === item.label
+                    className={`flex items-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium rounded-t-lg transition duration-300 ${activeSection === item.label
                       ? 'bg-[#F6F8FF] text-blue-700 border-b-2 border-blue-500'
                       : 'hover:bg-[#F6F8FF] hover:text-blue-700 hover:border-b-2 hover:border-blue-500'
                       }`}
                     onClick={() => handleMenuClick(item.label)}
                   >
                     {item.icon}
-                    <span className="ml-4">{item.label}</span>
+                    <span className="ml-2 sm:ml-4">{item.label}</span>
                   </button>
                 </li>
               ))}
@@ -244,6 +243,7 @@ const UserProfile = ({ params }) => {
           <div>{renderSection()}</div>
         </div>
       </div>
+
     </AuthRedirect>
   );
 };

@@ -172,9 +172,11 @@ const Page = ({ params }) => {
 
   return (
     <AuthRedirect>
-      <div className="bg-[#F5F6FA] flex items-center justify-between min-h-screen fixed h-full w-screen z-50 inset-0 overflow-hidden">
+      <div className="bg-[#F5F6FA] flex flex-col-reverse lg:flex-row items-center justify-between min-h-screen fixed h-full w-screen z-50 inset-0 lg:overflow-hidden overflow-y-auto">
         <StoryForm isOpen={isModalOpen} onClose={closeModal} />
-        <div className="absolute top-4 right-4">
+
+        {/* Back Home Button */}
+        <div className="absolute top-4 right-4 z-20">
           <Link href="/" className="bg-gray-200 text-gray-800 px-3 py-2 rounded-full shadow hover:bg-gray-300 transition duration-200 flex items-center text-sm">
             <MdOutlineKeyboardArrowLeft />
             Back Home
@@ -182,27 +184,27 @@ const Page = ({ params }) => {
         </div>
 
         {/* Left Sidebar */}
-        <div className="p-6 shadow-lg w-1/3 h-full bg-white rounded-l-lg relative">
+        <div className="p-4 lg:p-6 shadow-lg w-full lg:w-1/3 h-full bg-white rounded-none lg:rounded-l-lg relative">
           <div className="flex items-center justify-between mb-6">
             <Link href="/stories">
-              <AiOutlineClose className="text-gray-600 w-8 h-8 hover:text-gray-900 transition" />
+              <AiOutlineClose className="text-gray-600 w-6 h-6 lg:w-8 lg:h-8 hover:text-gray-900 transition" />
             </Link>
             <Link href="/" className="flex items-center">
               <img
                 src="/images/rehman_logo.png"
                 alt="Logo"
-                className="w-10 mr-2 transition duration-300 hover:scale-110"
+                className="w-8 lg:w-10 mr-2 transition duration-300 hover:scale-110"
               />
-              <span className="font-bold text-gray-700 text-xl">Rehman</span>
+              <span className="font-bold text-gray-700 text-lg lg:text-xl">Rehman</span>
             </Link>
           </div>
 
-          <h2 className="text-2xl font-semibold text-gray-800 mb-6">Stories</h2>
+          <h2 className="text-xl lg:text-2xl font-semibold text-gray-800 mb-6">Stories</h2>
 
           {/* Create a Story Button */}
           <div onClick={openModal} className="mb-6 flex items-center p-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition duration-300 cursor-pointer">
-            <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center">
-              <AiOutlinePlus className="text-indigo-500 text-2xl" />
+            <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full bg-gray-300 flex items-center justify-center">
+              <AiOutlinePlus className="text-indigo-500 text-xl lg:text-2xl" />
             </div>
             <div className="ml-3">
               <h4 className="font-semibold text-gray-700">Create a story</h4>
@@ -210,15 +212,12 @@ const Page = ({ params }) => {
             </div>
           </div>
 
-          {/* Story List - grouped by user */}
-          <ul className="space-y-3 overflow-y-auto h-5/6 scrollbar-thin scrollbar-thumb-gray-400">
+          {/* Story List - Grouped by User */}
+          <ul className="space-y-3 overflow-y-auto h-2/3 lg:h-5/6 scrollbar-thin scrollbar-thumb-gray-400">
             {users.slice(0, visibleStories).map((userGroup, index) => (
-              <Link href={`${userGroup.stories[0]._id}`}
-                key={index}
-                className="flex items-center justify-between hover:bg-gray-100 transition duration-300 p-3 rounded-lg"
-              >
+              <Link href={`${userGroup.stories[0]._id}`} key={index} className="flex items-center justify-between hover:bg-gray-100 transition duration-300 p-3 rounded-lg">
                 <div className="flex items-center cursor-pointer">
-                  <div className="w-16 h-16 rounded-full border-2 border-indigo-400 bg-white p-0.5 transition transform hover:scale-105">
+                  <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full border-2 border-indigo-400 bg-white p-0.5 transition transform hover:scale-105">
                     <img
                       src={userGroup.user.profilePicture}
                       alt={userGroup.user.fullName}
@@ -226,9 +225,7 @@ const Page = ({ params }) => {
                     />
                   </div>
                   <div className="flex justify-center ml-3 flex-col">
-                    <h5 className="HelvB text-gray-800">
-                      {userGroup.user.fullName}
-                    </h5>
+                    <h5 className="HelvB text-gray-800">{userGroup.user.fullName}</h5>
                     <p className="HelvR text-gray-600">{userGroup.stories[0].content.slice(0, 20)}</p>
                   </div>
                 </div>
@@ -240,97 +237,76 @@ const Page = ({ params }) => {
           </ul>
 
           {/* Show more/less button */}
-          <button
-            className="w-full mt-4 text-sm text-indigo-500 hover:text-indigo-700 transition"
-            onClick={handleShowMore}
-          >
+          <button className="w-full mt-4 text-sm text-indigo-500 hover:text-indigo-700 transition" onClick={handleShowMore}>
             {showMore ? "Show less" : "Show more"}
           </button>
         </div>
 
         {/* Story Content */}
-        <div className="w-2/3 flex justify-center">
-          <div
-            className="w-[36rem] h-screen bg-slate-800 shadow-xl rounded-r-lg relative flex flex-col justify-between items-center px-4 pb-8 pt-4 bg-cover bg-center"
-            style={{ backgroundImage: `url(${storyToShow?.image})` }}
-          >
+        <div className="w-full lg:w-2/3 flex justify-center">
+          <div className="w-full lg:w-[36rem] h-screen bg-slate-800 shadow-xl rounded-none lg:rounded-r-lg relative flex flex-col justify-between items-center px-4 pb-8 pt-4 bg-cover bg-center"
+            style={{ backgroundImage: `url(${storyToShow?.image})` }}>
+
             {/* Story Header */}
             <Link href={`/profile/${storyToShow?.user?._id}`} className="absolute top-7 left-4 flex items-center bg-white py-3 px-4 rounded-xl shadow-sm"
-              style={{ backdropFilter: "blur(10px)", background: "rgba(255, 255, 255, 0.9)" }}
-            >
-              <img src={storyToShow?.user.profilePicture} alt={storyToShow?.user.fullName} className="w-10 h-10 rounded-full mr-4 object-cover" />
+              style={{ backdropFilter: "blur(10px)", background: "rgba(255, 255, 255, 0.9)" }}>
+              <img src={storyToShow?.user.profilePicture} alt={storyToShow?.user.fullName} className="w-8 lg:w-10 h-8 lg:h-10 rounded-full mr-4 object-cover" />
               <div>
-                <h3 className="font-semibold text-lg text-gray-900">{storyToShow?.user.fullName}</h3>
+                <h3 className="font-semibold text-base lg:text-lg text-gray-900">{storyToShow?.user.fullName}</h3>
                 <p className="text-gray-500 text-sm">{timePassed(storyToShow?.createdAt)}</p>
               </div>
             </Link>
 
             {/* Play/Pause Button */}
-            <button
-              className="absolute top-10 right-5 text-white"
-              onClick={handlePlayPause}
-            >
+            <button className="absolute top-10 right-5 text-white" onClick={handlePlayPause}>
               {isPlaying ? (
-                <AiOutlinePauseCircle className="w-8 h-8" />
+                <AiOutlinePauseCircle className="w-6 lg:w-8 h-6 lg:h-8" />
               ) : (
-                <AiOutlinePlayCircle className="w-8 h-8" />
+                <AiOutlinePlayCircle className="w-6 lg:w-8 h-6 lg:h-8" />
               )}
             </button>
 
             {/* Story Content */}
-            <motion.div
-              className="absolute bottom-6 w-[95%] bg-white text-gray-800 py-2 px-6 rounded-xl shadow-md max-w-full text-center HelvR"
+            <motion.div className="absolute bottom-6 w-full bg-white text-gray-800 py-2 px-4 lg:px-6 rounded-xl shadow-md max-w-full text-center HelvR"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              style={{ backdropFilter: "blur(10px)", background: "rgba(255, 255, 255, 0.8)" }}
-            >
+              style={{ backdropFilter: "blur(10px)", background: "rgba(255, 255, 255, 0.8)" }}>
               {storyToShow?.content}
             </motion.div>
 
             {/* Progress bar */}
             <div className="w-full h-[3px] relative flex space-x-1">
               {groupedStories[storyToShow.user._id].stories.map((story, index) => (
-                <div
-                  key={story._id}
-                  className="relative h-full rounded-full overflow-hidden transition-all duration-300 cursor-pointer"
+                <div key={story._id} className="relative h-full rounded-full overflow-hidden transition-all duration-300 cursor-pointer"
                   style={{
                     width: `${100 / groupedStories[storyToShow.user._id].stories.length}%`,
                     backgroundColor: index < currentStoryIndex ? "blue" : "gray",
                   }}
-                  onClick={() => handleProgressClick(index)} // Call the handleProgressClick function
-                >
-                  <div
-                    className="absolute top-0 left-0 h-full bg-blue-500 transition-all duration-100"
+                  onClick={() => handleProgressClick(index)}>
+                  <div className="absolute top-0 left-0 h-full bg-blue-500 transition-all duration-100"
                     style={{
                       width: index === currentStoryIndex ? `${progress}%` : index < currentStoryIndex ? "100%" : "0%",
-                    }}
-                  />
+                    }} />
                 </div>
               ))}
             </div>
 
-
             {/* Navigation Buttons */}
             {users.findIndex((userGroup) => userGroup.user._id === storyToShow.user._id) > 0 && (
-              <button
-                onClick={handlePrevUser}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 p-1 bg-gray-300 rounded-full shadow hover:bg-gray-200 transition duration-300"
-              >
-                <MdChevronLeft className="text-gray-700 w-8 h-8" />
+              <button onClick={handlePrevUser} className="absolute left-4 top-1/2 transform -translate-y-1/2 p-1 bg-gray-300 rounded-full shadow hover:bg-gray-200 transition duration-300">
+                <MdChevronLeft className="text-gray-700 w-6 lg:w-8 h-6 lg:h-8" />
               </button>
             )}
             {users.findIndex((userGroup) => userGroup.user._id === storyToShow.user._id) < users.length - 1 && (
-              <button
-                onClick={handleNextUser}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 p-1 bg-gray-300 rounded-full shadow hover:bg-gray-200 transition duration-300"
-              >
-                <MdChevronRight className="text-gray-700 w-8 h-8" />
+              <button onClick={handleNextUser} className="absolute right-4 top-1/2 transform -translate-y-1/2 p-1 bg-gray-300 rounded-full shadow hover:bg-gray-200 transition duration-300">
+                <MdChevronRight className="text-gray-700 w-6 lg:w-8 h-6 lg:h-8" />
               </button>
             )}
           </div>
         </div>
       </div>
+
     </AuthRedirect>
   );
 };

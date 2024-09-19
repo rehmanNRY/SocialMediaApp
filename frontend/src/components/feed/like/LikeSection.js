@@ -37,15 +37,18 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
   }, [dispatch, post._id]);
 
   return (
-    <div className="bg-white pb-4">
+    <div className="bg-white pb-4 px-2 sm:px-4">
       {/* Likers Section */}
-      <div className="flex items-center space-x-2 mb-2 cursor-pointer" onClick={handleShowLikers}>
+      <div
+        className="flex items-center space-x-2 mb-2 cursor-pointer"
+        onClick={handleShowLikers}
+      >
         {likers.slice(0, 3).map((liker) => (
           <img
             key={liker._id}
             src={liker.profilePicture}
             alt={liker.fullName}
-            className="w-6 h-6 rounded-full shadow-sm transition-transform transform hover:scale-110 object-cover"
+            className="w-8 h-8 sm:w-6 sm:h-6 rounded-full shadow-sm transition-transform transform hover:scale-110 object-cover"
           />
         ))}
         {likers.length > 0 && (
@@ -56,25 +59,31 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
       </div>
 
       {/* Action Buttons Section */}
-      <div className="flex justify-around items-center border-t border-b py-4 space-x-4">
+      <div className="flex justify-around items-center border-t border-b py-4 sm:space-x-4 space-x-2">
         {/* Like Button */}
         <button
           onClick={handleToggleLike}
           className={`flex items-center space-x-1 transition ${userHasLiked ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
             }`}
         >
-          {userHasLiked ? <AiFillLike className="text-2xl" /> : <AiOutlineLike className="text-2xl" />}
-          <span className="font-semibold">{userHasLiked ? "Liked" : "Like"}</span>
-          <span className="text-xs text-white rounded-full px-2 py-0.5 bg-blue-500">
+          {userHasLiked ? (
+            <AiFillLike className="text-xl sm:text-2xl" />
+          ) : (
+            <AiOutlineLike className="text-xl sm:text-2xl" />
+          )}
+          <span className="font-semibold text-xs sm:text-base">
+            {userHasLiked ? "Liked" : "Like"}
+          </span>
+          <span className="text-xs text-white rounded-full px-1 sm:px-2 py-0.5 bg-blue-500">
             {post.likes.length}
           </span>
         </button>
 
         {/* Comment Button */}
         <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-500 transition">
-          <BiCommentDetail className="text-2xl" />
-          <span className="font-semibold">Comment</span>
-          <span className="text-xs text-white rounded-full px-2 py-0.5 bg-blue-500">
+          <BiCommentDetail className="text-xl sm:text-2xl" />
+          <span className="font-semibold text-xs sm:text-base">Comment</span>
+          <span className="text-xs text-white rounded-full px-1 sm:px-2 py-0.5 bg-blue-500">
             {comments?.length || "0"}
           </span>
         </button>
@@ -85,8 +94,14 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
           className={`flex items-center space-x-1 transition ${isBookmarked ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
             }`}
         >
-          {isBookmarked ? <BsFillBookmarkFill className="text-2xl" /> : <FiBookmark className="text-2xl" />}
-          <span className="font-semibold">{isBookmarked ? "Bookmarked" : "Bookmark"}</span>
+          {isBookmarked ? (
+            <BsFillBookmarkFill className="text-xl sm:text-2xl" />
+          ) : (
+            <FiBookmark className="text-xl sm:text-2xl" />
+          )}
+          <span className="font-semibold text-xs sm:text-base">
+            {isBookmarked ? "Bookmarked" : "Bookmark"}
+          </span>
         </button>
       </div>
     </div>

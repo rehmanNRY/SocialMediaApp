@@ -15,25 +15,30 @@ const FriendList = ({ users, user }) => {
         <div className="flex flex-col items-center justify-center text-center p-6">
           <FaUserFriends className="text-gray-300 text-6xl mb-4" />
           <p className="text-xl text-gray-500">No friends to show</p>
-          <p className="text-sm text-gray-400 mt-2">
-            Add some friends to see them here.
-          </p>
+          <p className="text-sm text-gray-400 mt-2">Add some friends to see them here.</p>
         </div>
       ) : (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 justify-center">
           {friends.map((friend) => (
-            <Link key={friend._id} href={`profile/${friend._id}`} className="relative group flex flex-col items-center p-2 transition-transform transform hover:scale-105 cursor-pointer">
+            <Link
+              key={friend._id}
+              href={`profile/${friend._id}`}
+              className="relative group flex flex-col items-center p-2 transition-transform transform hover:scale-105 cursor-pointer"
+            >
               <img
                 src={friend.profilePicture || "https://via.placeholder.com/80"}
                 alt={friend.fullName}
-                className="w-20 h-20 rounded-full border-2 border-gray-200 friend-avatar"
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-gray-200"
               />
-              <span className="text-sm text-gray-600 mt-2">{friend.fullName}</span>
+              <span className="text-sm sm:text-base text-gray-600 mt-2 text-center">
+                {friend.fullName}
+              </span>
             </Link>
           ))}
         </div>
       )}
     </div>
+
   );
 };
 

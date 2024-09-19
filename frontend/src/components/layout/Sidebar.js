@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
 
-const Sidebar = () => {
+const Sidebar = ({isSidebar}) => {
   const dispatch = useDispatch();
   const [isClient, setIsClient] = useState(false);
   const [activeIcon, setActiveIcon] = useState(null);
@@ -39,10 +39,10 @@ const Sidebar = () => {
   }
   return (
     <>
-      {isLoggedIn && <div className={`${minimize ? 'w-[5.5rem]' : 'w-64'}`}>
-        <div className={`sidebar from-white via-gray-50 to-blue-50 text-gray-900 flex flex-col border-r border-gray-200 shadow-xl fixed overflow-y-auto ${minimize ? 'w-[5.5rem]' : 'w-64 bg-gradient-to-b'}`} style={{ height: "calc(100vh - 4.5rem)" }}>
+      {isLoggedIn && <div className={`${minimize ? 'w-[5.5rem]' : `md:w-64 w-screen ${isSidebar ? 'block' : 'hidden md:block md:relative fixed z-50'}`}`}>
+        <div className={`sidebar from-white via-gray-50 to-blue-50 text-gray-900 flex flex-col border-r border-gray-200 shadow-xl fixed overflow-y-auto ${minimize ? 'w-[5.5rem]' : 'w-screen md:w-64 bg-gradient-to-b'}`} style={{ height: "calc(100vh - 4.5rem)" }}>
           <button
-            className="absolute right-0 bottom-32 bg-white text-black border border-gray-200 shadow-md p-2 rounded-l-lg z-10"
+            className="absolute right-0 bottom-32 bg-white text-black border border-gray-200 shadow-md p-2 rounded-l-lg z-10 md:"
             onClick={toggleSidebar}
           >
             {minimize ? '>>' : '<<'}

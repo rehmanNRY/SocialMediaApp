@@ -23,7 +23,6 @@ export default function SignupForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Redirect to home if already logged in
     if (isLoggedIn) {
       router.push("/");
     }
@@ -31,23 +30,44 @@ export default function SignupForm() {
 
   const validate = () => {
     let errors = {};
-    if (!formData.username) errors.username = "Username is required";
-    if (!formData.fullName) errors.fullName = "Full Name is required";
+
+    // Validate username (must be at least 3 characters)
+    if (!formData.username) {
+      errors.username = "Username is required";
+    } else if (formData.username.length < 3) {
+      errors.username = "Username must be at least 3 characters long";
+    }
+
+    // Validate full name (must be at least 3 characters)
+    if (!formData.fullName) {
+      errors.fullName = "Full Name is required";
+    } else if (formData.fullName.length < 3) {
+      errors.fullName = "Full Name must be at least 3 characters long";
+    }
+
+    // Validate email
     if (!formData.email) {
       errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       errors.email = "Email address is invalid";
     }
+
+    // Validate password (must be at least 6 characters)
     if (!formData.password) {
       errors.password = "Password is required";
     } else if (formData.password.length < 6) {
       errors.password = "Password must be at least 6 characters long";
+    } else if (formData.password.length > 30) {
+      errors.password = "Password must be no more than 30 characters long";
     }
+
+    // Validate confirm password
     if (!formData.confirmPassword) {
       errors.confirmPassword = "Please confirm your password";
     } else if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
     }
+
     setErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -74,10 +94,14 @@ export default function SignupForm() {
         }
       );
       console.log("User registered successfully:", response.data);
-      router.push("/login"); // Redirect to home page after successful registration
+      router.push("/login"); 
     } catch (error) {
       console.error("Registration failed:", error.response?.data?.message);
-      setErrors({ email: "User with this email already exists" });
+
+      // Set the error message from the backend or show default if no message
+      setErrors({
+        email: error.response?.data?.message || "User with this email or username already exists",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -102,8 +126,9 @@ export default function SignupForm() {
               placeholder="Username"
               value={formData.username}
               onChange={handleChange}
-              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.username ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.username ? "border-red-500" : "border-gray-300"
+              }`}
             />
             {errors.username && (
               <p className="text-red-500 text-sm mt-2">{errors.username}</p>
@@ -117,8 +142,9 @@ export default function SignupForm() {
               placeholder="Full Name"
               value={formData.fullName}
               onChange={handleChange}
-              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.fullName ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.fullName ? "border-red-500" : "border-gray-300"
+              }`}
             />
             {errors.fullName && (
               <p className="text-red-500 text-sm mt-2">{errors.fullName}</p>
@@ -132,8 +158,9 @@ export default function SignupForm() {
               placeholder="Email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.email ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.email ? "border-red-500" : "border-gray-300"
+              }`}
             />
             {errors.email && (
               <p className="text-red-500 text-sm mt-2">{errors.email}</p>
@@ -147,8 +174,9 @@ export default function SignupForm() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.password ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.password ? "border-red-500" : "border-gray-300"
+              }`}
             />
             {errors.password && (
               <p className="text-red-500 text-sm mt-2">{errors.password}</p>
@@ -162,8 +190,9 @@ export default function SignupForm() {
               placeholder="Confirm Password"
               value={formData.confirmPassword}
               onChange={handleChange}
-              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                }`}
+              className={`w-full px-6 py-3 text-base border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.confirmPassword ? "border-red-500" : "border-gray-300"
+              }`}
             />
             {errors.confirmPassword && (
               <p className="text-red-500 text-sm mt-2">{errors.confirmPassword}</p>
@@ -185,7 +214,6 @@ export default function SignupForm() {
             </Link>
           </p>
         </form>
-
       </div>
     </UnAuthRedirect>
   );

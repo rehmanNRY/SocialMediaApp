@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Link from "next/link";
 import { createStory } from "@/redux/story/storySlice";
 
-const StoryForm = ({ isOpen, onClose }) => {
+const StoryForm = ({ isOpen, onClose, storyToast }) => {
   if (!isOpen) return null;
 
   const [content, setContent] = useState("");
@@ -16,11 +16,18 @@ const StoryForm = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { isLoading, error } = useSelector((state) => state.story);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Dispatch the createStory action
-    dispatch(createStory({ content, image }));
+    const resultAction = await dispatch(createStory({ content, image }));
+
+    // Check if the story was successfully posted
+    if (createStory.fulfilled.match(resultAction)) {
+      storyToast("success");
+    } else if (createStory.rejected.match(resultAction)) {
+      storyToast("error");
+    }
 
     // Clear the form after submission
     setContent("");
@@ -58,6 +65,7 @@ const StoryForm = ({ isOpen, onClose }) => {
           className="w-full p-4 border border-gray-200 rounded-xl resize-none focus:ring focus:ring-indigo-200 transition focus:outline-none focus:border-none duration-200 bg-gray-100 text-gray-700"
           rows="4"
           placeholder="Write your story here..."
+          maxLength={100}
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
@@ -77,6 +85,7 @@ const StoryForm = ({ isOpen, onClose }) => {
           <button
             type="submit"
             className="bg-indigo-500 text-white px-6 py-3 rounded-full shadow-md hover:bg-indigo-600 transition duration-200 ease-in-out flex items-center"
+            maxLength={100}
             disabled={isLoading} // Disable button if loading
           >
             <MdAddPhotoAlternate className="w-5 h-5 mr-2" />
@@ -93,6 +102,7 @@ const StoryForm = ({ isOpen, onClose }) => {
               className="w-full p-3 text-sm border-none focus:outline-none rounded-lg focus:ring focus:ring-indigo-200"
               value={image}
               onChange={(e) => setImage(e.target.value)}
+              maxLength={300}
             />
             {/* Clear input button (cross) */}
             {image && (

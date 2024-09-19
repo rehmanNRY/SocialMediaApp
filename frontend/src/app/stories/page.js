@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllStories } from '@/redux/story/storySlice';
 import AuthRedirect from '@/components/AuthRedirect';
 import Link from 'next/link';
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function StorySection() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,8 +37,16 @@ export default function StorySection() {
     });
   }
 
+  const storyToast = (toastType) => {
+    if (toastType === 'success') {
+      toast.success('Story created successfully');
+    } else {
+      toast.error('Error creating story');
+    }
+  }
   return (
     <AuthRedirect>
+      <ToastContainer autoClose={1000} />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 p-4">
         {/* Create Story Card */}
         <div onClick={openModal} className="cursor-pointer flex flex-col items-center justify-center w-full h-60 bg-white rounded-lg shadow-lg">
@@ -68,7 +78,7 @@ export default function StorySection() {
             </div>
           </Link>
         ))}
-        <StoryForm isOpen={isModalOpen} onClose={closeModal} />
+        <StoryForm isOpen={isModalOpen} onClose={closeModal} storyToast={storyToast} />
       </div>
     </AuthRedirect>
   );

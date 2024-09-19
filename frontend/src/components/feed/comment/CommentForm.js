@@ -41,6 +41,7 @@ const CommentForm = ({ postId }) => {
           onChange={(e) => setContent(e.target.value)}
           className="flex-1 py-2 px-4 border border-gray-300 rounded-lg bg-[#F8F8F9]"
           placeholder="Write your comment.."
+          maxLength={100}
         />
         <button
           type="submit"

@@ -82,23 +82,24 @@ const PostForm = () => {
       {isLoggedIn && (
         <form
           onSubmit={handleSubmit}
-          className={`bg-white p-6 rounded-xl shadow-lg border border-gray-200`}
+          className={`bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 w-full max-w-xl mx-auto`}
         >
-          <div className="flex items-center mb-4 space-x-3">
-            <img className="w-12 h-12 object-cover rounded-full shadow-md" src={userDetails?.profilePicture} />
-            <h4 className="font-semibold text-gray-800 text-lg">What's on your mind?</h4>
+          <div className="flex flex-col sm:flex-row items-center mb-4 space-y-3 sm:space-y-0 sm:space-x-3">
+            <img className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-full shadow-md" src={userDetails?.profilePicture} />
+            <h4 className="font-semibold text-gray-800 text-base sm:text-lg">What's on your mind?</h4>
           </div>
 
           <textarea
-            className="bg-[#F8F8F9] w-full p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-300 shadow-sm placeholder:italic placeholder-gray-400"
+            className="bg-[#F8F8F9] w-full p-3 sm:p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-300 shadow-sm placeholder:italic placeholder-gray-400"
             rows="3"
             placeholder={`Share your thoughts ${userDetails?.fullName}..`}
             value={content}
+            maxLength={100}
             onChange={(e) => setContent(e.target.value)}
           />
           {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content}</p>}
 
-          <div className="mt-2 flex items-center justify-between">
+          <div className="mt-2 flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0 sm:space-x-2">
             <div className="flex items-center space-x-2">
               <button
                 className="space-x-1 hover:text-indigo-600 transition duration-200 shadow-sm bg-gray-100 rounded-md text-gray-600 px-2 py-1 text-sm HelvR flex items-center"
@@ -128,7 +129,7 @@ const PostForm = () => {
             <button
               type="submit"
               disabled={loading}
-              className="bg-indigo-500 text-white px-5 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center space-x-2"
+              className="bg-indigo-500 text-white px-4 sm:px-5 py-2 sm:py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center space-x-2"
             >
               {loading ? (
                 <BiLoaderCircle className="w-6 h-6 animate-spin" />
@@ -140,7 +141,7 @@ const PostForm = () => {
               )}
             </button>
           </div>
-          {/* Image imput */}
+
           {showImageInput && (
             <div className="w-full mt-2 flex items-center border border-gray-300 rounded-lg overflow-hidden animate-slideIn">
               <input
@@ -156,7 +157,7 @@ const PostForm = () => {
               />
             </div>
           )}
-          {/* Hashtags list */}
+
           {showHashtags && (
             <div className="mt-4 p-3 bg-gray-100 rounded-lg shadow-lg">
               <div className="flex justify-between items-center">
@@ -166,7 +167,7 @@ const PostForm = () => {
                   onClick={() => setShowHashtags(false)}
                 />
               </div>
-              <div className="mt-2 flex space-x-2">
+              <div className="mt-2 flex flex-wrap space-x-2">
                 {hashtags.map((hashtag) => (
                   <button
                     key={hashtag}
@@ -180,7 +181,6 @@ const PostForm = () => {
             </div>
           )}
 
-          {/* Emojis list */}
           {showEmojis && (
             <div className="mt-4 p-3 bg-gray-100 rounded-lg shadow-lg">
               <div className="flex justify-between items-center">
@@ -206,6 +206,7 @@ const PostForm = () => {
 
           {errors.api && <p className="text-red-500 text-sm mt-2">{errors.api}</p>}
         </form>
+
       )}
     </>
   );
