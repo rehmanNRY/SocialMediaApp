@@ -51,9 +51,10 @@ To run the project locally, follow these steps:
 3. **Set up environment variables**:
    - Create a `.env` file in the root directory of the backend and add the following:
     ```env
-    MONGO_URI=<Your MongoDB URI>
-    JWT_SECRET=<Your JWT Secret>
-    PORT=<Backend Port>
+    MONGO_URI =
+    PORT =
+    CORS_ORIGIN=
+    JWT_SECRET=
     ```
 
 4. **Start the development server**:
