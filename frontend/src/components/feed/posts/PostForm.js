@@ -82,7 +82,7 @@ const PostForm = () => {
       {isLoggedIn && (
         <form
           onSubmit={handleSubmit}
-          className={`bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 w-full max-w-xl mx-auto`}
+          className={`bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 w-full mx-auto`}
         >
           <div className="flex flex-col sm:flex-row items-center mb-4 space-y-3 sm:space-y-0 sm:space-x-3">
             <img className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-full shadow-md" src={userDetails?.profilePicture} />
