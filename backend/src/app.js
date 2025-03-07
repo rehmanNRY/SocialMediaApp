@@ -14,6 +14,11 @@ app.use(express.urlencoded({limit: "16kb", extended: true}))
 app.use(express.static("public"))
 app.use(cookieParser())
 
+// Default route to test if the server is running
+app.get("/", (req, res) => {
+  res.send("Server is running!");
+});
+
 // importing routes
 import commentRoute from "./routes/comment.routes.js"
 import friendRoute from "./routes/friendRequests.routes.js"
@@ -28,6 +33,5 @@ app.use("/api/posts", postRoute);
 app.use("/api/saves", saves);
 app.use("/api/user", userRoute);
 app.use("/api/story", storyRoute);
-
 
 export {app}
