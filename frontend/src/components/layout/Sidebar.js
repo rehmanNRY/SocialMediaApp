@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
 
-const Sidebar = ({isSidebar}) => {
+const Sidebar = ({ isSidebar }) => {
   const dispatch = useDispatch();
   const [isClient, setIsClient] = useState(false);
   const [activeIcon, setActiveIcon] = useState(null);
@@ -34,7 +34,7 @@ const Sidebar = ({isSidebar}) => {
   if (!isClient) {
     return null; // Render nothing until client-side rendering is confirmed
   }
-  const toggleSidebar = ()=>{
+  const toggleSidebar = () => {
     setMinimize(!minimize);
   }
   return (
@@ -67,8 +67,8 @@ const Sidebar = ({isSidebar}) => {
           </Link>
 
           {/* Navigation Menu */}
-          <nav className="flex-1 py-1">
-            <ul className="space-y-1 overflow-hidden">
+          <nav className="flex-1 py-2">
+            <ul className="space-y-1 overflow-hidden px-2">
               {menuItems.map((item, index) => (
                 <motion.li
                   key={item.label}
@@ -78,10 +78,14 @@ const Sidebar = ({isSidebar}) => {
                 >
                   <Link
                     href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
-                    className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 from-indigo-50 to-indigo-200 hover:text-indigo-700 ${activeIcon === index ? 'bg-gradient-to-r text-indigo-700' : ''}  ${minimize ? 'justify-center py-3' : 'px-6 py-3 hover:bg-gradient-to-r'}`}
+                    className={`flex items-center rounded-xl transition-all duration-200 
+                      ${activeIcon === index
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
+                        : 'hover:bg-blue-50 text-gray-700 hover:text-blue-700'} 
+                      ${minimize ? 'justify-center p-3' : 'px-4 py-2.5'}`}
                     onClick={() => changeActive(index)}
                   >
-                    <img src={item.iconSrc} className={`select-none ${minimize ? 'w-9' : 'w-8' }`} alt={`${item.label}`} />
+                    <img src={item.iconSrc} className={`select-none ${minimize ? 'w-9' : 'w-8'}`} alt={`${item.label}`} />
                     <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>{item.label}</span>
                     {item.isNew && (
                       <span className={`ml-2 bg-green-200 text-green-800 text-xs font-semibold px-2 py-1 rounded-full animate-pulse ${minimize ? 'hidden' : ''}`}>
@@ -89,15 +93,14 @@ const Sidebar = ({isSidebar}) => {
                       </span>
                     )}
                   </Link>
-                  <div className={`absolute right-0 top-0 h-full w-1 bg-indigo-500 rounded-md opacity-0 group-hover:opacity-100 transition-all duration-300 ${activeIcon === index ? 'opacity-100' : ''}  ${minimize ? 'hidden' : ''}`}></div>
                 </motion.li>
               ))}
             </ul>
           </nav>
 
           {/* Settings and Support */}
-          <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-            <ul className="space-y-1">
+          <div className="py-4 border-t border-gray-200 bg-gray-50">
+            <ul className="space-y-1 px-4 pb-2">
               <li>
                 <Link
                   href="/contact"
@@ -118,9 +121,11 @@ const Sidebar = ({isSidebar}) => {
                 </button>
               </li>
             </ul>
+
           </div>
         </div>
       </div>}
+
     </>
   );
 };

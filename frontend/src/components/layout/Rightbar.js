@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '@/redux/users/usersSlice';
 import { AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { FiHome } from "react-icons/fi";
 
 const Rightbar = () => {
@@ -36,9 +37,40 @@ const Rightbar = () => {
       {isLoggedIn && (
         <div className={`w-64 hidden md:block`}>
           <div
-            className="rightBar w-64 p-4 bg-gradient-to-b from-white to-blue-50 shadow-xl flex flex-col gap-6 fixed overflow-y-auto rounded-lg"
+            className="rightBar w-64 p-4 bg-gradient-to-b from-white to-blue-50 shadow-xl flex flex-col gap-4 fixed overflow-y-auto rounded-lg"
             style={{ height: "calc(100vh - 4rem)" }}
           >
+            <div>
+              <div className="px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg shadow-md overflow-hidden">
+                <div className="absolute right-0 top-0 opacity-10">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="white">
+                    <path d="M12 15.39l-3.76 2.27.99-4.28-3.32-2.88 4.38-.37L12 6.09l1.71 4.04 4.38.37-3.32 2.88.99 4.28z" />
+                  </svg>
+                </div>
+                <div className="flex items-center">
+                  <motion.div
+                    className="p-1 bg-white rounded-full mr-3"
+                    animate={{ rotate: [0, 10, 0, -10, 0] }}
+                    transition={{ repeat: Infinity, duration: 5 }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#6366f1">
+                      <path d="M12 2l2.4 7.2h7.6l-6 4.8 2.4 7.2-6-4.8-6 4.8 2.4-7.2-6-4.8h7.6z" />
+                    </svg>
+                  </motion.div>
+                  <div>
+                    <h4 className="font-bold text-sm">Premium Features</h4>
+                    <p className="text-xs opacity-90">Upgrade your account now!</p>
+                  </div>
+                </div>
+                <motion.button
+                  className="w-full mt-2 py-1.5 bg-white bg-opacity-20 rounded-md text-xs font-semibold hover:bg-opacity-30"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  Upgrade Now
+                </motion.button>
+              </div>
+            </div>
 
             {/* Navigation Menu */}
             <ul className="flex flex-col gap-3">
