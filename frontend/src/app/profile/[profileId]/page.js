@@ -26,6 +26,7 @@ import Following from '@/components/userProfile/Following';
 import Posts from '@/components/userProfile/Posts';
 // import StatsSection from '@/components/userProfile/StatsSection';
 import Link from 'next/link';
+import { Loading } from '@/components';
 
 const UserProfile = ({ params }) => {
   const [user, setUser] = useState(null);
@@ -61,7 +62,7 @@ const UserProfile = ({ params }) => {
   }, [params.profileId, dispatch]);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <Loading />;
   }
 
   if (error) {

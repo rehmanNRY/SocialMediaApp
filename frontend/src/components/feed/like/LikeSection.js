@@ -5,30 +5,19 @@ import { FiBookmark } from "react-icons/fi";
 import { BsFillBookmarkFill } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { getCommentsByPost } from "@/redux/comments/commentsSlice";
-import { fetchSavedItems, toggleSavedItem } from "@/redux/savedItems/savedItemsSlice";
 
-const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, likers }) => {
+const LikeSection = ({
+  userHasLiked,
+  handleToggleLike,
+  post,
+  handleShowLikers,
+  likers,
+  isUserBookmark,
+  handleToggleBookmark,
+}) => {
   const dispatch = useDispatch();
   const { commentsByPostId } = useSelector((state) => state.comments);
   const comments = commentsByPostId[post._id] || [];
-  const { savedItems } = useSelector((state) => state.savedItems);
-
-  const [isBookmarked, setIsBookmarked] = useState(false);
-
-  useEffect(() => {
-    dispatch(fetchSavedItems());
-  }, [dispatch]);
-
-  useEffect(() => {
-    setIsBookmarked(savedItems.some((item) => item.post._id === post._id));
-  }, [savedItems, post._id]);
-
-  const handleToggleBookmark = () => {
-    dispatch(toggleSavedItem(post._id)).then((action) => {
-      const { isSaved } = action.payload;
-      setIsBookmarked(!isBookmarked);
-    });
-  };
 
   useEffect(() => {
     if (post._id) {
@@ -91,16 +80,16 @@ const LikeSection = ({ userHasLiked, handleToggleLike, post, handleShowLikers, l
         {/* Bookmark Button */}
         <button
           onClick={handleToggleBookmark}
-          className={`flex items-center space-x-1 transition ${isBookmarked ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
+          className={`flex items-center space-x-1 transition ${isUserBookmark ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
             }`}
         >
-          {isBookmarked ? (
+          {isUserBookmark ? (
             <BsFillBookmarkFill className="text-xl sm:text-2xl" />
           ) : (
             <FiBookmark className="text-xl sm:text-2xl" />
           )}
           <span className="font-semibold text-xs sm:text-base">
-            {isBookmarked ? "Bookmarked" : "Bookmark"}
+            {isUserBookmark ? "Bookmarked" : "Bookmark"}
           </span>
         </button>
       </div>

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '@/redux/users/usersSlice';
 import Link from 'next/link';
@@ -15,6 +15,7 @@ import {
 } from '@/redux/friendRequests/friendRequestsSlice';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
 import AuthRedirect from '@/components/AuthRedirect';
+import { useLoading } from '@/components/LoadingProvider';
 
 const FriendsSuggestion = () => {
   const dispatch = useDispatch();
@@ -24,6 +25,12 @@ const FriendsSuggestion = () => {
   const friendsList = useSelector((state) => state.friendRequests.friendsList);
   const { userDetails } = useSelector((state) => state.auth);
   const loggedInUserId = userDetails?._id;
+  const { showLoadingFor } = useLoading();
+
+  // Local state for optimistic updates
+  const [optimisticSentRequests, setOptimisticSentRequests] = useState([]);
+  const [optimisticReceivedRequests, setOptimisticReceivedRequests] = useState([]);
+  const [optimisticFriendsList, setOptimisticFriendsList] = useState([]);
 
   const status = useSelector((state) => state.users.status);
   const error = useSelector((state) => state.users.error);
@@ -37,6 +44,19 @@ const FriendsSuggestion = () => {
     dispatch(fetchReceivedRequests());
     dispatch(fetchFriendsList());
   }, [status, dispatch]);
+
+  // Update optimistic states when Redux state changes
+  useEffect(() => {
+    setOptimisticSentRequests(sentRequests);
+  }, [sentRequests]);
+
+  useEffect(() => {
+    setOptimisticReceivedRequests(receivedRequests);
+  }, [receivedRequests]);
+
+  useEffect(() => {
+    setOptimisticFriendsList(friendsList);
+  }, [friendsList]);
 
   if (status === 'loading') {
     return (
@@ -55,24 +75,72 @@ const FriendsSuggestion = () => {
   }
 
   const handleSendRequest = async (receiverId) => {
+    // Optimistically update UI
+    const receiver = users.find(user => user._id === receiverId);
+    if (receiver) {
+      const optimisticRequest = {
+        _id: `temp-${Date.now()}`, // Temporary ID
+        receiver: {
+          _id: receiverId,
+          fullName: receiver.fullName,
+          username: receiver.username,
+          profilePicture: receiver.profilePicture
+        }
+      };
+      setOptimisticSentRequests([...optimisticSentRequests, optimisticRequest]);
+    }
+    
+    // Make the actual API call
     dispatch(sendFriendRequest(receiverId));
-    dispatch(fetchSentRequests());
   };
 
   const handleAcceptRequest = (requestId) => {
+    // Find the request to get the sender info
+    const request = optimisticReceivedRequests.find(req => req._id === requestId);
+    
+    if (request) {
+      // Optimistically update UI
+      // 1. Remove from received requests
+      setOptimisticReceivedRequests(
+        optimisticReceivedRequests.filter(req => req._id !== requestId)
+      );
+      
+      // 2. Add to friends list
+      setOptimisticFriendsList([...optimisticFriendsList, request.sender]);
+    }
+    
+    // Make the actual API call
     dispatch(acceptFriendRequest(requestId));
     dispatch(fetchFriendsList());
   };
 
   const handleRejectRequest = (requestId) => {
+    // Optimistically update UI
+    setOptimisticReceivedRequests(
+      optimisticReceivedRequests.filter(req => req._id !== requestId)
+    );
+    
+    // Make the actual API call
     dispatch(rejectFriendRequest(requestId));
   };
 
   const handleCancelRequest = (requestId) => {
+    // Optimistically update UI
+    setOptimisticSentRequests(
+      optimisticSentRequests.filter(req => req._id !== requestId)
+    );
+    
+    // Make the actual API call
     dispatch(cancelSentRequest(requestId));
   };
 
   const handleUnfriend = (friendId) => {
+    // Optimistically update UI
+    setOptimisticFriendsList(
+      optimisticFriendsList.filter(friend => friend._id !== friendId)
+    );
+    
+    // Make the actual API call
     dispatch(unfriend(friendId));
   };
 
@@ -86,11 +154,11 @@ const FriendsSuggestion = () => {
         {users.length > 0 ? (
           <ul className="grid grid-cols-1 gap-4">
             {users.map((user) => {
-              const isFriend = friendsList.some((friend) => friend._id === user._id);
-              const hasSentRequest = sentRequests.some((req) => req.receiver._id === user._id);
-              const sentRequestId = sentRequests.find((req) => req.receiver._id === user._id)?._id;
-              const hasReceivedRequest = receivedRequests.some((req) => req.sender._id === user._id);
-              const receivedRequestId = receivedRequests.find((req) => req.sender._id === user._id)?._id;
+              const isFriend = optimisticFriendsList.some((friend) => friend._id === user._id);
+              const hasSentRequest = optimisticSentRequests.some((req) => req.receiver._id === user._id);
+              const sentRequestId = optimisticSentRequests.find((req) => req.receiver._id === user._id)?._id;
+              const hasReceivedRequest = optimisticReceivedRequests.some((req) => req.sender._id === user._id);
+              const receivedRequestId = optimisticReceivedRequests.find((req) => req.sender._id === user._id)?._id;
 
               return (
                 <li

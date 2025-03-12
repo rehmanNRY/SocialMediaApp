@@ -5,7 +5,6 @@ import { getAllPosts } from "@/redux/posts/postsSlice";
 import AuthRedirect from "@/components/AuthRedirect";
 import { FaFire, FaCode, FaLeaf, FaTree } from "react-icons/fa";
 import { FiFilter } from "react-icons/fi";
-import { AiOutlinePlusCircle } from "react-icons/ai";
 import PostForm from "@/components/feed/posts/PostForm";
 import PostList from "@/components/feed/posts/PostList";
 import { BsFillPostcardFill } from "react-icons/bs";

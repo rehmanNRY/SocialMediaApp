@@ -16,14 +16,22 @@ import {
   getPostLikers,
 } from "@/redux/posts/postsSlice";
 import Link from "next/link";
+import { useLoading } from "@/components/LoadingProvider";
+import { fetchSavedItems, toggleSavedItem } from "@/redux/savedItems/savedItemsSlice";
 
 const PostCard = ({ post }) => {
-  const dispatch = useDispatch();
-  const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
   const [likers, setLikers] = useState([]);
   const [showLikersModal, setShowLikersModal] = useState(false);
+  const [optimisticLiked, setOptimisticLiked] = useState(false);  
+  const [optimisticBookmarked, setOptimisticBookmarked] = useState(false);
+  
+  const { showLoadingFor } = useLoading();
+  const dispatch = useDispatch();
+  
+  const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
+  const { savedItems } = useSelector((state) => state.savedItems);
 
   const timePassed = (date) => timeAgo(date);
 
@@ -41,6 +49,11 @@ const PostCard = ({ post }) => {
     }
   }, [dispatch, post._id]);
 
+  // Set initial optimistic state based on actual state
+  useEffect(() => {
+    setOptimisticLiked(likers.some((liker) => liker._id === userDetails?._id));
+  }, [likers, userDetails]);
+
   const handleEditPost = () => {
     if (isEditing) {
       dispatch(editPost({ postId: post._id, content: editContent }));
@@ -53,6 +66,22 @@ const PostCard = ({ post }) => {
   };
 
   const handleToggleLike = () => {
+    // Optimistically update UI
+    const wasLiked = likers.some((liker) => liker._id === userDetails?._id);
+    
+    // Update optimistic state
+    setOptimisticLiked(!wasLiked);
+    
+    // If user was in likers, remove them; otherwise add them
+    let updatedLikers = [...likers];
+    if (wasLiked) {
+      updatedLikers = updatedLikers.filter(liker => liker._id !== userDetails?._id);
+    } else if (userDetails) {
+      updatedLikers.push(userDetails);
+    }
+    setLikers(updatedLikers);
+    
+    // Make the actual API call
     dispatch(toggleLikePost(post._id)).then(() => {
       // Refresh the list of likers after liking or unliking the post
       dispatch(getPostLikers(post._id)).then((action) => {
@@ -69,7 +98,23 @@ const PostCard = ({ post }) => {
     setShowLikersModal(false);
   };
 
-  const userHasLiked = likers.some((liker) => liker._id === userDetails?._id);
+  useEffect(() => {
+    dispatch(fetchSavedItems());
+  }, [dispatch, savedItems]);
+
+  useEffect(() => {
+    setOptimisticBookmarked(savedItems.some((item) => item.post._id === post._id));
+  }, [savedItems, post._id]);
+
+  const handleToggleBookmark = () => {
+    setOptimisticBookmarked(!optimisticBookmarked);
+    dispatch(toggleSavedItem(post._id)).then((action) => {
+    });
+  };
+
+  // Use optimistic state for UI
+  const userHasLiked = optimisticLiked;
+  const isUserBookmark = optimisticBookmarked;
 
   return (
     <div className="bg-white p-6 rounded-xl shadow-md relative hover:shadow-xl">
@@ -139,6 +184,8 @@ const PostCard = ({ post }) => {
         post={post}
         handleShowLikers={handleShowLikers}
         likers={likers}
+        isUserBookmark={isUserBookmark}
+        handleToggleBookmark={handleToggleBookmark}
       />
       <CommentForm postId={post._id} />
       <CommentList postId={post._id} />

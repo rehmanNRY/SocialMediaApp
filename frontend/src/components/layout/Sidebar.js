@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { logout } from '@/redux/auth/authSlice';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,20 +10,15 @@ import { fetchUserDetails } from '@/redux/auth/authSlice';
 const Sidebar = ({ isSidebar }) => {
   const dispatch = useDispatch();
   const [isClient, setIsClient] = useState(false);
-  const [activeIcon, setActiveIcon] = useState(null);
-  const [minimize, setMinimize] = useState(false)
-  const changeActive = (activeIndex) => {
-    setActiveIcon(activeIndex);
-  }
-
-  const router = useRouter();
+  const [minimize, setMinimize] = useState(false);
   const { isLoggedIn, userDetails, loading, error } = useSelector((state) => state.auth);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     dispatch(logout());
     router.push('/login');
   };
-
 
   useEffect(() => {
     setIsClient(true);
@@ -31,15 +26,18 @@ const Sidebar = ({ isSidebar }) => {
       dispatch(fetchUserDetails());
     }
   }, [isLoggedIn, dispatch]);
+
   if (!isClient) {
     return null; // Render nothing until client-side rendering is confirmed
   }
+
   const toggleSidebar = () => {
     setMinimize(!minimize);
   }
+
   return (
     <>
-      {isLoggedIn && <div className={`${minimize ? 'w-[5.5rem]' : `md:w-64 w-screen ${isSidebar ? 'block' : 'hidden md:block md:relative fixed z-50'}`}`}>
+      {isLoggedIn && <div className={`${minimize ? 'w-[5.5rem]' : `md:w-64 w-screen ${isSidebar ? 'block' : 'hidden md:block md:relative fixed z-20'}`}`}>
         <div className={`sidebar from-white via-gray-50 to-blue-50 text-gray-900 flex flex-col border-r border-gray-200 shadow-xl fixed overflow-y-auto ${minimize ? 'w-[5.5rem]' : 'w-screen md:w-64 bg-gradient-to-b'}`} style={{ height: "calc(100vh - 4.5rem)" }}>
           <button
             className="absolute right-0 bottom-32 bg-white text-black border border-gray-200 shadow-md p-2 rounded-l-lg z-10 md:"
@@ -57,12 +55,11 @@ const Sidebar = ({ isSidebar }) => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             />
-            {loading && <p>Loading user details...</p>}
             {error && <p>Error: {error.message || JSON.stringify(error)}</p>}
 
             <div className={`${minimize ? 'hidden' : ''}`}>
-              <h3 className="text-lg HelvM">{userDetails?.fullName}</h3>
-              <p className="text-sm text-gray-700 HelvR">@{userDetails?.username}</p>
+              <h3 className="text-lg HelvM">{userDetails?.fullName || "Guest User"}</h3>
+              <p className="text-sm text-gray-700 HelvR">@{userDetails?.username || "guest"}</p>
             </div>
           </Link>
 
@@ -79,11 +76,10 @@ const Sidebar = ({ isSidebar }) => {
                   <Link
                     href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
                     className={`flex items-center rounded-xl transition-all duration-200 
-                      ${activeIcon === index
+                      ${pathname === item.href || (item.myProfile && pathname.includes('/profile')) 
                         ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
                         : 'hover:bg-blue-50 text-gray-700 hover:text-blue-700'} 
                       ${minimize ? 'justify-center p-3' : 'px-4 py-2.5'}`}
-                    onClick={() => changeActive(index)}
                   >
                     <img src={item.iconSrc} className={`select-none ${minimize ? 'w-9' : 'w-8'}`} alt={`${item.label}`} />
                     <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>{item.label}</span>
@@ -104,8 +100,7 @@ const Sidebar = ({ isSidebar }) => {
               <li>
                 <Link
                   href="/contact"
-                  className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 ${activeIcon === 'contact' ? 'bg-blue-50 text-blue-700' : ''}  ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-blue-50 hover:text-blue-700'}`}
-                  onClick={() => changeActive('contact')}
+                  className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 ${pathname === '/contact' ? 'bg-blue-50 text-blue-700' : ''}  ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-blue-50 hover:text-blue-700'}`}
                 >
                   <img src="https://res.cloudinary.com/datvbo0ey/image/upload/v1726327946/Microsoft-Fluentui-Emoji-3d-E-Mail-3d.1024_qzqrs2.png" className="w-8" alt="contact" />
                   <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>Contact</span>

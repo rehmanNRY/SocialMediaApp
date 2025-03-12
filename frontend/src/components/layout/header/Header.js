@@ -9,15 +9,25 @@ import { fetchUsers } from '@/redux/users/usersSlice';
 import { IoRocketOutline } from 'react-icons/io5';
 import Search from './Search';
 import Notification from './Notification';
+import { useLoading } from '@/components/LoadingProvider';
+import { useRouter } from 'next/navigation';
 
 const Header = ({ toggleSidebar }) => {
   const dispatch = useDispatch();
+  const router = useRouter();
+  const { showLoadingFor } = useLoading();
   const [isClient, setIsClient] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hoverNav, setHoverNav] = useState(null);
 
   const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
+
+  // Custom navigation function to show loading state
+  const handleNavigation = (path) => {
+    showLoadingFor(500); // Show loading for 500ms
+    router.push(path);
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -59,7 +69,10 @@ const Header = ({ toggleSidebar }) => {
           >
             {/* Left Section - Logo & Nav Links */}
             <div className="flex items-center">
-              <Link href="/" className="flex items-center group">
+              <div 
+                onClick={() => handleNavigation('/')} 
+                className="flex items-center group cursor-pointer"
+              >
                 <motion.div
                   whileHover={{ scale: 1.2, rotate: 10 }}
                   whileTap={{ scale: 0.9 }}
@@ -85,12 +98,12 @@ const Header = ({ toggleSidebar }) => {
                   />
                 </motion.div>
                 <span className="font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent group-hover:from-purple-600 group-hover:to-indigo-600 transition-all duration-500">Rehman</span>
-              </Link>
+              </div>
 
               <nav className="hidden lg:flex ml-3">
-                <Link 
-                  href={`/`} 
-                  className="relative flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition-colors duration-200 py-1 px-3 rounded-full hover:bg-indigo-50 group"
+                <div 
+                  onClick={() => handleNavigation('/')}
+                  className="relative flex items-center space-x-2 text-gray-700 hover:text-indigo-600 transition-colors duration-200 py-1 px-3 rounded-full hover:bg-indigo-50 group cursor-pointer"
                   onMouseEnter={() => setHoverNav('home')}
                   onMouseLeave={() => setHoverNav(null)}
                 >
@@ -109,11 +122,11 @@ const Header = ({ toggleSidebar }) => {
                       transition={{ duration: 0.2 }}
                     />
                   )}
-                </Link>
+                </div>
                 
-                <Link 
-                  href={`profile/${userDetails?._id}`} 
-                  className="relative flex items-center space-x-2 text-gray-700 hover:text-green-600 transition-colors duration-200 py-1 px-3 rounded-full hover:bg-green-50 group"
+                <div 
+                  onClick={() => handleNavigation(`/profile/${userDetails?._id}`)}
+                  className="relative flex items-center space-x-2 text-gray-700 hover:text-green-600 transition-colors duration-200 py-1 px-3 rounded-full hover:bg-green-50 group cursor-pointer"
                   onMouseEnter={() => setHoverNav('profile')}
                   onMouseLeave={() => setHoverNav(null)}
                 >
@@ -132,11 +145,11 @@ const Header = ({ toggleSidebar }) => {
                       transition={{ duration: 0.2 }}
                     />
                   )}
-                </Link>
+                </div>
                 
-                <Link 
-                  href="/friends" 
-                  className="relative flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200 py-1 px-3 rounded-full hover:bg-pink-50 group"
+                <div 
+                  onClick={() => handleNavigation('/friends')}
+                  className="relative flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-200 py-1 px-3 rounded-full hover:bg-pink-50 group cursor-pointer"
                   onMouseEnter={() => setHoverNav('connections')}
                   onMouseLeave={() => setHoverNav(null)}
                 >
@@ -155,11 +168,11 @@ const Header = ({ toggleSidebar }) => {
                       transition={{ duration: 0.2 }}
                     />
                   )}
-                </Link>
+                </div>
                 
-                <Link 
-                  href="/explore" 
-                  className="relative flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200 py-1 px-3 rounded-full hover:bg-purple-50 group"
+                <div 
+                  onClick={() => handleNavigation('/explore')}
+                  className="relative flex items-center space-x-2 text-gray-700 hover:text-purple-600 transition-colors duration-200 py-1 px-3 rounded-full hover:bg-purple-50 group cursor-pointer"
                   onMouseEnter={() => setHoverNav('explore')}
                   onMouseLeave={() => setHoverNav(null)}
                 >
@@ -178,7 +191,7 @@ const Header = ({ toggleSidebar }) => {
                       transition={{ duration: 0.2 }}
                     />
                   )}
-                </Link>
+                </div>
               </nav>
             </div>
 
@@ -195,9 +208,12 @@ const Header = ({ toggleSidebar }) => {
                 whileHover={{ rotate: 90 }}
                 transition={{ duration: 0.3 }}
               >
-                <Link href="/settings" className="hidden md:flex p-2 rounded-full hover:bg-gray-100 transition-colors">
+                <div 
+                  onClick={() => handleNavigation('/settings')} 
+                  className="hidden md:flex p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
+                >
                   <FiSettings className="w-5 h-5 text-gray-700" />
-                </Link>
+                </div>
               </motion.div>
 
               {/* Mobile Search Trigger */}
@@ -211,9 +227,9 @@ const Header = ({ toggleSidebar }) => {
               </motion.button>
 
               {/* User Profile */}
-              <Link
-                href={`profile/${userDetails?._id}`}
-                className="flex items-center ml-1 p-1 rounded-full hover:bg-gray-50 transition-colors"
+              <div
+                onClick={() => handleNavigation(`/profile/${userDetails?._id}`)}
+                className="flex items-center ml-1 p-1 rounded-full hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
@@ -238,7 +254,7 @@ const Header = ({ toggleSidebar }) => {
                   ></motion.span>
                 </motion.div>
                 <span className="hidden md:block ml-2 font-medium text-sm text-gray-800">{userDetails?.fullName?.split(' ')[0]}</span>
-              </Link>
+              </div>
 
               {/* Menu Toggle */}
               <motion.button

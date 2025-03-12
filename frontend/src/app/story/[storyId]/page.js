@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import { timeAgo } from "@/utility/timeAgo";
 import StoryForm from '@/components/feed/stories/StoryForm';
 import AuthRedirect from '@/components/AuthRedirect';
+import { Loading } from "@/components";
 
 const Page = ({ params }) => {
   const dispatch = useDispatch();
@@ -167,7 +168,7 @@ const Page = ({ params }) => {
   };
 
   if (!storyToShow) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (

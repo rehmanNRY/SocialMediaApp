@@ -3,11 +3,14 @@ import { Provider, useSelector } from "react-redux";
 import { store } from "@/redux/store";
 import { useState } from "react";
 import { Header, Rightbar, Sidebar } from ".";
+import LoadingProvider from "./LoadingProvider";
 
 export default function RootLayoutClient({ children }) {
   return (
     <Provider store={store}>
-      <LayoutWrapper>{children}</LayoutWrapper>
+      <LoadingProvider>
+        <LayoutWrapper>{children}</LayoutWrapper>
+      </LoadingProvider>
     </Provider>
   );
 }

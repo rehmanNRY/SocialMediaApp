@@ -35,7 +35,7 @@ const Rightbar = () => {
   return (
     <>
       {isLoggedIn && (
-        <div className={`w-64 hidden md:block`}>
+        <div className={`w-64 hidden md:block z-20`}>
           <div
             className="rightBar w-64 p-4 bg-gradient-to-b from-white to-blue-50 shadow-xl flex flex-col gap-4 fixed overflow-y-auto rounded-lg"
             style={{ height: "calc(100vh - 4rem)" }}
