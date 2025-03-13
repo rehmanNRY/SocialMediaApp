@@ -38,13 +38,25 @@ const Sidebar = ({ isSidebar }) => {
   return (
     <>
       {isLoggedIn && <div className={`${minimize ? 'w-[5.5rem]' : `md:w-64 w-screen ${isSidebar ? 'block' : 'hidden md:block md:relative fixed z-20'}`}`}>
-        <div className={`sidebar from-white via-gray-50 to-blue-50 text-gray-900 flex flex-col border-r border-gray-200 shadow-xl fixed overflow-y-auto ${minimize ? 'w-[5.5rem]' : 'w-screen md:w-64 bg-gradient-to-b'}`} style={{ height: "calc(100vh - 4.5rem)" }}>
-          <button
-            className="absolute right-0 bottom-32 bg-white text-black border border-gray-200 shadow-md p-2 rounded-l-lg z-10 md:"
+        <div className={`sidebar from-purple-50 via-gray-50 to-blue-50 text-gray-900 flex flex-col border-r border-gray-200 shadow-xl fixed overflow-y-auto ${minimize ? 'w-[5.5rem]' : 'w-screen md:w-64 bg-gradient-to-b'}`} style={{ height: "calc(100vh - 4rem)" }}>
+          <motion.button
+            className="absolute right-0 bottom-32 bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-2 rounded-l-lg z-10 shadow-lg"
             onClick={toggleSidebar}
+            whileHover={{ scale: 1.1, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5)" }}
+            whileTap={{ scale: 0.95 }}
           >
-            {minimize ? '>>' : '<<'}
-          </button>
+            {minimize ? (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="13 17 18 12 13 7"></polyline>
+                <polyline points="6 17 11 12 6 7"></polyline>
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="11 17 6 12 11 7"></polyline>
+                <polyline points="18 17 13 12 18 7"></polyline>
+              </svg>
+            )}
+          </motion.button>
           {/* Profile Section */}
           <Link href={`/profile/${userDetails?._id}`} className={`flex items-center space-x-4 shadow-sm border-b border-gray-200 bg-gray-50  ${minimize ? 'justify-center py-6' : 'p-6'}`}>
             <motion.img
@@ -76,8 +88,8 @@ const Sidebar = ({ isSidebar }) => {
                   <Link
                     href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
                     className={`flex items-center rounded-xl transition-all duration-200 
-                      ${pathname === item.href || (item.myProfile && pathname.includes('/profile')) 
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
+                      ${pathname === item.href || (item.myProfile && pathname.includes('/profile'))
+                        ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
                         : 'hover:bg-blue-50 text-gray-700 hover:text-blue-700'} 
                       ${minimize ? 'justify-center p-3' : 'px-4 py-2.5'}`}
                   >

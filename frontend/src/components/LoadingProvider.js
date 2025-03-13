@@ -1,6 +1,6 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect, Suspense } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import Loading from './Loading';
 
 // Create a context for the loading state
@@ -18,7 +18,6 @@ export const LoadingProvider = ({ children }) => {
   const [loadingTimeout, setLoadingTimeout] = useState(null);
   
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   // Clear any existing timeout when the component unmounts
   useEffect(() => {
@@ -41,7 +40,7 @@ export const LoadingProvider = ({ children }) => {
     return () => {
       clearTimeout(timeout);
     };
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   // Function to show loading for a specific duration
   const showLoadingFor = (duration = 500) => {
@@ -59,9 +58,7 @@ export const LoadingProvider = ({ children }) => {
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading, showLoadingFor }}>
       {isLoading && <Loading />}
-      <Suspense fallback={<Loading />}>
-        {children}
-      </Suspense>
+      {children}
     </LoadingContext.Provider>
   );
 };
