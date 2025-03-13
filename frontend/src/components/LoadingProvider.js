@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import Loading from './Loading';
 
@@ -59,7 +59,9 @@ export const LoadingProvider = ({ children }) => {
   return (
     <LoadingContext.Provider value={{ isLoading, setIsLoading, showLoadingFor }}>
       {isLoading && <Loading />}
-      {children}
+      <Suspense fallback={<Loading />}>
+        {children}
+      </Suspense>
     </LoadingContext.Provider>
   );
 };

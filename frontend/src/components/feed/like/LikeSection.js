@@ -82,6 +82,7 @@ const LikeSection = ({
           onClick={handleToggleBookmark}
           className={`flex items-center space-x-1 transition ${isUserBookmark ? "text-blue-500" : "text-gray-600 hover:text-blue-500"
             }`}
+          aria-label={isUserBookmark ? "Remove bookmark" : "Add bookmark"}
         >
           {isUserBookmark ? (
             <BsFillBookmarkFill className="text-xl sm:text-2xl" />

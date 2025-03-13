@@ -100,16 +100,28 @@ const PostCard = ({ post }) => {
 
   useEffect(() => {
     dispatch(fetchSavedItems());
-  }, [dispatch, savedItems]);
+  }, [dispatch]);
 
   useEffect(() => {
     setOptimisticBookmarked(savedItems.some((item) => item.post._id === post._id));
   }, [savedItems, post._id]);
 
   const handleToggleBookmark = () => {
+    // Optimistically update UI
     setOptimisticBookmarked(!optimisticBookmarked);
-    dispatch(toggleSavedItem(post._id)).then((action) => {
-    });
+    
+    // Dispatch the action and handle the result
+    dispatch(toggleSavedItem(post._id))
+      .unwrap()
+      .then((result) => {
+        // The result contains the correct isSaved state from the server
+        // We don't need to do anything here as the Redux store will be updated
+      })
+      .catch((error) => {
+        // If there was an error, revert the optimistic update
+        setOptimisticBookmarked(optimisticBookmarked);
+        console.error("Error toggling bookmark:", error);
+      });
   };
 
   // Use optimistic state for UI

@@ -42,20 +42,15 @@
 /* Scrollbars hidden */
 .rightBar::-webkit-scrollbar,
 .sidebar::-webkit-scrollbar,
-.scrollbar-hide::-webkit-scrollbar{
+.scrollbar-hide::-webkit-scrollbar,
+.mini-sidebar::-webkit-scrollbar {
   display: none;
 }
+
 .sidebar,
 .rightBar,
-.scrollbar-hide {
+.scrollbar-hide,
+.mini-sidebar {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
-}
-
-
-/* Registeration pages */
-.registerPage{
-  background-image: url(https://cdn.dribbble.com/users/9699739/screenshots/19642851/media/4ae6e50916384149e7e927b315141ac5.jpg);
-  background-position: center;
-  background-size: cover;
 }
