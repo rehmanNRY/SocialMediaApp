@@ -53,6 +53,10 @@ const UserSchema = new Schema({
     maxlength: [100, 'Bio cannot exceed 100 characters'],
     default: '✨ Crafting cool apps with MERN! 💻',
   },
+  isDpVerify: {
+    type: Boolean,
+    default: false,
+  },
   location: {
     type: String,
     trim: true,

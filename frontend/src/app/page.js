@@ -11,6 +11,7 @@ import { BsFillPostcardFill } from "react-icons/bs";
 import StorySection from "@/components/feed/stories/StorySection";
 import RunningServer from "@/components/RunningServer";
 import axios from "axios";
+import { ProfilePicVerify } from "@/components";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -86,6 +87,7 @@ export default function Home() {
   return (
     <AuthRedirect>
       <main className="bg-[#F5F6FA] mx-auto p-4 space-y-5 w-full min-h-screen">
+        <ProfilePicVerify />
         <StorySection />
         {/* Hashtag and Actions Section */}
         <div className="items-center justify-between mb-6 flex-wrap gap-2 hidden">

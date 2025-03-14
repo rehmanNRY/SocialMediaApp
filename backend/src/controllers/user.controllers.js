@@ -159,6 +159,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     location,
     bio,
     dob,
+    isDpVerify,
   } = req.body;
 
   const user = await User.findById(userId);
@@ -176,6 +177,7 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     if (location) user.location = location;
     if (bio) user.bio = bio;
     if (dob) user.dob = dob;
+    if (isDpVerify) user.isDpVerify = isDpVerify;
 
     await user.save();
     res.json({ data: user });

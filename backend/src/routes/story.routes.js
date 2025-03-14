@@ -6,7 +6,7 @@ import {
   deleteStory,
   autoDeleteStories,
   getAllStories,
-} from '../controllers/story.controller.js';
+} from '../controllers/story.controllers.js';
 
 const router = express.Router();
 
