@@ -4,15 +4,19 @@ import axiosInstance from '@/api/axiosInstance';
 // Async thunk to create a new post
 export const createPost = createAsyncThunk(
   'posts/createPost',
-  async ({ content, image }, { rejectWithValue }) => {
+  async ({ content, image, backgroundColor, pollData }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axiosInstance.post('/posts', { content, image }, {
+      const response = await axiosInstance.post('/posts', { 
+        content, 
+        image, 
+        backgroundColor,
+        pollData 
+      }, {
         headers: {
           'auth-token': token,
         },
       });
-      // console.log(response.data)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -36,9 +40,18 @@ export const getAllPosts = createAsyncThunk(
 // Async thunk to edit a post
 export const editPost = createAsyncThunk(
   'posts/editPost',
-  async ({ postId, content, image }, { rejectWithValue }) => {
+  async ({ postId, content, image, backgroundColor }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`/posts/${postId}`, { content, image });
+      const token = localStorage.getItem('authToken');
+      const response = await axiosInstance.put(`/posts/${postId}`, { 
+        content, 
+        image,
+        backgroundColor 
+      }, {
+        headers: {
+          'auth-token': token,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -51,7 +64,12 @@ export const deletePost = createAsyncThunk(
   'posts/deletePost',
   async (postId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.delete(`/posts/${postId}`);
+      const token = localStorage.getItem('authToken');
+      const response = await axiosInstance.delete(`/posts/${postId}`, {
+        headers: {
+          'auth-token': token,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -64,7 +82,12 @@ export const toggleLikePost = createAsyncThunk(
   'posts/toggleLikePost',
   async (postId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post(`/posts/${postId}/like`);
+      const token = localStorage.getItem('authToken');
+      const response = await axiosInstance.post(`/posts/${postId}/like`, {}, {
+        headers: {
+          'auth-token': token,
+        },
+      });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -85,12 +108,44 @@ export const getPostLikers = createAsyncThunk(
   }
 );
 
+// Async thunk to vote on a poll option
+export const votePollOption = createAsyncThunk(
+  'posts/votePollOption',
+  async ({ postId, optionId }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await axiosInstance.post(`/posts/${postId}/poll/${optionId}/vote`, {}, {
+        headers: {
+          'auth-token': token,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
+// Async thunk to get poll results
+export const getPollResults = createAsyncThunk(
+  'posts/getPollResults',
+  async (postId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/posts/${postId}/poll/results`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const postsSlice = createSlice({
   name: 'posts',
   initialState: {
     posts: [],
     status: 'idle',
     error: null,
+    pollResults: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -122,6 +177,15 @@ const postsSlice = createSlice({
         if (post) {
           post.likers = action.payload.data;
         }
+      })
+      .addCase(votePollOption.fulfilled, (state, action) => {
+        const index = state.posts.findIndex((post) => post._id === action.payload.data._id);
+        if (index !== -1) {
+          state.posts[index] = action.payload.data;
+        }
+      })
+      .addCase(getPollResults.fulfilled, (state, action) => {
+        state.pollResults[action.meta.arg] = action.payload.data;
       })
       .addMatcher(
         (action) => action.type.endsWith('/rejected'),

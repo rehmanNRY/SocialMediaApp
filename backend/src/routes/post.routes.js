@@ -7,7 +7,9 @@ import {
   editPost,
   deletePost,
   toggleLikePost,
-  getPostLikers
+  getPostLikers,
+  votePollOption,
+  getPollResults
 } from '../controllers/post.controllers.js';
 
 const router = express.Router();
@@ -29,5 +31,11 @@ router.post('/:postId/like', fetchUser, toggleLikePost);
 
 // Route to get the list of all users who liked a post
 router.get('/:postId/likers', getPostLikers);
+
+// Route to vote on a poll option
+router.post('/:postId/poll/:optionId/vote', fetchUser, votePollOption);
+
+// Route to get poll results
+router.get('/:postId/poll/results', getPollResults);
 
 export default router;

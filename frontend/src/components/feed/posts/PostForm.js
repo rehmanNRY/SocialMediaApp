@@ -1,13 +1,28 @@
 "use client"
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createPost } from '@/redux/posts/postsSlice';
-import { AiOutlinePicture, AiOutlineCloseCircle, AiFillSmile } from 'react-icons/ai';
-import { MdAddPhotoAlternate } from 'react-icons/md';
-import { BiLoaderCircle } from 'react-icons/bi';
-import { RiEmotionLaughLine } from 'react-icons/ri';
+import {
+  AiOutlineInfoCircle,
+} from 'react-icons/ai';
+
+// Import all components
+import {
+  PostFormHeader,
+  PostFormTextarea,
+  PostFormImagePreview,
+  PostFormMood,
+  PostFormFormatting,
+  PostFormBackgroundOptions,
+  PostFormHashtags,
+  PostFormEmojis,
+  PostFormGifs,
+  PostFormPoll,
+  PostFormAdvancedOptions,
+  PostFormImageInput,
+  PostFormToolbar
+} from './postform/index';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
-import { BsHash } from 'react-icons/bs';
 
 const PostForm = () => {
   const dispatch = useDispatch();
@@ -18,29 +33,87 @@ const PostForm = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [isClient, setIsClient] = useState(false);
+  const textareaRef = useRef(null);
 
-  // State for Hashtags and emojis
+  // Enhanced states
   const [showHashtags, setShowHashtags] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
-
-  // Sample hashtags and emojis
-  const hashtags = ['#trending', '#dev', '#nature', '#love', '#blessed'];
-  const emojis = ['😊', '😂', '😢', '😍', '👍'];
+  const [showFormatting, setShowFormatting] = useState(false);
+  const [backgroundColor, setBackgroundColor] = useState('bg-white');
+  const [charCount, setCharCount] = useState(0);
+  const [showBackgroundOptions, setShowBackgroundOptions] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isDraftSaved, setIsDraftSaved] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showGifSelector, setShowGifSelector] = useState(false);
+  const [showPollOptions, setShowPollOptions] = useState(false);
+  const [pollOptions, setPollOptions] = useState(['', '']);
+  const [pollDuration, setPollDuration] = useState(24);
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [mood, setMood] = useState('');
 
   useEffect(() => {
-    setIsClient(true); // Mark component as client-rendered
+    setIsClient(true);
     if (isLoggedIn) {
       dispatch(fetchUserDetails());
     }
+
+    // Load draft from local storage
+    const savedDraft = localStorage.getItem('postDraft');
+    if (savedDraft) {
+      try {
+        const draft = JSON.parse(savedDraft);
+        setContent(draft.content || '');
+        setImage(draft.image || '');
+        setIsDraftSaved(true);
+      } catch (e) {
+        console.error('Failed to load draft', e);
+      }
+    }
+
+    // Auto save draft every 30 seconds
+    const intervalId = setInterval(() => {
+      if (content.trim() || image) {
+        saveDraft();
+      }
+    }, 30000);
+
+    // Cleanup
+    return () => clearInterval(intervalId);
   }, [isLoggedIn, dispatch]);
+
+  // Update character count when content changes
+  useEffect(() => {
+    setCharCount(content.length);
+  }, [content]);
 
   const validate = () => {
     const errors = {};
-    if (!content.trim()) {
-      errors.content = 'Content is required.';
+    if (!content.trim() && !image && !previewImage) {
+      errors.content = 'Post content or image is required.';
     }
     setErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  const saveDraft = () => {
+    if (content.trim() || image) {
+      localStorage.setItem('postDraft', JSON.stringify({ content, image }));
+      setIsDraftSaved(true);
+
+      // Show saved notification briefly
+      setTimeout(() => {
+        setIsDraftSaved(false);
+      }, 2000);
+    }
+  };
+
+  const discardDraft = () => {
+    localStorage.removeItem('postDraft');
+    setContent('');
+    setImage('');
+    setPreviewImage(null);
+    setIsDraftSaved(false);
   };
 
   const handleSubmit = async (e) => {
@@ -50,10 +123,35 @@ const PostForm = () => {
 
     setLoading(true);
     try {
-      await dispatch(createPost({ content, image })).unwrap();
+      // Include poll data if poll is being created
+      const postData = {
+        content,
+        image: previewImage || image,
+        backgroundColor
+      };
+
+      if (showPollOptions && pollOptions.filter(opt => opt.trim()).length >= 2) {
+        postData.pollData = {
+          options: pollOptions.filter(opt => opt.trim()),
+          duration: pollDuration
+        };
+      }
+
+      if (mood) {
+        postData.content = `${mood} ${postData.content}`;
+      }
+
+      await dispatch(createPost(postData)).unwrap();
       setContent('');
       setImage('');
+      setPreviewImage(null);
       setShowImageInput(false);
+      setShowPollOptions(false);
+      setPollOptions(['', '']);
+      setMood('');
+      setBackgroundColor('bg-white');
+      localStorage.removeItem('postDraft');
+      resetAllMenus();
     } catch (error) {
       setErrors({ api: 'Failed to create post. Please try again.' });
     } finally {
@@ -61,152 +159,253 @@ const PostForm = () => {
     }
   };
 
+  const resetAllMenus = () => {
+    setShowImageInput(false);
+    setShowHashtags(false);
+    setShowEmojis(false);
+    setShowFormatting(false);
+    setShowBackgroundOptions(false);
+    setShowGifSelector(false);
+    setShowPollOptions(false);
+    setShowAdvancedOptions(false);
+  };
+
   // Handle hashtag click
   const handleHashtagClick = (hashtag) => {
-    setContent((prevContent) => prevContent + ' ' + hashtag);
+    setContent((prevContent) => prevContent + ' ' + hashtag + ' ');
     setShowHashtags(false);
+    textareaRef.current?.focus();
   };
 
   // Handle emoji click
   const handleEmojiClick = (emoji) => {
-    setContent((prevContent) => prevContent + ' ' + emoji);
+    setContent((prevContent) => prevContent + emoji);
     setShowEmojis(false);
+    textareaRef.current?.focus();
+  };
+
+  // Handle GIF selection
+  const handleGifSelect = (gifUrl) => {
+    setImage(gifUrl);
+    setPreviewImage(gifUrl);
+    setShowGifSelector(false);
+    textareaRef.current?.focus();
+  };
+
+  // Handle text formatting
+  const handleFormat = (type) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+
+    let formattedText = '';
+    switch (type) {
+      case 'bold':
+        formattedText = `**${selectedText}**`;
+        break;
+      case 'italic':
+        formattedText = `_${selectedText}_`;
+        break;
+      case 'underline':
+        formattedText = `~${selectedText}~`;
+        break;
+      default:
+        return;
+    }
+
+    const newContent = content.substring(0, start) + formattedText + content.substring(end);
+    setContent(newContent);
+
+    // Reset cursor position
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + formattedText.length, start + formattedText.length);
+    }, 0);
+  };
+
+  // Handle textarea expansion
+  const handleTextareaFocus = () => {
+    setIsExpanded(true);
+  };
+
+  // Handle adding poll option
+  const handleAddPollOption = () => {
+    if (pollOptions.length < 4) {
+      setPollOptions([...pollOptions, '']);
+    }
+  };
+
+  // Handle removing poll option
+  const handleRemovePollOption = (index) => {
+    if (pollOptions.length > 2) {
+      const newOptions = [...pollOptions];
+      newOptions.splice(index, 1);
+      setPollOptions(newOptions);
+    }
+  };
+
+  // Handle poll option change
+  const handlePollOptionChange = (index, value) => {
+    const newOptions = [...pollOptions];
+    newOptions[index] = value;
+    setPollOptions(newOptions);
+  };
+
+  // Handle mood selection
+  const handleMoodSelect = (emojiAndText) => {
+    setMood(emojiAndText);
+    setShowAdvancedOptions(false);
   };
 
   if (!isClient) {
-    return null; // Render nothing until client-side rendering is confirmed
+    return null;
   }
 
   return (
     <>
       {isLoggedIn && (
-        <form
-          onSubmit={handleSubmit}
-          className={`bg-white p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 w-full mx-auto`}
-        >
-          <div className="flex flex-col sm:flex-row items-center mb-4 space-y-3 sm:space-y-0 sm:space-x-3">
-            <img className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-full shadow-md" src={userDetails?.profilePicture} />
-            <h4 className="font-semibold text-gray-800 text-base sm:text-lg">What's on your mind?</h4>
-          </div>
+        <div className={`w-full transition-all duration-300 ${isExpanded ? 'mb-8' : 'mb-4'}`}>
+          <form
+            onSubmit={handleSubmit}
+            className={`${backgroundColor} p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 w-full mx-auto transition-all duration-300 transform ${isExpanded ? 'scale-102' : ''}`}
+          >
+            {/* Header with user info */}
+            <PostFormHeader
+              userDetails={userDetails}
+              isDraftSaved={isDraftSaved}
+            />
 
-          <textarea
-            className="bg-[#F8F8F9] w-full p-3 sm:p-4 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-300 shadow-sm placeholder:italic placeholder-gray-400"
-            rows="3"
-            placeholder={`Share your thoughts ${userDetails?.fullName}..`}
-            value={content}
-            maxLength={100}
-            onChange={(e) => setContent(e.target.value)}
-          />
-          {errors.content && <p className="text-red-500 text-sm mt-1">{errors.content}</p>}
+            {/* Main textarea */}
+            <PostFormTextarea
+              content={content}
+              setContent={setContent}
+              charCount={charCount}
+              isExpanded={isExpanded}
+              backgroundColor={backgroundColor}
+              textareaRef={textareaRef}
+              handleTextareaFocus={handleTextareaFocus}
+              userDetails={userDetails}
+            />
 
-          <div className="mt-2 flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0 sm:space-x-2">
-            <div className="flex items-center space-x-2">
-              <button
-                className="space-x-1 hover:text-indigo-600 transition duration-200 shadow-sm bg-gray-100 rounded-md text-gray-600 px-2 py-1 text-sm HelvR flex items-center"
-                type="button"
-                onClick={() => setShowImageInput(!showImageInput)}
-              >
-                <AiOutlinePicture className="w-4 h-4 text-indigo-500" />
-                <span>{showImageInput ? 'Remove Photo' : 'Add Photo'}</span>
-              </button>
-              <button
-                className="space-x-0.5 hover:text-indigo-600 transition duration-200 shadow-sm bg-gray-100 rounded-md text-gray-600 px-2 py-1 text-sm HelvR flex items-center"
-                type="button"
-                onClick={() => setShowHashtags(!showHashtags)}
-              >
-                <BsHash className="w-4 h-4 text-green-500" />
-                <span>Hashtags</span>
-              </button>
-              <button
-                className="flex items-center space-x-1 hover:text-indigo-600 transition duration-200 shadow-sm bg-gray-100 rounded-md text-gray-600 px-2 py-1 text-sm HelvR"
-                type="button"
-                onClick={() => setShowEmojis(!showEmojis)}
-              >
-                <RiEmotionLaughLine className="w-4 h-4 text-yellow-500" />
-                <span>Emoji</span>
-              </button>
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-indigo-500 text-white px-4 sm:px-5 py-2 sm:py-3 rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 flex items-center space-x-2"
-            >
-              {loading ? (
-                <BiLoaderCircle className="w-6 h-6 animate-spin" />
-              ) : (
-                <>
-                  <MdAddPhotoAlternate className="w-5 h-5" />
-                  <span>Post</span>
-                </>
-              )}
-            </button>
-          </div>
+            {errors.content && (
+              <p className="text-red-500 text-sm mt-1 flex items-center">
+                <AiOutlineInfoCircle className="mr-1" /> {errors.content}
+              </p>
+            )}
 
-          {showImageInput && (
-            <div className="w-full mt-2 flex items-center border border-gray-300 rounded-lg overflow-hidden animate-slideIn">
-              <input
-                type="text"
-                placeholder="Enter image link"
-                className="w-full p-2 border-none focus:outline-none"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-              />
-              <AiOutlineCloseCircle
-                className="pr-3 w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-200"
-                onClick={() => setImage('')}
-              />
-            </div>
-          )}
+            {/* Toolbar */}
+            <PostFormToolbar
+              resetAllMenus={resetAllMenus}
+              setShowImageInput={setShowImageInput}
+              showImageInput={showImageInput}
+              setShowEmojis={setShowEmojis}
+              showEmojis={showEmojis}
+              setShowGifSelector={setShowGifSelector}
+              showGifSelector={showGifSelector}
+              setShowPollOptions={setShowPollOptions}
+              showPollOptions={showPollOptions}
+              setShowHashtags={setShowHashtags}
+              showHashtags={showHashtags}
+              setShowFormatting={setShowFormatting}
+              showFormatting={showFormatting}
+              setShowBackgroundOptions={setShowBackgroundOptions}
+              showBackgroundOptions={showBackgroundOptions}
+              setShowAdvancedOptions={setShowAdvancedOptions}
+              showAdvancedOptions={showAdvancedOptions}
+              isDraftSaved={isDraftSaved}
+              discardDraft={discardDraft}
+              saveDraft={saveDraft}
+              loading={loading}
+            />
 
-          {showHashtags && (
-            <div className="mt-4 p-3 bg-gray-100 rounded-lg shadow-lg">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold">Select a hashtag:</span>
-                <AiOutlineCloseCircle
-                  className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-200"
-                  onClick={() => setShowHashtags(false)}
-                />
+            {/* Image preview area */}
+            <PostFormImagePreview
+              previewImage={previewImage}
+              image={image}
+              setPreviewImage={setPreviewImage}
+              setImage={setImage}
+            />
+
+            {/* Mood indicator */}
+            <PostFormMood
+              mood={mood}
+              setMood={setMood}
+            />
+
+            {/* Formatting toolbar */}
+            <PostFormFormatting
+              showFormatting={showFormatting}
+              setShowFormatting={setShowFormatting}
+              handleFormat={handleFormat}
+            />
+
+            {/* Background color selector */}
+            <PostFormBackgroundOptions
+              showBackgroundOptions={showBackgroundOptions}
+              setShowBackgroundOptions={setShowBackgroundOptions}
+              backgroundColor={backgroundColor}
+              setBackgroundColor={setBackgroundColor}
+            />
+
+            {/* Hashtag selector */}
+            <PostFormHashtags
+              showHashtags={showHashtags}
+              setShowHashtags={setShowHashtags}
+              handleHashtagClick={handleHashtagClick}
+            />
+
+            {/* Emoji selector */}
+            <PostFormEmojis
+              showEmojis={showEmojis}
+              setShowEmojis={setShowEmojis}
+              handleEmojiClick={handleEmojiClick}
+            />
+
+            {/* GIF selector */}
+            <PostFormGifs
+              showGifSelector={showGifSelector}
+              setShowGifSelector={setShowGifSelector}
+              handleGifSelect={handleGifSelect}
+            />
+
+            {/* Poll creation interface */}
+            <PostFormPoll
+              showPollOptions={showPollOptions}
+              setShowPollOptions={setShowPollOptions}
+              pollOptions={pollOptions}
+              setPollOptions={setPollOptions}
+              pollDuration={pollDuration}
+              setPollDuration={setPollDuration}
+              handleAddPollOption={handleAddPollOption}
+              handleRemovePollOption={handleRemovePollOption}
+              handlePollOptionChange={handlePollOptionChange}
+            />
+
+            {/* Advanced options - mood, location etc */}
+            <PostFormAdvancedOptions
+              showAdvancedOptions={showAdvancedOptions}
+              setShowAdvancedOptions={setShowAdvancedOptions}
+              handleMoodSelect={handleMoodSelect}
+            />
+
+            {/* Image input display area */}
+            <PostFormImageInput
+              showImageInput={showImageInput}
+              setShowImageInput={setShowImageInput}
+              image={image}
+              setImage={setImage}
+            />
+
+            {errors.api && (
+              <div className="mt-2 p-2 bg-red-50 text-red-500 text-sm rounded-md border border-red-100">
+                {errors.api}
               </div>
-              <div className="mt-2 flex flex-wrap space-x-2">
-                {hashtags.map((hashtag) => (
-                  <button
-                    key={hashtag}
-                    className="bg-indigo-500 text-white px-3 py-1 rounded-full shadow-sm hover:bg-indigo-700 transition duration-200"
-                    onClick={() => handleHashtagClick(hashtag)}
-                  >
-                    {hashtag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {showEmojis && (
-            <div className="mt-4 p-3 bg-gray-100 rounded-lg shadow-lg">
-              <div className="flex justify-between items-center">
-                <span className="font-semibold">Select an emoji:</span>
-                <AiOutlineCloseCircle
-                  className="w-6 h-6 text-gray-500 cursor-pointer hover:text-gray-700 transition duration-200"
-                  onClick={() => setShowEmojis(false)}
-                />
-              </div>
-              <div className="mt-2 flex space-x-2">
-                {emojis.map((emoji) => (
-                  <button
-                    key={emoji}
-                    className="text-2xl"
-                    onClick={() => handleEmojiClick(emoji)}
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {errors.api && <p className="text-red-500 text-sm mt-2">{errors.api}</p>}
-        </form>
-
+            )}
+          </form>
+        </div>
       )}
     </>
   );

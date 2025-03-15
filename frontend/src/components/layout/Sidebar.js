@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { logout } from '@/redux/auth/authSlice';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
 
@@ -11,6 +11,7 @@ const Sidebar = ({ isSidebar }) => {
   const dispatch = useDispatch();
   const [isClient, setIsClient] = useState(false);
   const [minimize, setMinimize] = useState(false);
+  const [hoveredItem, setHoveredItem] = useState(null);
   const { isLoggedIn, userDetails, loading, error } = useSelector((state) => state.auth);
   const router = useRouter();
   const pathname = usePathname();
@@ -35,104 +36,298 @@ const Sidebar = ({ isSidebar }) => {
     setMinimize(!minimize);
   }
 
+  // Animation variants
+  const sidebarVariants = {
+    expanded: {
+      width: "16rem",
+      transition: { duration: 0.3, ease: "easeInOut" }
+    },
+    collapsed: {
+      width: "5.5rem",
+      transition: { duration: 0.3, ease: "easeInOut" }
+    }
+  };
+
+  const itemVariants = {
+    hover: {
+      // backgroundColor: "#EEF2FF",
+      scale: 1.03,
+      boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
+    }
+  };
+
   return (
     <>
-      {isLoggedIn && <div className={`${minimize ? 'w-[5.5rem]' : `md:w-64 w-screen ${isSidebar ? 'block' : 'hidden md:block md:relative fixed z-20'}`}`}>
-        <div className={`sidebar from-purple-50 via-gray-50 to-blue-50 text-gray-900 flex flex-col border-r border-gray-200 shadow-xl fixed overflow-y-auto ${minimize ? 'w-[5.5rem]' : 'w-screen md:w-64 bg-gradient-to-b'}`} style={{ height: "calc(100vh - 4rem)" }}>
-          <motion.button
-            className="absolute right-0 bottom-32 bg-gradient-to-r from-blue-500 to-indigo-600 text-white p-2 rounded-l-lg z-10 shadow-lg"
-            onClick={toggleSidebar}
-            whileHover={{ scale: 1.1, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5)" }}
-            whileTap={{ scale: 0.95 }}
+      {isLoggedIn &&
+        <motion.div
+          className={`${isSidebar ? 'block' : 'hidden md:block md:relative fixed z-20'}`}
+          initial={false}
+          animate={minimize ? "collapsed" : "expanded"}
+          variants={sidebarVariants}
+        >
+          <motion.div
+            className={`sidebar fixed overflow-y-auto bg-white text-gray-900 flex flex-col border-r border-gray-200 shadow-lg`}
+            style={{ height: "calc(100vh - 4rem)" }}
+            animate={minimize ? "collapsed" : "expanded"}
+            variants={sidebarVariants}
           >
-            {minimize ? (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="13 17 18 12 13 7"></polyline>
-                <polyline points="6 17 11 12 6 7"></polyline>
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="11 17 6 12 11 7"></polyline>
-                <polyline points="18 17 13 12 18 7"></polyline>
-              </svg>
-            )}
-          </motion.button>
-          {/* Profile Section */}
-          <Link href={`/profile/${userDetails?._id}`} className={`flex items-center space-x-4 shadow-sm border-b border-gray-200 bg-gray-50  ${minimize ? 'justify-center py-6' : 'p-6'}`}>
-            <motion.img
-              src={userDetails?.profilePicture}
-              alt="Profile"
-              className={`object-cover rounded-full bg-gray-300 ${minimize ? 'w-10 h-10' : 'w-12 h-12'}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            />
-            {error && <p>Error: {error.message || JSON.stringify(error)}</p>}
+            <motion.button
+              className="absolute right-0 bottom-32 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-2.5 rounded-l-lg z-10 shadow-lg"
+              onClick={toggleSidebar}
+              whileHover={{ scale: 1.1, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5)" }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {minimize ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="13 17 18 12 13 7"></polyline>
+                  <polyline points="6 17 11 12 6 7"></polyline>
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="11 17 6 12 11 7"></polyline>
+                  <polyline points="18 17 13 12 18 7"></polyline>
+                </svg>
+              )}
+            </motion.button>
 
-            <div className={`${minimize ? 'hidden' : ''}`}>
-              <h3 className="text-lg HelvM">{userDetails?.fullName || "Guest User"}</h3>
-              <p className="text-sm text-gray-700 HelvR">@{userDetails?.username || "guest"}</p>
+            {/* Profile Section */}
+            <div>
+              <Link href={`/profile/${userDetails?._id}`} className="relative overflow-hidden">
+                <motion.div
+                  className={`flex items-center space-x-3 border-b border-gray-200 bg-gradient-to-r from-white to-blue-50 ${minimize ? 'justify-center py-6' : 'px-6 py-5'}`}
+                >
+                  <motion.div
+                    className={`rounded-full overflow-hidden border-2 border-white shadow-md ${minimize ? 'w-10 h-10' : 'w-12 h-12'}`}
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                  >
+                    <motion.img
+                      src={userDetails?.profilePicture || "https://via.placeholder.com/80"}
+                      alt="Profile"
+                      className="object-cover w-full h-full"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                    />
+                  </motion.div>
+
+                  <AnimatePresence>
+                    {!minimize && (
+                      <motion.div
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -10 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <h3 className="text-lg font-semibold text-gray-800">{userDetails?.fullName || "Guest User"}</h3>
+                        <p className="text-sm text-indigo-600 font-medium">@{userDetails?.username || "guest"}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </Link>
             </div>
-          </Link>
 
-          {/* Navigation Menu */}
-          <nav className="flex-1 py-2">
-            <ul className="space-y-1 overflow-hidden px-2">
-              {menuItems.map((item, index) => (
+            {/* Navigation Menu */}
+            <nav className="flex-1 py-4 px-3">
+              <AnimatePresence>
+                {!minimize && (
+                  <motion.h3
+                    className="text-xs uppercase text-gray-500 font-semibold ml-3 mb-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    Main Navigation
+                  </motion.h3>
+                )}
+              </AnimatePresence>
+
+              <ul className="space-y-2 overflow-hidden">
+                {menuItems.map((item, index) => {
+                  const isActive = pathname === item.href || (item.myProfile && pathname.includes('/profile'));
+                  return (
+                    <motion.li
+                      key={item.label}
+                      className="relative"
+                      onHoverStart={() => setHoveredItem(item.label)}
+                      onHoverEnd={() => setHoveredItem(null)}
+                      whileHover="hover"
+                      variants={itemVariants}
+                    >
+                      <Link
+                        href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
+                        className={`flex items-center rounded-xl transition-all duration-200 
+                          ${isActive
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                            : 'text-gray-700 hover:text-indigo-700 hover:bg-[#EEF2FF]'} 
+                          ${minimize ? 'justify-center p-3' : 'px-4 py-3'}`}
+                      >
+                        <div className={`relative ${isActive ? '' : 'group'}`}>
+                          <motion.img
+                            src={item.iconSrc}
+                            className={`select-none ${minimize ? 'w-8 h-8' : 'w-7 h-7'}`}
+                            alt={`${item.label}`}
+                            whileHover={{
+                              rotate: isActive ? 0 : 10,
+                              scale: isActive ? 1 : 1.1
+                            }}
+                          />
+
+                          {!isActive && hoveredItem === item.label && !minimize && (
+                            <motion.div
+                              className="absolute inset-0 bg-indigo-100 rounded-full opacity-30"
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 2 }}
+                              transition={{ duration: 0.5 }}
+                            />
+                          )}
+                        </div>
+
+                        <AnimatePresence>
+                          {!minimize && (
+                            <motion.span
+                              className={`ml-4 font-medium text-sm ${isActive ? 'text-white' : ''}`}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -10 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              {item.label}
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+
+                        {item.isNew && !minimize && (
+                          <motion.span
+                            className="ml-2 bg-green-100 text-green-800 text-xs font-bold px-2 py-0.5 rounded-full"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{
+                              opacity: 1,
+                              scale: 1,
+                              transition: {
+                                repeat: Infinity,
+                                repeatType: "reverse",
+                                duration: 1
+                              }
+                            }}
+                          >
+                            NEW
+                          </motion.span>
+                        )}
+                      </Link>
+                    </motion.li>
+                  );
+                })}
+              </ul>
+            </nav>
+
+            {/* Settings and Support */}
+            <div className="py-3 border-t border-gray-200">
+              <AnimatePresence>
+                {!minimize && (
+                  <motion.h3
+                    className="text-xs uppercase text-gray-500 font-semibold ml-6 mb-2 mt-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    Support
+                  </motion.h3>
+                )}
+              </AnimatePresence>
+
+              <ul className="space-y-1 px-3">
                 <motion.li
-                  key={item.label}
-                  className="relative group"
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.3 }}
+                  whileHover="hover"
+                  variants={itemVariants}
                 >
                   <Link
-                    href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
-                    className={`flex items-center rounded-xl transition-all duration-200 
-                      ${pathname === item.href || (item.myProfile && pathname.includes('/profile'))
-                        ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-md'
-                        : 'hover:bg-blue-50 text-gray-700 hover:text-blue-700'} 
-                      ${minimize ? 'justify-center p-3' : 'px-4 py-2.5'}`}
+                    href="/contact"
+                    className={`flex items-center text-sm font-medium rounded-xl transition-all duration-200 
+                      ${pathname === '/contact' ? 'bg-blue-50 text-blue-700' : ''}  
+                      ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-blue-50 hover:text-blue-700'}`}
                   >
-                    <img src={item.iconSrc} className={`select-none ${minimize ? 'w-9' : 'w-8'}`} alt={`${item.label}`} />
-                    <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>{item.label}</span>
-                    {item.isNew && (
-                      <span className={`ml-2 bg-green-200 text-green-800 text-xs font-semibold px-2 py-1 rounded-full animate-pulse ${minimize ? 'hidden' : ''}`}>
-                        NEW
-                      </span>
-                    )}
+                    <motion.img
+                      src="https://res.cloudinary.com/datvbo0ey/image/upload/v1726327946/Microsoft-Fluentui-Emoji-3d-E-Mail-3d.1024_qzqrs2.png"
+                      className="w-7"
+                      alt="contact"
+                      whileHover={{ rotate: 10, scale: 1.1 }}
+                    />
+
+                    <AnimatePresence>
+                      {!minimize && (
+                        <motion.span
+                          className="ml-4"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          Contact
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
                   </Link>
                 </motion.li>
-              ))}
-            </ul>
-          </nav>
 
-          {/* Settings and Support */}
-          <div className="py-4 border-t border-gray-200 bg-gray-50">
-            <ul className="space-y-1 px-4 pb-2">
-              <li>
-                <Link
-                  href="/contact"
-                  className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 ${pathname === '/contact' ? 'bg-blue-50 text-blue-700' : ''}  ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-blue-50 hover:text-blue-700'}`}
+                <motion.li
+                  whileHover="hover"
+                  variants={itemVariants}
                 >
-                  <img src="https://res.cloudinary.com/datvbo0ey/image/upload/v1726327946/Microsoft-Fluentui-Emoji-3d-E-Mail-3d.1024_qzqrs2.png" className="w-8" alt="contact" />
-                  <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>Contact</span>
-                </Link>
-              </li>
-              <li>
-                <button
-                  className={`flex items-center text-sm font-medium rounded-lg transition-all duration-200 w-full text-left ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-red-100 hover:text-red-500'}`}
-                  onClick={handleLogout}
-                >
-                  <img src="https://cdn-icons-png.flaticon.com/512/1828/1828304.png" className="w-8 h-8" alt="logout" />
-                  <span className={`ml-4 ${minimize ? 'hidden' : ''}`}>Logout</span>
-                </button>
-              </li>
-            </ul>
+                  <motion.button
+                    className={`flex items-center text-sm font-medium rounded-xl transition-all duration-200 w-full text-left 
+                      ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-red-50 hover:text-red-600'}`}
+                    onClick={handleLogout}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <motion.img
+                      src="https://cdn-icons-png.flaticon.com/512/1828/1828304.png"
+                      className="w-7 h-7"
+                      alt="logout"
+                      whileHover={{ rotate: 10, scale: 1.1 }}
+                    />
 
-          </div>
-        </div>
-      </div>}
+                    <AnimatePresence>
+                      {!minimize && (
+                        <motion.span
+                          className="ml-4"
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: -10 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          Logout
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+                </motion.li>
+              </ul>
 
+              {!minimize && (
+                <div className="mt-3 mb-4 mx-4">
+                  <motion.div
+                    className="bg-gradient-to-r from-indigo-100 to-blue-100 p-4 rounded-xl shadow-sm"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    <h4 className="text-sm font-medium text-indigo-800">Need Help?</h4>
+                    <p className="text-xs text-indigo-600 mt-1">Check our help center or contact support</p>
+                    <motion.button
+                      className="mt-2 text-xs font-medium text-white bg-indigo-600 px-3 py-1.5 rounded-lg shadow-sm"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Get Support
+                    </motion.button>
+                  </motion.div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </motion.div>
+      }
     </>
   );
 };
@@ -170,15 +365,10 @@ const menuItems = [
     iconSrc: 'https://cdn-icons-png.flaticon.com/256/5509/5509446.png',
   },
   {
-    label: 'Bookmarks',
-    href: '/bookmarks',
-    iconSrc: 'https://cdn-icons-png.freepik.com/512/5300/5300640.png',
-    isNew: true,
-  },
-  {
     label: 'Stories',
     href: '/stories',
     iconSrc: 'https://res.cloudinary.com/datvbo0ey/image/upload/v1726328461/social-media-post-3d-icon-download-in-png-blend-fbx-gltf-file-formats--like-logo-user-network-miscellaneous-pack-icons-5753373_imunlr.png',
+    isNew: true,
   },
   {
     label: 'Settings',
