@@ -6,6 +6,43 @@ import {
   AiOutlineInfoCircle,
 } from 'react-icons/ai';
 
+// Background pattern styles
+const patternStyles = {
+  'pattern-dots': {
+    backgroundImage: 'radial-gradient(rgba(0,0,0,0.1) 1px, transparent 1px)',
+    backgroundSize: '10px 10px'
+  },
+  'pattern-grid': {
+    backgroundImage: 'linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)',
+    backgroundSize: '20px 20px'
+  },
+  'pattern-stars': {
+    backgroundImage: 'radial-gradient(circle, rgba(130,170,255,0.2) 2px, transparent 2px)',
+    backgroundSize: '30px 30px'
+  },
+  'pattern-waves': {
+    backgroundImage: 'repeating-linear-gradient(45deg, rgba(0,150,255,0.05), rgba(0,150,255,0.05) 10px, transparent 10px, transparent 20px)',
+    backgroundSize: 'auto'
+  },
+  'pattern-snowflakes': {
+    backgroundImage: 'radial-gradient(rgba(150,120,250,0.2) 2px, transparent 2px)',
+    backgroundSize: '20px 20px',
+    backgroundPosition: '0 0, 10px 10px'
+  },
+  'pattern-hearts': {
+    backgroundImage: 'radial-gradient(rgba(255,150,170,0.2) 2px, transparent 2px)',
+    backgroundSize: '25px 25px'
+  },
+  'pattern-confetti': {
+    backgroundImage: 'repeating-linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.1) 5px, transparent 5px, transparent 10px), repeating-linear-gradient(135deg, rgba(255, 105, 180, 0.1), rgba(255, 105, 180, 0.1) 5px, transparent 5px, transparent 10px)',
+    backgroundSize: 'auto'
+  },
+  'pattern-lightning': {
+    backgroundImage: 'repeating-linear-gradient(-45deg, rgba(255,200,0,0.1), rgba(255,200,0,0.1) 5px, transparent 5px, transparent 15px)',
+    backgroundSize: 'auto'
+  }
+};
+
 // Import all components
 import {
   PostFormHeader,
@@ -51,6 +88,7 @@ const PostForm = () => {
   const [pollDuration, setPollDuration] = useState(24);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [mood, setMood] = useState('');
+  const [isPollSaved, setIsPollSaved] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -130,7 +168,7 @@ const PostForm = () => {
         backgroundColor
       };
 
-      if (showPollOptions && pollOptions.filter(opt => opt.trim()).length >= 2) {
+      if (isPollSaved && pollOptions.filter(opt => opt.trim()).length >= 2) {
         postData.pollData = {
           options: pollOptions.filter(opt => opt.trim()),
           duration: pollDuration
@@ -190,6 +228,16 @@ const PostForm = () => {
     setPreviewImage(gifUrl);
     setShowGifSelector(false);
     textareaRef.current?.focus();
+  };
+
+  const handleSavePoll = () => {
+    // Validate that there are at least 2 non-empty options
+    if (pollOptions.filter(opt => opt.trim()).length >= 2) {
+      setIsPollSaved(true);
+      // Maybe show a success message or highlight
+    } else {
+      // Show error - need at least 2 options
+    }
   };
 
   // Handle text formatting
@@ -271,6 +319,7 @@ const PostForm = () => {
           <form
             onSubmit={handleSubmit}
             className={`${backgroundColor} p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 w-full mx-auto transition-all duration-300 transform ${isExpanded ? 'scale-102' : ''}`}
+            style={backgroundColor.includes('pattern-') ? patternStyles[backgroundColor.split(' ').find(cls => cls.startsWith('pattern-'))] : {}}
           >
             {/* Header with user info */}
             <PostFormHeader
@@ -288,6 +337,7 @@ const PostForm = () => {
               textareaRef={textareaRef}
               handleTextareaFocus={handleTextareaFocus}
               userDetails={userDetails}
+              style={backgroundColor.includes('pattern-') ? patternStyles[backgroundColor.split(' ').find(cls => cls.startsWith('pattern-'))] : {}}
             />
 
             {errors.content && (
@@ -319,14 +369,6 @@ const PostForm = () => {
               discardDraft={discardDraft}
               saveDraft={saveDraft}
               loading={loading}
-            />
-
-            {/* Image preview area */}
-            <PostFormImagePreview
-              previewImage={previewImage}
-              image={image}
-              setPreviewImage={setPreviewImage}
-              setImage={setImage}
             />
 
             {/* Mood indicator */}
@@ -382,6 +424,9 @@ const PostForm = () => {
               handleAddPollOption={handleAddPollOption}
               handleRemovePollOption={handleRemovePollOption}
               handlePollOptionChange={handlePollOptionChange}
+              handleSavePoll={handleSavePoll}
+              isPollSaved={isPollSaved}
+              setIsPollSaved={setIsPollSaved}
             />
 
             {/* Advanced options - mood, location etc */}
@@ -396,6 +441,14 @@ const PostForm = () => {
               showImageInput={showImageInput}
               setShowImageInput={setShowImageInput}
               image={image}
+              setImage={setImage}
+            />
+
+            {/* Image preview area */}
+            <PostFormImagePreview
+              previewImage={previewImage}
+              image={image}
+              setPreviewImage={setPreviewImage}
               setImage={setImage}
             />
 

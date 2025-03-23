@@ -8,13 +8,15 @@ const PostFormTextarea = ({
   backgroundColor, 
   textareaRef, 
   handleTextareaFocus, 
-  userDetails 
+  userDetails,
+  style
 }) => {
   return (
     <div className={`relative`}>
       <textarea
         ref={textareaRef}
         className={`w-full p-3 sm:p-4 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-300 shadow-sm placeholder:italic placeholder-gray-400 border border-gray-300 ${backgroundColor === 'bg-white' ? 'bg-[#F8F8F9]' : backgroundColor}`}
+        style={style}
         rows={isExpanded ? "4" : "3"}
         placeholder={`What's on your mind, ${userDetails?.fullName || 'there'}?`}
         value={content}
