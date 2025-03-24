@@ -301,8 +301,8 @@ const PostFormGifs = ({ showGifSelector, setShowGifSelector, handleGifSelect }) 
                 className="w-full h-32 object-cover cursor-pointer"
                 onClick={() => selectGif(gif)}
               />
-              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200">
-                <div className="absolute bottom-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 pointer-events-none">
+                <div className="absolute bottom-1 right-1 flex space-x-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-auto">
                   <button
                     type="button"
                     onClick={() => toggleFavorite(gif)}

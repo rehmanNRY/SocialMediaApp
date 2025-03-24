@@ -23,6 +23,10 @@ const PostSchema = new Schema({
     maxLength: [100, 'Post cannot exceed 100 characters'],
     required: true,
   },
+  feeling: {
+    type: String,
+    maxLength: [50, 'Feeling cannot exceed 50 characters'],
+  },
   image: {
     type: String,
   },

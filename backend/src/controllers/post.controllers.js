@@ -9,14 +9,15 @@ import { Comment } from '../models/comment.model.js';
 export const createPost = asyncHandler(async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { content, image, backgroundColor, pollData } = req.body;
+    const { content, image, backgroundColor, pollData, feeling } = req.body;
 
     // Create post object with basic fields
     const postData = { 
-      user: userId, 
       content, 
       image,
-      backgroundColor: backgroundColor || 'bg-white'
+      feeling,
+      backgroundColor: backgroundColor || 'bg-white',
+      user: userId, 
     };
 
     // Add poll data if provided

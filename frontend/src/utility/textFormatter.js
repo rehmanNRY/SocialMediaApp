@@ -9,16 +9,19 @@
  */
 export const formatText = (text) => {
   if (!text) return '';
-  
+
   // Format bold text: **text** -> <strong>text</strong>
   let formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  
+
   // Format italic text: _text_ -> <em>text</em>
   formattedText = formattedText.replace(/_(.*?)_/g, '<em>$1</em>');
-  
+
   // Format underlined text: ~text~ -> <u>text</u>
   formattedText = formattedText.replace(/~(.*?)~/g, '<u>$1</u>');
-  
+
+  // Convert line breaks to <br> tags
+  formattedText = formattedText.replace(/\n/g, '<br />');
+
   return formattedText;
 };
 
@@ -30,10 +33,12 @@ export const formatText = (text) => {
  */
 export const hasFormatting = (text) => {
   if (!text) return false;
-  
+
   const boldPattern = /\*\*(.*?)\*\*/;
   const italicPattern = /_(.*?)_/;
   const underlinePattern = /~(.*?)~/;
-  
-  return boldPattern.test(text) || italicPattern.test(text) || underlinePattern.test(text);
+  const lineBreakPattern = /\n/;
+
+  return boldPattern.test(text) || italicPattern.test(text) || 
+  underlinePattern.test(text) || lineBreakPattern.test(text);
 }; 

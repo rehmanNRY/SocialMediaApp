@@ -3,6 +3,7 @@ import Sidebar from "./layout/Sidebar"
 import Rightbar from "./layout/Rightbar"
 import Loading from "./Loading"
 import ProfilePicVerify from "./userProfile/ProfilePicVerify"
+import ConfirmModal from "./common/ConfirmModal"
 
 export {
   Header,
@@ -10,4 +11,5 @@ export {
   Rightbar,
   Loading,
   ProfilePicVerify,
+  ConfirmModal,
 }
