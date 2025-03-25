@@ -1,7 +1,7 @@
 import React from 'react';
 import { RiDraftLine } from 'react-icons/ri';
 
-const PostFormHeader = ({ userDetails, isDraftSaved }) => {
+const PostFormHeader = ({ userDetails, isDraftSaved = false }) => {
   return (
     <div className="flex justify-between items-center mb-4">
       <div className="flex items-center space-x-3">

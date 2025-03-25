@@ -4,12 +4,14 @@ import { store } from "@/redux/store";
 import { useState } from "react";
 import { Header, Rightbar, Sidebar } from ".";
 import LoadingProvider from "./LoadingProvider";
+import ModalPortal from "./common/ModalPortal";
 
 export default function RootLayoutClient({ children }) {
   return (
     <Provider store={store}>
       <LoadingProvider>
         <LayoutWrapper>{children}</LayoutWrapper>
+        <ModalPortal />
       </LoadingProvider>
     </Provider>
   );

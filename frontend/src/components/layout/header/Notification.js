@@ -57,7 +57,7 @@ const Notification = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+            className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-40"
           >
             <div className="p-3 border-b border-gray-100 flex justify-between items-center">
               <h5 className="font-semibold text-gray-800">Notifications</h5>

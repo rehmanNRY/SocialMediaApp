@@ -32,8 +32,6 @@ import { patternStyles } from "@/constants";
 
 const PostCard = ({ post }) => {
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editContent, setEditContent] = useState(post.content);
-  const [editBackgroundColor, setEditBackgroundColor] = useState(post.backgroundColor || 'bg-white');
   const [likers, setLikers] = useState([]);
   const [showLikersModal, setShowLikersModal] = useState(false);
   const [optimisticLiked, setOptimisticLiked] = useState(false);
@@ -75,20 +73,7 @@ const PostCard = ({ post }) => {
   }, [likers, userDetails]);
 
   const handleEditClick = () => {
-    // Reset edit state to current post values
-    setEditContent(post.content);
-    setEditBackgroundColor(post.backgroundColor || 'bg-white');
     setShowEditModal(true);
-  };
-
-  const handleSaveEdit = (newContent, newBackgroundColor) => {
-    dispatch(editPost({
-      postId: post._id,
-      content: newContent,
-      backgroundColor: newBackgroundColor
-    }));
-    setEditContent(newContent);
-    setEditBackgroundColor(newBackgroundColor);
   };
 
   const handleDeletePost = () => {
@@ -359,7 +344,6 @@ const PostCard = ({ post }) => {
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
         post={post}
-        onSave={handleSaveEdit}
       />
     </motion.div>
   );
