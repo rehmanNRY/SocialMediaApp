@@ -11,6 +11,7 @@ import Notification from './Notification';
 import { useLoading } from '@/components/LoadingProvider';
 import { useRouter } from 'next/navigation';
 import ProfileMenu from './ProfileMenu';
+import Link from 'next/link';
 
 const Header = ({ toggleSidebar }) => {
   const dispatch = useDispatch();
@@ -232,11 +233,18 @@ const Header = ({ toggleSidebar }) => {
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors md:hidden"
                 onClick={toggleSidebar}
               >
                 <FiMenu className="w-5 h-5 text-gray-700" />
               </motion.button>
+              <a
+                href={"https://github.com/rehmanNRY/SocialMediaApp/fork"}
+                target='_blank'
+                className="p-2 rounded-full hover:bg-gray-100 transition-colors md:block hidden"
+              >
+                <img src='https://cdn-icons-png.flaticon.com/512/25/25231.png' className="w-6 h-6" />
+              </a>
             </div>
           </motion.header>
 

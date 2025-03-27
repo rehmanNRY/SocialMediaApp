@@ -60,7 +60,7 @@ export const autoDeleteStories = asyncHandler(async (req, res, next) => {
 // Get all stories of all users
 export const getAllStories = asyncHandler(async (req, res, next) => {
   const stories = await Story.find()
-    .populate('user', 'fullName profilePicture')
+    .populate('user', 'fullName profilePicture username coverImage')
     .sort('-createdAt');
 
   res.status(200).json(new ApiResponse(200, 'Stories fetched successfully', stories));
