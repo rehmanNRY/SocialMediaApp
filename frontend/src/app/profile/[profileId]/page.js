@@ -167,9 +167,9 @@ const UserProfile = ({ params }) => {
                 className="w-36 h-36 sm:w-52 sm:h-52 rounded-full border-4 border-white shadow-lg hover:scale-105 transition-transform object-cover"
               />
             </div>
-            <div className="ml-0 sm:ml-56 mt-6 sm:mt-0 mr-4 sm:mr-7 flex-1">
+            <div className="ml-0 sm:ml-56 mt-4 sm:mt-0 mr-4 sm:mr-7 flex-1">
               <div className="ml-2 text-center sm:text-left">
-                <h1 className="text-2xl sm:text-3xl HelvB">{user.fullName}</h1>
+                <h1 className="text-2xl sm:text-3xl HelvB capitalize">{user.fullName}</h1>
                 <h1 className="text-sm sm:text-lg HelvR">@{user.username}</h1>
                 <p className="text-sm sm:text-base HelvR text-gray-800">{user.bio}</p>
                 <p className="text-sm sm:text-base text-gray-700 HelvR">Joined: {new Date(user.createdAt).toLocaleDateString()}</p>

@@ -65,7 +65,7 @@ export const rejectFriendRequest = asyncHandler(async (req, res, next) => {
 export const getSentRequests = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  const sentRequests = await FriendRequest.find({ sender: userId }).populate('receiver', 'fullName username bio profilePicture');
+  const sentRequests = await FriendRequest.find({ sender: userId }).populate('receiver', 'fullName username bio profilePicture coverImage');
 
   res.status(200).json(new ApiResponse(200, 'Sent friend requests fetched successfully', sentRequests));
 });
@@ -74,7 +74,7 @@ export const getSentRequests = asyncHandler(async (req, res, next) => {
 export const getReceivedRequests = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  const receivedRequests = await FriendRequest.find({ receiver: userId }).populate('sender', 'fullName username bio profilePicture');
+  const receivedRequests = await FriendRequest.find({ receiver: userId }).populate('sender', 'fullName username bio profilePicture coverImage');
   res.status(200).json(new ApiResponse(200, 'Received friend requests fetched successfully', receivedRequests));
 });
 
@@ -82,7 +82,7 @@ export const getReceivedRequests = asyncHandler(async (req, res, next) => {
 export const getFriendsList = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
-  const user = await User.findById(userId).populate('friends', 'fullName username bio profilePicture');
+  const user = await User.findById(userId).populate('friends', 'fullName username bio profilePicture coverImage');
   if (!user) {
     return next(new ApiError(404, 'User not found'));
   }

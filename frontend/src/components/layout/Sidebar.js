@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
+import { FiMail } from 'react-icons/fi';
 
 const Sidebar = ({ isSidebar }) => {
   const dispatch = useDispatch();
@@ -94,11 +95,12 @@ const Sidebar = ({ isSidebar }) => {
             <div>
               <Link href={`/profile/${userDetails?._id}`} className="relative overflow-hidden">
                 <motion.div
-                  className={`flex items-center space-x-3 border-b border-gray-200 bg-gradient-to-r from-white to-blue-50 ${minimize ? 'justify-center py-6' : 'px-6 py-5'}`}
+                  className={`flex items-center space-x-2.5 border-b border-gray-200 bg-white ${minimize ? 'justify-center py-6' : 'px-5 py-4'}`}
                 >
                   <motion.div
-                    className={`rounded-full overflow-hidden border-2 border-white shadow-md ${minimize ? 'w-10 h-10' : 'w-12 h-12'}`}
+                    className={`rounded-full overflow-hidden border-2 border-white shadow-md ${minimize ? 'w-10 h-10' : 'w-14 h-14'}`}
                     whileHover={{ scale: 1.1, rotate: 5 }}
+                    style={{ minWidth: minimize ? '40px' : '56px', minHeight: minimize ? '40px' : '56px' }}
                   >
                     <motion.img
                       src={userDetails?.profilePicture || "https://via.placeholder.com/80"}
@@ -117,9 +119,10 @@ const Sidebar = ({ isSidebar }) => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: -10 }}
                         transition={{ duration: 0.2 }}
+                        className="flex flex-col overflow-hidden"
                       >
-                        <h3 className="text-lg font-semibold text-gray-800">{userDetails?.fullName || "Guest User"}</h3>
-                        <p className="text-sm text-indigo-600 font-medium">@{userDetails?.username || "guest"}</p>
+                        <h3 className="text-lg font-semibold text-gray-800 capitalize whitespace-nowrap overflow-hidden text-ellipsis">{userDetails?.fullName || "Guest User"}</h3>
+                        <p className="text-sm text-indigo-600 font-medium whitespace-nowrap overflow-hidden text-ellipsis">@{userDetails?.username || "guest"}</p>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -129,19 +132,6 @@ const Sidebar = ({ isSidebar }) => {
 
             {/* Navigation Menu */}
             <nav className="flex-1 py-4 px-3">
-              <AnimatePresence>
-                {!minimize && (
-                  <motion.h3
-                    className="text-xs uppercase text-gray-500 font-semibold ml-3 mb-3"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                  >
-                    Main Navigation
-                  </motion.h3>
-                )}
-              </AnimatePresence>
-
               <ul className="space-y-2 overflow-hidden">
                 {menuItems.map((item, index) => {
                   const isActive = pathname === item.href || (item.myProfile && pathname.includes('/profile'));
@@ -158,7 +148,7 @@ const Sidebar = ({ isSidebar }) => {
                         href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
                         className={`flex items-center rounded-xl transition-all duration-200 
                           ${isActive
-                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
+                            ? 'bg-indigo-600 text-white shadow-md'
                             : 'text-gray-700 hover:text-indigo-700 hover:bg-[#EEF2FF]'} 
                           ${minimize ? 'justify-center p-3' : 'px-4 py-3'}`}
                       >
@@ -304,25 +294,30 @@ const Sidebar = ({ isSidebar }) => {
                 </motion.li>
               </ul>
 
+              {/* Help Card */}
               {!minimize && (
-                <div className="mt-3 mb-4 mx-4">
-                  <motion.div
-                    className="bg-gradient-to-r from-indigo-100 to-blue-100 p-4 rounded-xl shadow-sm"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    <h4 className="text-sm font-medium text-indigo-800">Need Help?</h4>
-                    <p className="text-xs text-indigo-600 mt-1">Check our help center or contact support</p>
+                <motion.div
+                  className="mb-6 mx-3 mt-4"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-blue-50 p-5 rounded-2xl shadow-sm border border-indigo-100">
+                    <div className="absolute -right-6 -top-6 w-20 h-20 bg-indigo-100 rounded-full opacity-50"></div>
+                    <div className="absolute right-8 top-4 w-6 h-6 bg-blue-100 rounded-full opacity-70"></div>
+
+                    <h4 className="text-sm font-bold text-indigo-800">Need Help?</h4>
+                    <p className="text-xs text-indigo-600 mt-1 mb-3">Our support team is ready to assist you</p>
                     <motion.button
-                      className="mt-2 text-xs font-medium text-white bg-indigo-600 px-3 py-1.5 rounded-lg shadow-sm"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      className="w-full text-xs font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-500 px-3 py-2 rounded-lg shadow-sm flex items-center justify-center"
+                      whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(79, 70, 229, 0.2)" }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      Get Support
+                      <FiMail className="mr-1.5" />
+                      Contact Support
                     </motion.button>
-                  </motion.div>
-                </div>
+                  </div>
+                </motion.div>
               )}
             </div>
           </motion.div>

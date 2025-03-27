@@ -191,7 +191,7 @@ const Rightbar = () => {
               </div>
 
               {/* Upcoming Events */}
-              <div className="bg-gray-50 rounded-xl p-3">
+              {/* <div className="bg-gray-50 rounded-xl p-3">
                 <div className="flex items-center justify-between mb-3">
                   <h4 className="text-md font-semibold text-gray-800 px-2">Upcoming Events</h4>
                   <BsCalendarEvent className="text-orange-500" />
@@ -216,7 +216,7 @@ const Rightbar = () => {
                     </div>
                   </motion.div>
                 ))}
-              </div>
+              </div> */}
 
               {/* User Suggestions */}
               <div className="bg-gray-50 rounded-xl p-3">
@@ -247,12 +247,13 @@ const Rightbar = () => {
                               src={user?.profilePicture || "/default-profile.jpg"}
                               alt={user?.fullName}
                               className="rounded-full h-10 w-10 mr-2 object-cover border-2 border-white group-hover:border-indigo-200 transition-all"
+                              style={{ minWidth: '40px', minHeight: '40px' }} // Ensures the image maintains a square aspect ratio
                             />
                             <div className="absolute bottom-0 right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                           </div>
                           <div className="flex flex-col flex-1">
-                            <p className="text-gray-800 text-sm font-medium">{user?.fullName}</p>
-                            <span className="text-xs text-gray-500">@{user?.username}</span>
+                            <p className="text-gray-800 text-sm font-medium truncate">{user?.fullName}</p>
+                            <span className="text-xs text-gray-500 truncate">@{user?.username}</span>
                           </div>
                           <motion.button
                             className="text-xs bg-gray-100 hover:bg-indigo-100 hover:text-indigo-600 text-gray-600 px-2 py-1 rounded-md font-medium transition-colors"

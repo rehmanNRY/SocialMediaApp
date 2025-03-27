@@ -6,7 +6,6 @@ import axiosInstance from "@/api/axiosInstance";
 export const fetchSavedItems = createAsyncThunk("savedItems/fetchSavedItems", async (_, rejectWithValue) => {
   try {
     const response = await axiosInstance.get("/saves/all");
-    console.log(response.data)
     return response.data.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -64,7 +63,7 @@ const savedItemsSlice = createSlice({
           state.savedItems.push({ post: { _id: postId } });
         } else {
           // Remove the item from savedItems if it was removed
-          state.savedItems = state.savedItems.filter((item) => item.post._id !== postId);
+          state.savedItems = state.savedItems.filter((item) => item.post?._id !== postId);
         }
         
         state.error = null;

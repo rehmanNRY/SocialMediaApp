@@ -3,48 +3,33 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FiMoreHorizontal,
-  FiMessageSquare,
-  FiHeart,
-  FiBookmark,
-  FiShare2,
   FiImage,
   FiChevronDown,
   FiChevronUp
 } from "react-icons/fi";
 import CommentForm from "../comment/CommentForm";
 import CommentList from "../comment/CommentList";
-import LikersModal from "../like/LikersModal";
 import InteractionButtons from "../like/InteractionButtons";
 import { formatText } from "@/utility/textFormatter";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUserDetails } from "@/redux/auth/authSlice";
 import {
   deletePost,
-  editPost,
-  toggleLikePost,
-  getPostLikers,
 } from "@/redux/posts/postsSlice";
-import { fetchSavedItems, toggleSavedItem } from "@/redux/savedItems/savedItemsSlice";
 import { useRouter } from "next/navigation";
 import { PollSection, PostHeader, EditPostModal } from "./post_card";
 import { patternStyles } from "@/constants";
 
 const PostCard = ({ post }) => {
   const [showEditModal, setShowEditModal] = useState(false);
-  const [likers, setLikers] = useState([]);
-  const [showLikersModal, setShowLikersModal] = useState(false);
-  const [optimisticLiked, setOptimisticLiked] = useState(false);
-  const [optimisticBookmarked, setOptimisticBookmarked] = useState(false);
   const [showFullContent, setShowFullContent] = useState(false);
-  const [showComments, setShowComments] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [showComments, setShowComments] = useState(false);
 
   const dispatch = useDispatch();
   const router = useRouter();
 
   const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
-  const { savedItems } = useSelector((state) => state.savedItems);
 
   // Animate card on mount
   useEffect(() => {
@@ -56,21 +41,6 @@ const PostCard = ({ post }) => {
       dispatch(fetchUserDetails());
     }
   }, [isLoggedIn, dispatch]);
-
-  useEffect(() => {
-    if (post._id) {
-      dispatch(getPostLikers(post._id)).then((action) => {
-        if (action.payload?.data) {
-          setLikers(action.payload.data);
-        }
-      });
-    }
-  }, [dispatch, post._id]);
-
-  // Set initial optimistic state based on actual state
-  useEffect(() => {
-    setOptimisticLiked(likers.some((liker) => liker._id === userDetails?._id));
-  }, [likers, userDetails]);
 
   const handleEditClick = () => {
     setShowEditModal(true);
@@ -84,84 +54,9 @@ const PostCard = ({ post }) => {
     }, 300);
   };
 
-  const handleToggleLike = () => {
-    if (!isLoggedIn) {
-      // Maybe show a login prompt
-      return;
-    }
-
-    // Optimistically update UI
-    const wasLiked = likers.some((liker) => liker._id === userDetails?._id);
-
-    // Update optimistic state
-    setOptimisticLiked(!wasLiked);
-
-    // If user was in likers, remove them; otherwise add them
-    let updatedLikers = [...likers];
-    if (wasLiked) {
-      updatedLikers = updatedLikers.filter(liker => liker._id !== userDetails?._id);
-    } else if (userDetails) {
-      updatedLikers.push(userDetails);
-    }
-    setLikers(updatedLikers);
-
-    // Make the actual API call
-    dispatch(toggleLikePost(post._id)).then(() => {
-      // Refresh the list of likers after liking or unliking the post
-      dispatch(getPostLikers(post._id)).then((action) => {
-        if (action.payload?.data) {
-          setLikers(action.payload.data);
-        }
-      });
-    });
-  };
-
-  const handleShowLikers = () => {
-    setShowLikersModal(true);
-  };
-
-  const closeModal = () => {
-    setShowLikersModal(false);
-  };
-
-  useEffect(() => {
-    dispatch(fetchSavedItems());
-  }, [dispatch]);
-
-  useEffect(() => {
-    setOptimisticBookmarked(savedItems.some((item) => item.post?._id === post._id));
-  }, [savedItems, post._id]);
-
-  const handleToggleBookmark = () => {
-    if (!isLoggedIn) {
-      // Maybe show a login prompt
-      return;
-    }
-
-    // Optimistically update UI
-    setOptimisticBookmarked(!optimisticBookmarked);
-
-    // Dispatch the action and handle the result
-    dispatch(toggleSavedItem(post._id))
-      .unwrap()
-      .then((result) => {
-        // The result contains the correct isSaved state from the server
-        // We don't need to do anything here as the Redux store will be updated
-      })
-      .catch((error) => {
-        // If there was an error, revert the optimistic update
-        setOptimisticBookmarked(optimisticBookmarked);
-        console.error("Error toggling bookmark:", error);
-      });
-  };
-
   const handleToggleComments = () => {
     setShowComments(!showComments);
   };
-
-  // Use optimistic state for UI
-  const userHasLiked = optimisticLiked;
-  const isUserBookmark = optimisticBookmarked;
 
   // Format content with hashtags
   const formatContentWithHashtags = (content) => {
@@ -189,21 +84,6 @@ const PostCard = ({ post }) => {
     if (!post.content) return '';
     const lines = post.content.split('\n');
     return lines.slice(0, 7).join('\n');
-  };
-
-  // Share post functionality
-  const handleSharePost = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: `Post by ${post.user?.fullName}`,
-        text: post.content?.substring(0, 100) + '...',
-        url: window.location.origin + '/post/' + post._id,
-      });
-    } else {
-      // Fallback for browsers that don't support share API
-      navigator.clipboard.writeText(window.location.origin + '/post/' + post._id);
-      // Could show a toast notification here
-    }
   };
 
   // Card variants for animation
@@ -306,16 +186,10 @@ const PostCard = ({ post }) => {
 
         {/* Interaction buttons */}
         <InteractionButtons
-          userHasLiked={userHasLiked}
-          likers={likers}
-          likersCount={likers.length}
+          post={post}
+          userDetails={userDetails}
           showComments={showComments}
-          isUserBookmark={isUserBookmark}
-          onToggleLike={handleToggleLike}
           onToggleComments={handleToggleComments}
-          onSharePost={handleSharePost}
-          onToggleBookmark={handleToggleBookmark}
-          onShowLikers={handleShowLikers}
         />
       </div>
 
@@ -336,8 +210,6 @@ const PostCard = ({ post }) => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {showLikersModal && <LikersModal likers={likers} closeModal={closeModal} />}
 
       {/* Edit Post Modal */}
       <EditPostModal
