@@ -13,7 +13,7 @@ import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loading } from "@/components";
 
-export default function Home() {
+function HomeContent() {
   const dispatch = useDispatch();
   const allPosts = useSelector((state) => state.posts.posts);
   const [isServerRunning, setIsServerRunning] = useState(false);
@@ -55,7 +55,7 @@ export default function Home() {
   useEffect(() => {
     setSelectedHashtag(hashtagParam || "");
   }, [hashtagParam])
-  
+
 
   useEffect(() => {
     if (isServerRunning) {
@@ -82,11 +82,10 @@ export default function Home() {
   }
 
   return (
-    <Suspense fallback={<Loading />}>
     <AuthRedirect>
       <main className="bg-[#F5F6FA] mx-auto p-4 space-y-6 w-full min-h-screen">
         {/* Hashtag Header */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -96,9 +95,9 @@ export default function Home() {
             <BsHash className="text-indigo-600 text-3xl" />
             <h1 className="text-2xl font-bold text-gray-800">Trending Hashtags</h1>
           </div>
-          
+
           {selectedHashtag && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               className="mb-4 p-3 bg-indigo-50 rounded-lg border border-indigo-100"
@@ -114,7 +113,7 @@ export default function Home() {
           )}
 
           {/* Hashtag Cards Grid */}
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3"
             initial="hidden"
             animate="visible"
@@ -138,19 +137,18 @@ export default function Home() {
                 whileHover={{ scale: 1.03, boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)" }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleHashtagClick(tag.name)}
-                className={`cursor-pointer rounded-xl p-4 transition-all duration-300 flex items-center gap-3 ${
-                  selectedHashtag === tag.name 
-                    ? `bg-gradient-to-r from-${tag.color.replace('#', '')} to-${tag.color.replace('#', '')}/80 text-white` 
-                    : `bg-white border hover:border-${tag.color.replace('#', '')}`
-                }`}
+                className={`cursor-pointer rounded-xl p-4 transition-all duration-300 flex items-center gap-3 ${selectedHashtag === tag.name
+                  ? `bg-gradient-to-r from-${tag.color.replace('#', '')} to-${tag.color.replace('#', '')}/80 text-white`
+                  : `bg-white border hover:border-${tag.color.replace('#', '')}`
+                  }`}
                 style={{
                   backgroundColor: selectedHashtag === tag.name ? tag.color : 'white',
                   borderColor: tag.color,
                 }}
               >
-                <div 
-                  className="p-3 rounded-full" 
-                  style={{ 
+                <div
+                  className="p-3 rounded-full"
+                  style={{
                     backgroundColor: selectedHashtag === tag.name ? 'rgba(255, 255, 255, 0.2)' : tag.bgColor,
                     color: selectedHashtag === tag.name ? 'white' : tag.color
                   }}
@@ -190,8 +188,8 @@ export default function Home() {
               </motion.div>
               <p className="text-xl text-gray-500">No posts found</p>
               <p className="text-sm text-gray-400 mt-2">
-                {selectedHashtag 
-                  ? `No posts with #${selectedHashtag} hashtag` 
+                {selectedHashtag
+                  ? `No posts with #${selectedHashtag} hashtag`
                   : "Try selecting a hashtag to see related posts"}
               </p>
             </div>
@@ -199,6 +197,14 @@ export default function Home() {
         </motion.div>
       </main>
     </AuthRedirect>
-    </Suspense>
   );
+}
+
+
+export default function Home() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <HomeContent />
+    </Suspense>
+  )
 }

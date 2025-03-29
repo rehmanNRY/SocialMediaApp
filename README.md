@@ -41,7 +41,7 @@ To run the project locally, follow these steps:
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/your-repo-link
+    git clone https://github.com/rehmanNRY/SocialMediaApp
     ```
 
 2. **Install dependencies**:
