@@ -7,6 +7,8 @@ import { getAllPosts } from '@/redux/posts/postsSlice';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
 import AuthRedirect from '@/components/AuthRedirect';
 import { BsFillPostcardFill } from "react-icons/bs";
+import { motion } from 'framer-motion';
+import { FiRefreshCw } from "react-icons/fi";
 
 const myPosts = () => {
   const dispatch = useDispatch();
@@ -22,11 +24,22 @@ const myPosts = () => {
   return (
     <AuthRedirect>
       <main className="bg-[#F5F6FA] mx-auto p-4 space-y-6 w-full"
-      style={{ minHeight: "calc(100vh - 3.5rem)" }}
+        style={{ minHeight: "calc(100vh - 3.5rem)" }}
       >
-        <h1 className="text-2xl text-gray-800 mb-8 flex items-center">
-          <BsFillPostcardFill className="text-pink-500 mr-2" />
-          Your Posts</h1>
+
+        <motion.h1
+          className="text-3xl font-bold text-gray-800 flex items-center"
+          whileHover={{ scale: 1.03 }}
+        >
+          <motion.div
+            className="bg-indigo-100 p-2 rounded-lg mr-3"
+            whileHover={{ rotate: 5 }}
+          >
+            <BsFillPostcardFill className="text-indigo-600 text-xl" />
+          </motion.div>
+          Your Creative Space
+        </motion.h1>
+
         <PostForm />
         {userPosts.length > 0 ? (
           <PostList posts={userPosts} />

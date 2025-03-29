@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { AiOutlineAppstoreAdd, AiOutlineFire, AiOutlineNumber } from "react-icons/ai";
-import { BsGear, BsHash, BsBookmark, BsCalendarEvent } from "react-icons/bs";
-import { usePathname } from "next/navigation";
+import { AiOutlineNumber } from "react-icons/ai";
+import { BsGear, BsHash, BsBookmark } from "react-icons/bs";
+import { usePathname, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchUsers } from '@/redux/users/usersSlice';
 import { AnimatePresence } from 'framer-motion';
@@ -18,6 +18,7 @@ const Rightbar = () => {
   const [showMoreTags, setShowMoreTags] = useState(false);
   const pathname = usePathname();
   const dispatch = useDispatch();
+  const router = useRouter();
   const users = useSelector((state) => state.users.users);
   const reversedUsers = users.slice().reverse();
 
@@ -127,7 +128,7 @@ const Rightbar = () => {
                     </Link>
                   </motion.div>
                   <motion.div variants={itemVariants}>
-                    <Link href="/trending" className="flex items-center gap-3 hover:bg-white p-2 rounded-lg cursor-pointer transition-all duration-300 group">
+                    <Link href="/hashtags" className="flex items-center gap-3 hover:bg-white p-2 rounded-lg cursor-pointer transition-all duration-300 group">
                       <div className="bg-green-100 p-2 rounded-lg text-green-600 group-hover:bg-green-600 group-hover:text-white transition-all duration-300">
                         <FiTrendingUp />
                       </div>
@@ -135,7 +136,7 @@ const Rightbar = () => {
                     </Link>
                   </motion.div>
                   <motion.div variants={itemVariants}>
-                    <Link href="/saved" className="flex items-center gap-3 hover:bg-white p-2 rounded-lg cursor-pointer transition-all duration-300 group">
+                    <Link href="/bookmarks" className="flex items-center gap-3 hover:bg-white p-2 rounded-lg cursor-pointer transition-all duration-300 group">
                       <div className="bg-amber-100 p-2 rounded-lg text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300">
                         <BsBookmark />
                       </div>
@@ -171,6 +172,7 @@ const Rightbar = () => {
                       className="flex items-center justify-between bg-white p-2 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer"
                       variants={itemVariants}
                       whileHover={{ x: 3 }}
+                      onClick={()=> router.push(`/hashtags?hashtag=${hashtag.tag}`)}
                     >
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-md" style={{ backgroundColor: `${hashtag.color}20` }}>

@@ -52,7 +52,7 @@ export default function StorySection() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="relative w-full max-w-full overflow-hidden mb-6"
+      className="relative w-full max-w-full overflow-hidden mb-5"
     >
       {/* Scroll buttons */}
       <motion.button

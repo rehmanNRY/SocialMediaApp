@@ -308,14 +308,13 @@ const Sidebar = ({ isSidebar }) => {
 
                     <h4 className="text-sm font-bold text-indigo-800">Need Help?</h4>
                     <p className="text-xs text-indigo-600 mt-1 mb-3">Our support team is ready to assist you</p>
-                    <motion.button
+                    <Link
                       className="w-full text-xs font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-500 px-3 py-2 rounded-lg shadow-sm flex items-center justify-center"
-                      whileHover={{ scale: 1.03, boxShadow: "0 4px 12px rgba(79, 70, 229, 0.2)" }}
-                      whileTap={{ scale: 0.98 }}
+                      href={"/contact"}
                     >
                       <FiMail className="mr-1.5" />
                       Contact Support
-                    </motion.button>
+                    </Link>
                   </div>
                 </motion.div>
               )}

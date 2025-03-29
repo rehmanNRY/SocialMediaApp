@@ -54,7 +54,6 @@ export const createPost = asyncHandler(async (req, res, next) => {
   }
 });
 
-
 // Get all posts of all users along with comments and user details
 export const getAllPosts = asyncHandler(async (req, res, next) => {
   try {
@@ -79,6 +78,36 @@ export const getAllPosts = asyncHandler(async (req, res, next) => {
     res.status(200).json(new ApiResponse(200, 'All posts fetched successfully', updatedPosts));
   } catch (error) {
     next(new ApiError(500, 'Failed to fetch posts'));
+  }
+});
+
+// get specific post by id
+export const getPostById = asyncHandler(async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    // Find the post by ID and populate necessary fields
+    const post = await Post.findById(id)
+      .populate('user', 'fullName profilePicture username')
+      .populate('likes', 'fullName')
+      .populate('poll.options.votes', 'fullName username profilePicture')
+      .lean();
+
+    if (!post) {
+      return next(new ApiError(404, 'Post not found'));
+    }
+
+    // Check if the poll has expired and update its active status
+    const now = new Date();
+    if (post.poll && post.poll.endDate && post.poll.active) {
+      if (new Date(post.poll.endDate) < now) {
+        post.poll.active = false;
+      }
+    }
+
+    res.status(200).json(new ApiResponse(200, 'Post fetched successfully', post));
+  } catch (error) {
+    next(new ApiError(500, 'Failed to fetch post'));
   }
 });
 

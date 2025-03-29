@@ -9,7 +9,8 @@ import {
   toggleLikePost,
   getPostLikers,
   votePollOption,
-  getPollResults
+  getPollResults,
+  getPostById
 } from '../controllers/post.controllers.js';
 
 const router = express.Router();
@@ -19,6 +20,9 @@ router.post('/', fetchUser, createPost);
 
 // Route to get all posts of all users
 router.get('/', getAllPosts);
+
+// Route to get specific post
+router.get('/:id', getPostById);
 
 // Route to edit own post
 router.put('/:postId', fetchUser, editPost);

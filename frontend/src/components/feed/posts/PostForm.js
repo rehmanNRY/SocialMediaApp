@@ -276,7 +276,7 @@ const PostForm = () => {
   return (
     <>
       {isLoggedIn && (
-        <div className={`w-full transition-all duration-300 ${isExpanded ? 'mb-8' : 'mb-4'}`}>
+        <div className={`w-full transition-all duration-300 ${isExpanded ? 'mb-10' : 'mb-4'}`}>
           <form
             onSubmit={handleSubmit}
             className={`${backgroundColor} p-4 sm:p-6 rounded-xl shadow-lg border border-gray-200 w-full mx-auto transition-all duration-300 transform ${isExpanded ? 'scale-102' : ''}`}

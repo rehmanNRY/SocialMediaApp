@@ -12,46 +12,46 @@ const LikersModal = ({ likers, closeModal }) => {
     liker.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Faster animation variants
   const modalVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 0.2 } },
-    exit: { opacity: 0, transition: { duration: 0.15 } }
+    visible: { opacity: 1, transition: { duration: 0.15 } },
+    exit: { opacity: 0, transition: { duration: 0.1 } }
   };
 
   const contentVariants = {
-    hidden: { scale: 0.95, y: 20, opacity: 0 },
+    hidden: { scale: 0.98, y: 10, opacity: 0 },
     visible: {
       scale: 1,
       y: 0,
       opacity: 1,
       transition: {
         type: "spring",
-        damping: 25,
-        stiffness: 500,
-        mass: 0.5
+        damping: 28,
+        stiffness: 600,
+        mass: 0.4
       }
     },
     exit: {
-      scale: 0.95,
-      y: 20,
+      scale: 0.98,
+      y: 10,
       opacity: 0,
       transition: {
-        type: "spring",
-        damping: 30,
-        stiffness: 500
+        duration: 0.1
       }
     }
   };
 
   const listItemVariants = {
-    hidden: { opacity: 0, y: 10 },
+    hidden: { opacity: 0, y: 5 },
     visible: (i) => ({
       opacity: 1,
       y: 0,
       transition: {
-        delay: i * 0.03,
+        delay: i * 0.02, // Faster delay
         type: "spring",
-        stiffness: 400
+        stiffness: 500,
+        damping: 25
       }
     })
   };
@@ -68,28 +68,30 @@ const LikersModal = ({ likers, closeModal }) => {
           onClick={closeModal}
         >
           <motion.div
-            className="bg-white p-6 rounded-xl w-full max-w-md shadow-xl border border-gray-100 overflow-hidden"
+            className="bg-white p-6 rounded-2xl w-full max-w-md shadow-lg border border-gray-200 overflow-hidden"
             initial="hidden"
             animate="visible"
             exit="exit"
             variants={contentVariants}
             onClick={e => e.stopPropagation()}
+            style={{ boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 15px -8px rgba(0,0,0,0.05)" }}
           >
             <div className="flex justify-between items-center mb-5">
               <div className="flex items-center space-x-3">
                 <motion.div
-                  className="p-2.5 bg-indigo-500 rounded-full shadow-md"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 400 }}
+                  className="p-2.5 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full shadow-md"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  transition={{ type: "spring", stiffness: 500 }}
+                  style={{ boxShadow: "0 0 10px -2px rgba(99,102,241,0.3)" }}
                 >
                   <FiHeart className="text-white text-lg" />
                 </motion.div>
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-bold text-gray-800 tracking-tight">
                     {likers.length} {likers.length === 1 ? 'Like' : 'Likes'}
                   </h3>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 font-medium">
                     People who liked this post
                   </p>
                 </div>
@@ -97,8 +99,8 @@ const LikersModal = ({ likers, closeModal }) => {
               <motion.button
                 onClick={closeModal}
                 className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <FiX size={18} className="text-gray-500" />
               </motion.button>
@@ -106,31 +108,31 @@ const LikersModal = ({ likers, closeModal }) => {
 
             <div className="relative mb-4">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FiSearch className="text-gray-400" />
+                <FiSearch className="text-blue-500" />
               </div>
               <motion.input
                 type="text"
                 placeholder="Search likers..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-8 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-300 focus:border-transparent text-sm placeholder-gray-400 transition-all"
-                initial={{ y: 10, opacity: 0 }}
+                className="w-full pl-10 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-200 focus:border-blue-300 text-sm placeholder-gray-400 text-gray-700 transition-all"
+                initial={{ y: 5, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                transition={{ delay: 0.08 }}
                 whileFocus={{
-                  boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.15)",
-                  backgroundColor: "#f9fafb"
+                  boxShadow: "0 0 0 3px rgba(96, 165, 250, 0.15)",
+                  backgroundColor: "#fafafa"
                 }}
               />
               {searchTerm && (
                 <motion.button
                   className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
                   onClick={() => setSearchTerm("")}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0 }}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
+                  initial={{ scale: 0, rotate: -45 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  exit={{ scale: 0, rotate: 45 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <FiX size={16} />
                 </motion.button>
@@ -141,10 +143,10 @@ const LikersModal = ({ likers, closeModal }) => {
               className="space-y-1.5 max-h-[320px] overflow-y-auto pr-2 -mr-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
+              transition={{ delay: 0.15 }}
               style={{
                 scrollbarWidth: 'thin',
-                scrollbarColor: '#e5e7eb transparent'
+                scrollbarColor: '#d1d5db #f3f4f6'
               }}
             >
               {filteredLikers.length > 0 ? (
@@ -160,48 +162,50 @@ const LikersModal = ({ likers, closeModal }) => {
                   >
                     <Link href={`/profile/${liker._id}`} passHref>
                       <motion.div
-                        className="flex items-center p-2.5 rounded-lg hover:bg-gray-50 transition-all cursor-pointer group relative"
+                        className="flex items-center p-3 rounded-xl hover:bg-gradient-to-r hover:from-gray-50 hover:to-gray-100 transition-all cursor-pointer group relative"
                         whileHover={{
                           x: 2,
-                          backgroundColor: "#f9fafb",
                           boxShadow: "0 2px 8px -2px rgba(99, 102, 241, 0.15)"
                         }}
-                        whileTap={{ scale: 0.98 }}
+                        whileTap={{ scale: 0.99 }}
                       >
                         <div className="relative flex-shrink-0">
                           {liker.profilePicture ? (
                             <motion.img
                               src={liker.profilePicture}
                               alt={liker.fullName}
-                              className="w-10 h-10 rounded-full object-cover border border-gray-100 shadow-sm"
+                              className="w-11 h-11 rounded-full object-cover border-2 border-white shadow-sm"
                               whileHover={{ scale: 1.05 }}
+                              style={{ boxShadow: "0 0 0 2px rgba(99, 102, 241, 0.15)" }}
                             />
                           ) : (
                             <motion.div
                               whileHover={{ scale: 1.05 }}
-                              className="w-10 h-10 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center"
+                              className="w-11 h-11 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center shadow-sm"
+                              style={{ boxShadow: "0 0 0 2px rgba(99, 102, 241, 0.15)" }}
                             >
-                              <FiUser className="w-5 h-5 text-gray-400" />
+                              <FiUser className="w-5 h-5 text-blue-500" />
                             </motion.div>
                           )}
                           <motion.div
-                            className="absolute -bottom-1 -right-1 bg-indigo-500 rounded-full p-1 shadow-sm border border-white"
-                            initial={{ scale: 0 }}
+                            className="absolute -bottom-1 -right-1 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full p-1.5 shadow-md border-2 border-white"
+                            initial={{ scale: 0, rotate: -30 }}
                             animate={{
-                              scale: hoveredUser === liker._id ? 1 : 0
+                              scale: hoveredUser === liker._id ? 1 : 0,
+                              rotate: hoveredUser === liker._id ? 0 : -30
                             }}
-                            transition={{ type: "spring", stiffness: 500 }}
+                            transition={{ type: "spring", stiffness: 600 }}
                           >
                             <FiHeart className="w-2 h-2 text-white" />
                           </motion.div>
                         </div>
-                        <div className="ml-3 flex-1 min-w-0">
-                          <p className="font-medium text-gray-800 truncate text-sm">{liker.fullName}</p>
+                        <div className="ml-3.5 flex-1 min-w-0">
+                          <p className="font-semibold text-gray-800 truncate text-sm">{liker.fullName}</p>
                           <motion.p
-                            className="text-xs text-indigo-500 font-medium mt-0.5"
+                            className="text-xs bg-gradient-to-r from-blue-500 to-indigo-500 bg-clip-text text-transparent font-bold mt-0.5"
                             initial={{ x: 0 }}
                             animate={{
-                              x: hoveredUser === liker._id ? 2 : 0
+                              x: hoveredUser === liker._id ? 1 : 0
                             }}
                           >
                             View Profile
@@ -209,13 +213,13 @@ const LikersModal = ({ likers, closeModal }) => {
                         </div>
                         <motion.div
                           className="w-6 opacity-0 group-hover:opacity-100"
-                          initial={{ x: 5 }}
+                          initial={{ x: 3 }}
                           animate={{
-                            x: hoveredUser === liker._id ? 0 : 5,
+                            x: hoveredUser === liker._id ? 0 : 3,
                             opacity: hoveredUser === liker._id ? 1 : 0
                           }}
                         >
-                          <div className="text-indigo-400">→</div>
+                          <div className="text-indigo-500 font-bold">→</div>
                         </motion.div>
                       </motion.div>
                     </Link>
@@ -223,26 +227,27 @@ const LikersModal = ({ likers, closeModal }) => {
                 ))
               ) : (
                 <motion.div
-                  className="flex flex-col items-center justify-center py-8 text-center"
-                  initial={{ opacity: 0, y: 10 }}
+                  className="flex flex-col items-center justify-center py-10 text-center"
+                  initial={{ opacity: 0, y: 5 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
+                  transition={{ delay: 0.15 }}
                 >
                   <motion.div
-                    className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-3 border border-dashed border-gray-200"
+                    className="w-20 h-20 bg-gradient-to-br from-gray-100 to-gray-50 rounded-full flex items-center justify-center mb-4 border border-dashed border-gray-300"
                     animate={{
                       scale: [1, 1.03, 1],
+                      rotate: [0, 3, 0, -3, 0],
                     }}
                     transition={{
-                      duration: 2,
+                      duration: 2, // Faster animation
                       repeat: Infinity,
                       repeatType: "reverse"
                     }}
                   >
-                    <FiSearch className="text-gray-300 text-xl" />
+                    <FiSearch className="text-blue-500 text-2xl" />
                   </motion.div>
-                  <p className="text-gray-600 font-medium text-sm">No matching users found</p>
-                  <p className="text-gray-400 text-xs mt-1 max-w-xs">
+                  <p className="text-gray-700 font-semibold text-sm">No matching users found</p>
+                  <p className="text-gray-500 text-xs mt-1.5 max-w-xs">
                     {searchTerm ? `No results for "${searchTerm}"` : "Try searching for a name"}
                   </p>
                 </motion.div>
@@ -250,19 +255,20 @@ const LikersModal = ({ likers, closeModal }) => {
             </motion.div>
 
             <motion.div
-              className="mt-4 pt-3 border-t border-gray-100 flex justify-between items-center"
+              className="mt-5 pt-3 border-t border-gray-200 flex justify-between items-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.2 }}
             >
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-gray-500 font-medium">
                 {filteredLikers.length} of {likers.length} users
               </span>
               <motion.button
                 onClick={closeModal}
-                className="text-sm font-medium text-indigo-500 hover:text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors"
+                className="text-sm font-semibold bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-all"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
+                style={{ boxShadow: "0 4px 8px -2px rgba(99, 102, 241, 0.3)" }}
               >
                 Close
               </motion.button>

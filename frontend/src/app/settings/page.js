@@ -21,15 +21,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiChevronRight, FiLogOut, FiSave, FiX } from "react-icons/fi";
 import AuthRedirect from '@/components/AuthRedirect';
 import { useDispatch, useSelector } from "react-redux";
-import { updateUserDetails } from "@/redux/auth/authSlice";
+import { fetchUserDetails, updateUserDetails } from "@/redux/auth/authSlice";
 import Link from "next/link";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { fetchFriendsList, fetchReceivedRequests, fetchSentRequests } from "@/redux/friendRequests/friendRequestsSlice";
+import { fetchUsers } from "@/redux/users/usersSlice";
 
 const SettingsPage = () => {
   const [activeField, setActiveField] = useState(null);
   const dispatch = useDispatch();
   const { isLoggedIn, userDetails, loading, error } = useSelector((state) => state.auth);
+  const sentRequests = useSelector((state) => state.friendRequests.sentRequests);
+  const receivedRequests = useSelector((state) => state.friendRequests.receivedRequests);
+  const friendsList = useSelector((state) => state.friendRequests.friendsList);
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -41,6 +46,13 @@ const SettingsPage = () => {
     location: "",
     bio: "",
   });
+
+  useEffect(() => {
+    dispatch(fetchUserDetails());
+    dispatch(fetchSentRequests());
+    dispatch(fetchReceivedRequests());
+    dispatch(fetchFriendsList());
+  }, [dispatch]);
 
   useEffect(() => {
     if (userDetails) {
@@ -141,19 +153,52 @@ const SettingsPage = () => {
 
   const SettingItem = ({ title, icon, field, value }) => (
     <motion.li
-      className={`flex justify-between items-center ${field === "profilePicture" ? 'py-4 pr-4' : "p-4"} bg-white rounded-lg hover:bg-gray-50 transition duration-200 shadow-sm`}
+      className={`flex justify-between items-center ${(field === "profilePicture" || field === "coverImage") ? 'py-4 pr-4' : "p-4"} bg-white rounded-lg hover:bg-gray-50 transition duration-200 shadow-sm`}
       whileHover={{ scale: 1.02, boxShadow: "0 4px 12px rgba(0,0,0,0.05)" }}
       onClick={() => handleEdit(field)}
     >
-      {field !== "profilePicture" ? <div className="flex flex-col">
-        <span className="flex items-center gap-3 text-gray-700 font-medium">
-          {icon}
-          {title}
-        </span>
-        <span className="text-sm text-gray-500 mt-1 ml-7">
-          {field === "password" ? "••••••••" : value || "Not set"}
-        </span>
-      </div> : (
+      {field !== "profilePicture" ? field === "coverImage" ? (
+        <div className="flex items-center">
+          <div className="relative mx-auto w-16 h-14">
+            <motion.div
+              className="relative w-full h-full rounded-md overflow-hidden shadow-lg"
+              whileHover={{ scale: 1.05, rotate: 5 }}
+            >
+              <img
+                src={userDetails?.coverImage || "https://via.placeholder.com/100"}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
+            <motion.div
+              className="absolute -bottom-1 -right-1 bg-indigo-600 text-white p-1.5 rounded-full shadow-lg cursor-pointer"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => handleEdit("coverImage")}
+            >
+              <FaCamera size={14} />
+            </motion.div>
+          </div>
+          <div className="flex flex-col ml-3">
+            <span className="flex items-center gap-3 text-gray-700 font-medium">
+              {title}
+            </span>
+            <span className="text-sm text-gray-500 mt-1">
+              {field === "password" ? "••••••••" : value || "Not set"}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-col">
+          <span className="flex items-center gap-3 text-gray-700 font-medium">
+            {icon}
+            {title}
+          </span>
+          <span className="text-sm text-gray-500 mt-1 ml-7">
+            {field === "password" ? "••••••••" : value || "Not set"}
+          </span>
+        </div>
+      ) : (
         <div className="flex items-center">
           <div className="relative mx-auto w-16 h-16">
             <motion.div
@@ -212,6 +257,46 @@ const SettingsPage = () => {
         <motion.div
           className="setting-item bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 border border-gray-100"
           whileHover={{ y: -5 }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+        >
+          <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-6 pb-3 border-b border-gray-100">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <FaAddressCard className="text-blue-600" />
+            </div>
+            <span>Personal Details</span>
+          </h2>
+          <ul className="space-y-4">
+            <SettingItem
+              title="Profile Picture"
+              icon={<FaCamera className="text-indigo-500" />}
+              field="profilePicture"
+              value={userDetails?.profilePicture ? "Uploaded" : "No image"}
+            />
+            <SettingItem
+              title="Cover Image"
+              icon={<FaImage className="text-indigo-500" />}
+              field="coverImage"
+              value={userDetails?.coverImage ? "Uploaded" : "No image"}
+            />
+            <SettingItem
+              title="Full Name"
+              icon={<FaUserEdit className="text-indigo-500" />}
+              field="fullName"
+              value={userDetails?.fullName}
+            />
+          </ul>
+          <AnimatePresence>
+            {renderEditForm("fullName")}
+            {renderEditForm("profilePicture")}
+            {renderEditForm("coverImage")}
+          </AnimatePresence>
+        </motion.div>
+
+        <motion.div
+          className="setting-item bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 border border-gray-100"
+          whileHover={{ y: -5 }}
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
@@ -246,46 +331,6 @@ const SettingsPage = () => {
             {renderEditForm("username")}
             {renderEditForm("email")}
             {renderEditForm("password")}
-          </AnimatePresence>
-        </motion.div>
-
-        <motion.div
-          className="setting-item bg-white p-6 rounded-2xl shadow-md hover:shadow-xl transition duration-300 border border-gray-100"
-          whileHover={{ y: -5 }}
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2 mb-6 pb-3 border-b border-gray-100">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <FaAddressCard className="text-blue-600" />
-            </div>
-            <span>Personal Details</span>
-          </h2>
-          <ul className="space-y-4">
-            <SettingItem
-              title="Profile Picture"
-              icon={<FaCamera className="text-indigo-500" />}
-              field="profilePicture"
-              value={userDetails?.profilePicture ? "Uploaded" : "No image"}
-            />
-            <SettingItem
-              title="Full Name"
-              icon={<FaUserEdit className="text-indigo-500" />}
-              field="fullName"
-              value={userDetails?.fullName}
-            />
-            <SettingItem
-              title="Cover Image"
-              icon={<FaImage className="text-indigo-500" />}
-              field="coverImage"
-              value={userDetails?.coverImage ? "Uploaded" : "No image"}
-            />
-          </ul>
-          <AnimatePresence>
-            {renderEditForm("fullName")}
-            {renderEditForm("profilePicture")}
-            {renderEditForm("coverImage")}
           </AnimatePresence>
         </motion.div>
 
@@ -344,9 +389,9 @@ const SettingsPage = () => {
           </h2>
           <ul className="space-y-4">
             {[
-              { title: "Friends", icon: <FaUserPlus className="text-indigo-500" />, href: "/friends", count: "12" },
-              { title: "Followers", icon: <FaUserMinus className="text-indigo-500" />, href: "/pending-requests", count: "24" },
-              { title: "Following", icon: <FaUserFriends className="text-indigo-500" />, href: "/sent-requests", count: "18" },
+              { title: "Friends", icon: <FaUserPlus className="text-indigo-500" />, href: "/friends", count: friendsList.length },
+              { title: "Followers", icon: <FaUserMinus className="text-indigo-500" />, href: "/pending-requests", count: receivedRequests.length },
+              { title: "Following", icon: <FaUserFriends className="text-indigo-500" />, href: "/sent-requests", count: sentRequests.length },
             ].map((item, index) => (
               <motion.div
                 key={index}

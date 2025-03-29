@@ -159,14 +159,6 @@ const FriendsSuggestion = () => {
     dispatch(unfriend(friendId));
   };
 
-  const toggleFavorite = (userId) => {
-    if (favorites.includes(userId)) {
-      setFavorites(favorites.filter(id => id !== userId));
-    } else {
-      setFavorites([...favorites, userId]);
-    }
-  };
-
   // Filter and sort users
   const filteredUsers = users.filter(user => {
     // Search filter
