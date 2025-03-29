@@ -1,11 +1,15 @@
 import { Comment } from '../models/comment.model.js';
+import { Post } from '../models/post.model.js';
+import { Notification } from '../models/notification.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import { User } from '../models/user.model.js';
 
 // Controller to post a comment
 export const postComment = asyncHandler(async (req, res, next) => {
-  const userId = req.user.id; // Retrieved from fetchUser middleware
+  const userId = req.user.id;
+  const { fullName } = await User.findById(userId);
   const { post, content } = req.body;
 
   const comment = await Comment.create({
@@ -17,6 +21,19 @@ export const postComment = asyncHandler(async (req, res, next) => {
   const populatedComment = await Comment.findById(comment._id)
     .populate('user', 'fullName profilePicture') // Populate post's user details
     .lean();
+
+  // Find post owner to send notification
+  const postData = await Post.findById(post);
+  
+  // Send notification to post owner if commenter is not the post owner
+  if (postData && postData.user.toString() !== userId) {
+    await Notification.create({
+      senderUser: userId,
+      receiverUser: postData.user,
+      message: `${fullName} commented on your post: "${content.substring(0, 30)}${content.length > 25 ? '...' : ''}"`,
+      navigateLink: `/posts/${post}`,
+    });
+  }
 
   res.status(201).json(new ApiResponse(201, 'Comment posted successfully', populatedComment));
 });
@@ -70,6 +87,7 @@ export const getCommentsByPost = asyncHandler(async (req, res, next) => {
 // Controller to like or dislike a comment
 export const toggleLikeComment = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
+  const { fullName } = await User.findById(userId);
   const { commentId } = req.body;
 
   // Find the comment
@@ -86,6 +104,16 @@ export const toggleLikeComment = asyncHandler(async (req, res, next) => {
   } else {
     // Otherwise, add the like
     comment.likes.push(userId);
+    
+    // Send notification if the user is not liking their own comment
+    if (comment.user.toString() !== userId) {
+      await Notification.create({
+        senderUser: userId,
+        receiverUser: comment.user,
+        message: `${fullName} liked your comment`,
+        navigateLink: `/posts/${comment.post}`,
+      });
+    }
   }
 
   await comment.save();

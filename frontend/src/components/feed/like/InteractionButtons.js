@@ -94,11 +94,11 @@ const InteractionButtons = ({
       navigator.share({
         title: `Post by ${post.user?.fullName}`,
         text: post.content?.substring(0, 100) + '...',
-        url: window.location.origin + '/post/' + post._id,
+        url: window.location.origin + '/posts/' + post._id,
       });
     } else {
       // Fallback for browsers that don't support share API
-      navigator.clipboard.writeText(window.location.origin + '/post/' + post._id);
+      navigator.clipboard.writeText(window.location.origin + '/posts/' + post._id);
       // Could show a toast notification here
     }
   };

@@ -11,8 +11,6 @@ import Link from 'next/link';
 
 const ProfileMenu = ({ userDetails }) => {
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [activeTab, setActiveTab] = useState('account');
-  const [darkMode, setDarkMode] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const userMenuRef = useRef(null);
   const buttonRef = useRef(null);
@@ -63,42 +61,26 @@ const ProfileMenu = ({ userDetails }) => {
 
   // Animation variants
   const menuVariants = {
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       scale: 0.95,
-      transformOrigin: "top right" 
+      transformOrigin: "top right"
     },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
-      transition: { 
-        type: "spring", 
-        duration: 0.4, 
-        stiffness: 200, 
-        damping: 15 
+      transition: {
+        type: "spring",
+        duration: 0.4,
+        stiffness: 200,
+        damping: 15
       }
     },
-    exit: { 
-      opacity: 0, 
-      scale: 0.95, 
-      transition: { 
-        duration: 0.2 
-      } 
-    }
-  };
-
-  const avatarPulse = {
-    pulse: {
-      scale: [1, 1.05, 1],
-      boxShadow: [
-        "0 0 0 0 rgba(99, 102, 241, 0)",
-        "0 0 0 6px rgba(99, 102, 241, 0.2)",
-        "0 0 0 0 rgba(99, 102, 241, 0)"
-      ],
+    exit: {
+      opacity: 0,
+      scale: 0.95,
       transition: {
-        duration: 2,
-        repeat: Infinity,
-        repeatType: "loop"
+        duration: 0.2
       }
     }
   };
@@ -117,11 +99,6 @@ const ProfileMenu = ({ userDetails }) => {
     tap: { scale: 0.98 }
   };
 
-  const tabs = [
-    { id: 'account', label: 'Account' },
-    { id: 'settings', label: 'Settings' }
-  ];
-
   return (
     <div className="relative z-30" ref={userMenuRef}>
       <motion.button
@@ -132,10 +109,10 @@ const ProfileMenu = ({ userDetails }) => {
         variants={buttonVariants}
         initial="rest"
       >
-        <motion.div 
+        <motion.div
           className="relative"
         >
-          <motion.div 
+          <motion.div
             className="w-9 h-9 rounded-full overflow-hidden border-2 border-white shadow-sm"
           >
             <img
@@ -146,13 +123,13 @@ const ProfileMenu = ({ userDetails }) => {
           </motion.div>
           <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
         </motion.div>
-        
-        <motion.div 
+
+        <motion.div
           className={`flex items-center gap-1 ${showUserMenu ? 'text-indigo-600' : 'text-gray-700'}`}
           animate={{ color: showUserMenu ? '#4f46e5' : '#374151' }}
         >
-          <BiChevronDown 
-            className={`w-5 h-5 transition-transform duration-300 ${showUserMenu ? 'rotate-180' : ''}`} 
+          <BiChevronDown
+            className={`w-5 h-5 transition-transform duration-300 ${showUserMenu ? 'rotate-180' : ''}`}
           />
         </motion.div>
       </motion.button>
@@ -169,14 +146,14 @@ const ProfileMenu = ({ userDetails }) => {
           >
             {/* Header with user info */}
             <div className="p-5 border-b border-gray-100 relative overflow-hidden">
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 opacity-70"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.7 }}
               />
-              
+
               <div className="relative flex items-center gap-4">
-                <motion.div 
+                <motion.div
                   className="relative"
                   whileHover={{ scale: 1.05 }}
                 >
@@ -185,15 +162,15 @@ const ProfileMenu = ({ userDetails }) => {
                     alt={userDetails?.fullName || "User"}
                     className="w-16 h-16 rounded-full border-2 border-white shadow-md object-cover"
                   />
-                  <motion.div 
+                  <motion.div
                     className="absolute bottom-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white"
                     animate={{ scale: [1, 1.2, 1] }}
                     transition={{ repeat: Infinity, duration: 2 }}
                   />
                 </motion.div>
-                
+
                 <div>
-                  <motion.p 
+                  <motion.p
                     className="text-lg font-semibold text-gray-900"
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -201,7 +178,7 @@ const ProfileMenu = ({ userDetails }) => {
                   >
                     {userDetails?.fullName || "User"}
                   </motion.p>
-                  <motion.p 
+                  <motion.p
                     className="text-sm text-gray-600 truncate max-w-[180px]"
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -213,183 +190,61 @@ const ProfileMenu = ({ userDetails }) => {
               </div>
             </div>
 
-            {/* Tab navigation */}
-            <div className="flex border-b border-gray-100">
-              {tabs.map(tab => (
-                <motion.button
-                  key={tab.id}
-                  className={`flex-1 py-3 text-sm font-medium ${
-                    activeTab === tab.id 
-                      ? 'text-indigo-600 border-b-2 border-indigo-600' 
-                      : 'text-gray-500 hover:text-gray-700'
-                  }`}
-                  onClick={() => setActiveTab(tab.id)}
-                  whileHover={{ backgroundColor: 'rgba(238, 242, 255, 0.5)' }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  {tab.label}
-                </motion.button>
-              ))}
-            </div>
-
             {/* Content based on active tab */}
             <AnimatePresence mode="wait">
-              {activeTab === 'account' && (
-                <motion.div
-                  key="account"
-                  className="py-2"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
+              <motion.div
+                key="account"
+                className="py-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Link
+                  href={`/profile/${userDetails?._id}`}
+                  className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200"
+                  onClick={() => setShowUserMenu(false)}
                 >
-                  <Link
-                    href={`/profile/${userDetails?._id}`}
-                    className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200"
-                    onClick={() => setShowUserMenu(false)}
+                  <motion.div
+                    className="w-9 h-9 flex items-center justify-center bg-indigo-100 rounded-xl mr-3 text-indigo-600"
+                    variants={iconVariants}
+                    whileHover="hover"
                   >
-                    <motion.div 
-                      className="w-9 h-9 flex items-center justify-center bg-indigo-100 rounded-xl mr-3 text-indigo-600"
-                      variants={iconVariants}
-                      whileHover="hover"
-                    >
-                      <FiUser className="w-5 h-5" />
-                    </motion.div>
-                    <span>Your Profile</span>
-                  </Link>
-                  
-                  <Link
-                    href="/bookmarks"
-                    className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    <motion.div 
-                      className="w-9 h-9 flex items-center justify-center bg-blue-100 rounded-xl mr-3 text-blue-600"
-                      variants={iconVariants}
-                      whileHover="hover"
-                    >
-                      <BiBookmark className="w-5 h-5" />
-                    </motion.div>
-                    <span>Saved Items</span>
-                  </Link>
-                  
-                  <Link
-                    href="/notifications"
-                    className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition-colors duration-200"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    <motion.div 
-                      className="w-9 h-9 flex items-center justify-center bg-purple-100 rounded-xl mr-3 text-purple-600 relative"
-                      variants={iconVariants}
-                      whileHover="hover"
-                    >
-                      <IoNotificationsOutline className="w-5 h-5" />
-                      <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center">
-                        3
-                      </span>
-                    </motion.div>
-                    <span>Notifications</span>
-                  </Link>
-                  
-                  <Link
-                    href="/wallet"
-                    className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 transition-colors duration-200"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    <motion.div 
-                      className="w-9 h-9 flex items-center justify-center bg-emerald-100 rounded-xl mr-3 text-emerald-600"
-                      variants={iconVariants}
-                      whileHover="hover"
-                    >
-                      <IoWalletOutline className="w-5 h-5" />
-                    </motion.div>
-                    <span>Wallet</span>
-                  </Link>
-                </motion.div>
-              )}
+                    <FiUser className="w-5 h-5" />
+                  </motion.div>
+                  <span>Your Profile</span>
+                </Link>
 
-              {activeTab === 'settings' && (
-                <motion.div
-                  key="settings"
-                  className="py-2"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
+                <Link
+                  href="/bookmarks"
+                  className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200"
+                  onClick={() => setShowUserMenu(false)}
                 >
-                  <Link
-                    href="/settings"
-                    className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200"
-                    onClick={() => setShowUserMenu(false)}
+                  <motion.div
+                    className="w-9 h-9 flex items-center justify-center bg-blue-100 rounded-xl mr-3 text-blue-600"
+                    variants={iconVariants}
+                    whileHover="hover"
                   >
-                    <motion.div 
-                      className="w-9 h-9 flex items-center justify-center bg-indigo-100 rounded-xl mr-3 text-indigo-600"
-                      variants={iconVariants}
-                      whileHover="hover"
-                    >
-                      <IoSettingsOutline className="w-5 h-5" />
-                    </motion.div>
-                    <span>Account Settings</span>
-                  </Link>
-                  
-                  <Link
-                    href="/payments"
-                    className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-700 transition-colors duration-200"
-                    onClick={() => setShowUserMenu(false)}
+                    <BiBookmark className="w-5 h-5" />
+                  </motion.div>
+                  <span>Saved Items</span>
+                </Link>
+
+                <Link
+                  href="/settings"
+                  className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-700 transition-colors duration-200"
+                  onClick={() => setShowUserMenu(false)}
+                >
+                  <motion.div
+                    className="w-9 h-9 flex items-center justify-center bg-indigo-100 rounded-xl mr-3 text-indigo-600"
+                    variants={iconVariants}
+                    whileHover="hover"
                   >
-                    <motion.div 
-                      className="w-9 h-9 flex items-center justify-center bg-amber-100 rounded-xl mr-3 text-amber-600"
-                      variants={iconVariants}
-                      whileHover="hover"
-                    >
-                      <FiCreditCard className="w-5 h-5" />
-                    </motion.div>
-                    <span>Payment Methods</span>
-                  </Link>
-                  
-                  <Link
-                    href="/contact"
-                    className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    <motion.div 
-                      className="w-9 h-9 flex items-center justify-center bg-teal-100 rounded-xl mr-3 text-teal-600"
-                      variants={iconVariants}
-                      whileHover="hover"
-                    >
-                      <FiMessageCircle className="w-5 h-5" />
-                    </motion.div>
-                    <span>Help & Support</span>
-                  </Link>
-                  
-                  <button
-                    className="flex w-full items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                    onClick={() => setDarkMode(!darkMode)}
-                  >
-                    <motion.div 
-                      className="w-9 h-9 flex items-center justify-center bg-gray-100 rounded-xl mr-3 text-gray-600"
-                      variants={iconVariants}
-                      whileHover="hover"
-                    >
-                      {darkMode ? <FiSun className="w-5 h-5" /> : <FiMoon className="w-5 h-5" />}
-                    </motion.div>
-                    <span>{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
-                    
-                    <div className="ml-auto">
-                      <motion.div 
-                        className={`w-10 h-6 rounded-full p-1 flex items-center ${darkMode ? 'bg-indigo-600' : 'bg-gray-300'}`}
-                        animate={{ backgroundColor: darkMode ? '#4f46e5' : '#d1d5db' }}
-                      >
-                        <motion.div 
-                          className="w-4 h-4 rounded-full bg-white shadow-sm"
-                          animate={{ x: darkMode ? 16 : 0 }}
-                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        />
-                      </motion.div>
-                    </div>
-                  </button>
-                </motion.div>
-              )}
+                    <IoSettingsOutline className="w-5 h-5" />
+                  </motion.div>
+                  <span>Account Settings</span>
+                </Link>
+              </motion.div>
             </AnimatePresence>
 
             {/* Footer with logout */}
@@ -400,7 +255,7 @@ const ProfileMenu = ({ userDetails }) => {
                 whileHover={{ scale: 1.02, backgroundColor: "rgba(254, 226, 226, 0.6)" }}
                 whileTap={{ scale: 0.98 }}
               >
-                <motion.div 
+                <motion.div
                   className="w-9 h-9 flex items-center justify-center bg-red-100 rounded-xl mr-3 text-red-600"
                   variants={iconVariants}
                   whileHover="hover"
@@ -409,7 +264,7 @@ const ProfileMenu = ({ userDetails }) => {
                 </motion.div>
                 <span>Sign Out</span>
               </motion.button>
-              
+
               <div className="mt-3 text-xs text-center text-gray-400">
                 <p>Press <kbd className="px-2 py-1 bg-gray-100 rounded-md">Ctrl</kbd> + <kbd className="px-2 py-1 bg-gray-100 rounded-md">/</kbd> to toggle menu</p>
               </div>

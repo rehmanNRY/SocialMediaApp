@@ -69,7 +69,7 @@ const PostCard = ({ post }) => {
   const handleHashtagClick = (e) => {
     if (e.target.hasAttribute('data-hashtag')) {
       const hashtag = e.target.getAttribute('data-hashtag');
-      router.push(`/hashtag/${hashtag}`);
+      router.push(`/hashtags?hashtag=${hashtag}`);
     }
   };
 

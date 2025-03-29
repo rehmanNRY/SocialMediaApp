@@ -26,9 +26,11 @@ import postRoute from "./routes/post.routes.js"
 import saves from "./routes/saves.routes.js"
 import userRoute from "./routes/user.routes.js"
 import storyRoute from "./routes/story.routes.js"
+import notificationRoute from "./routes/notification.routes.js"
 
 app.use("/api/comments", commentRoute);
 app.use("/api/friendRequests", friendRoute);
+app.use("/api/notifications", notificationRoute);
 app.use("/api/posts", postRoute);
 app.use("/api/saves", saves);
 app.use("/api/user", userRoute);

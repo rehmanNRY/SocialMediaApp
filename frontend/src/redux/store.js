@@ -6,6 +6,7 @@ import authReducer  from './auth/authSlice';
 import commentsReducer  from './comments/commentsSlice';
 import savedItemsReducer  from './savedItems/savedItemsSlice';
 import storyReducer  from './story/storySlice';
+import notificationsReducer  from './notifications/notificationsSlice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     comments: commentsReducer,
     savedItems: savedItemsReducer,
     story: storyReducer,
+    notifications: notificationsReducer,
   },
 });
 

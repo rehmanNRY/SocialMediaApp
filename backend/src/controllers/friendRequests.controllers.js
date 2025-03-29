@@ -1,6 +1,7 @@
 // friendRequest.controller.js
 import { FriendRequest } from '../models/friendRequests.model.js';
 import { User } from '../models/user.model.js';
+import { Notification } from '../models/notification.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
@@ -23,6 +24,17 @@ export const sendFriendRequest = asyncHandler(async (req, res, next) => {
   // Create the friend request
   const friendRequest = await FriendRequest.create({ sender: senderId, receiver: receiverId });
 
+  // Get sender name for notification
+  const sender = await User.findById(senderId);
+  
+  // Create notification for receiver
+  await Notification.create({
+    senderUser: senderId,
+    receiverUser: receiverId,
+    message: `${sender.fullName} sent you a friend request`,
+    navigateLink: `/profile/${senderId}`,
+  });
+
   res.status(201).json(new ApiResponse(201, 'Friend request sent successfully', friendRequest));
 });
 
@@ -40,6 +52,17 @@ export const acceptFriendRequest = asyncHandler(async (req, res, next) => {
   // Add each other as friends
   await User.findByIdAndUpdate(userId, { $addToSet: { friends: friendRequest.sender } });
   await User.findByIdAndUpdate(friendRequest.sender, { $addToSet: { friends: userId } });
+
+  // Get recipient name for notification
+  const recipient = await User.findById(userId);
+  
+  // Create notification for sender of original request
+  await Notification.create({
+    senderUser: userId,
+    receiverUser: friendRequest.sender,
+    message: `${recipient.fullName} accepted your friend request`,
+    navigateLink: `/profile/${userId}`,
+  });
 
   // Remove the friend request
   await friendRequest.deleteOne();

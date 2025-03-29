@@ -4,6 +4,8 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import { Comment } from '../models/comment.model.js';
+import { Notification } from '../models/notification.model.js';
+import { User } from '../models/user.model.js';
 
 // Create a new post
 export const createPost = asyncHandler(async (req, res, next) => {
@@ -160,6 +162,7 @@ export const deletePost = asyncHandler(async (req, res, next) => {
 export const toggleLikePost = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
   const { postId } = req.params;
+  const { fullName } = await User.findById(userId);
 
   const post = await Post.findById(postId);
   if (!post) {
@@ -175,6 +178,16 @@ export const toggleLikePost = asyncHandler(async (req, res, next) => {
   } else {
     // Like the post
     post.likes.push(userId);
+    
+    // Create notification for post owner if the liker is not the post owner
+    if (post.user.toString() !== userId) {
+      await Notification.create({
+        senderUser: userId,
+        receiverUser: post.user,
+        message: `${fullName} liked your post`,
+        navigateLink: `/posts/${postId}`,
+      });
+    }
   }
 
   await post.save();
@@ -202,6 +215,7 @@ export const getPostLikers = asyncHandler(async (req, res, next) => {
 // Vote on a poll option
 export const votePollOption = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
+  const { fullName } = await User.findById(userId);
   const { postId, optionId } = req.params;
 
   const post = await Post.findById(postId);
@@ -248,6 +262,16 @@ export const votePollOption = asyncHandler(async (req, res, next) => {
   // Add user's vote to the selected option
   option.votes.push(userId);
   await post.save();
+  
+  // Create notification for post owner if the voter is not the post owner
+  if (!userHasVoted && post.user.toString() !== userId) {
+    await Notification.create({
+      senderUser: userId,
+      receiverUser: post.user,
+      message: `${fullName} voted on your poll`,
+      navigateLink: `/posts/${postId}`,
+    });
+  }
 
   // Return the updated post with populated fields
   const populatedPost = await Post.findById(post._id)
