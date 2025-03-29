@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllPosts } from "@/redux/posts/postsSlice";
 import AuthRedirect from "@/components/AuthRedirect";
@@ -11,6 +11,7 @@ import RunningServer from "@/components/RunningServer";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { Loading } from "@/components";
 
 export default function Home() {
   const dispatch = useDispatch();
@@ -81,6 +82,7 @@ export default function Home() {
   }
 
   return (
+    <Suspense fallback={<Loading />}>
     <AuthRedirect>
       <main className="bg-[#F5F6FA] mx-auto p-4 space-y-6 w-full min-h-screen">
         {/* Hashtag Header */}
@@ -197,5 +199,6 @@ export default function Home() {
         </motion.div>
       </main>
     </AuthRedirect>
+    </Suspense>
   );
 }
