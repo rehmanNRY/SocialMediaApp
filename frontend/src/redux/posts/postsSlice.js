@@ -4,23 +4,44 @@ import axiosInstance from '@/api/axiosInstance';
 // Async thunk to create a new post
 export const createPost = createAsyncThunk(
   'posts/createPost',
-  async ({ content, image, backgroundColor, pollData, feeling }, { rejectWithValue }) => {
+  async ({ content, image, backgroundColor, pollData, feeling, imageFile }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await axiosInstance.post('/posts', { 
-        content, 
-        image, 
-        backgroundColor,
-        pollData,
-        feeling,
-      }, {
-        headers: {
-          'auth-token': token,
-        },
-      });
+
+      // If a file is provided, use multipart/form-data
+      if (imageFile) {
+        const formData = new FormData();
+        formData.append('content', content || '');
+        formData.append('backgroundColor', backgroundColor || '');
+        formData.append('feeling', feeling || '');
+        // Send pollData as JSON string for backend to parse
+        if (pollData) {
+          formData.append('pollData', JSON.stringify(pollData));
+        }
+        formData.append('image', imageFile);
+
+        const response = await axiosInstance.post('/posts', formData, {
+          headers: {
+            'auth-token': token,
+            // Let axios set Content-Type boundary automatically
+          },
+        });
+        return response.data;
+      }
+
+      // Otherwise, fall back to JSON body (for URL/GIF/no image)
+      const response = await axiosInstance.post(
+        '/posts',
+        { content, image, backgroundColor, pollData, feeling },
+        {
+          headers: {
+            'auth-token': token,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error?.response?.data || { message: 'Failed to create post' });
     }
   }
 );

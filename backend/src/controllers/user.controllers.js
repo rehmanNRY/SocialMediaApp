@@ -195,3 +195,45 @@ export const updateUser = asyncHandler(async (req, res, next) => {
     next(err);
   }
 });
+
+// Update only profile picture via Cloudinary upload or URL
+export const updateUserAvatar = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  const uploadedUrl = req.file?.path || req.file?.secure_url || null;
+  const urlFromBody = req.body?.profilePicture || null;
+  const finalUrl = uploadedUrl || urlFromBody;
+
+  if (!finalUrl) {
+    return next(new ApiError(400, 'No image provided'));
+  }
+
+  user.profilePicture = finalUrl;
+  await user.save();
+  return res.status(200).json(new ApiResponse(200, 'Profile picture updated successfully', user));
+});
+
+// Update only cover image via Cloudinary upload or URL
+export const updateUserCover = asyncHandler(async (req, res, next) => {
+  const userId = req.user.id;
+  const user = await User.findById(userId);
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  const uploadedUrl = req.file?.path || req.file?.secure_url || null;
+  const urlFromBody = req.body?.coverImage || null;
+  const finalUrl = uploadedUrl || urlFromBody;
+
+  if (!finalUrl) {
+    return next(new ApiError(400, 'No image provided'));
+  }
+
+  user.coverImage = finalUrl;
+  await user.save();
+  return res.status(200).json(new ApiResponse(200, 'Cover image updated successfully', user));
+});

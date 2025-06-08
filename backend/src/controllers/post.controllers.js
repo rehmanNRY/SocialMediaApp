@@ -11,7 +11,20 @@ import { User } from '../models/user.model.js';
 export const createPost = asyncHandler(async (req, res, next) => {
   try {
     const userId = req.user.id;
-    const { content, image, backgroundColor, pollData, feeling } = req.body;
+    let { content, backgroundColor, pollData, feeling } = req.body;
+
+    // If pollData comes via multipart/form-data, it will be a string
+    if (typeof pollData === 'string') {
+      try {
+        pollData = JSON.parse(pollData);
+      } catch (_) {
+        // ignore parse failure, treat as absent/invalid
+      }
+    }
+
+    // Prefer uploaded file (Cloudinary) over URL when both are present
+    const uploadedImageUrl = req.file?.path || req.file?.secure_url || null;
+    const image = uploadedImageUrl || (req.body.image ? req.body.image : null);
 
     // Create post object with basic fields
     const postData = { 

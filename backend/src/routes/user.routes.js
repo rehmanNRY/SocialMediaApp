@@ -8,7 +8,10 @@ import {
   getAllUsers,
   userDetails,
   updateUser,
+  updateUserAvatar,
+  updateUserCover,
 } from '../controllers/user.controllers.js';
+import upload from '../config/multer.js';
 
 const router = express.Router();
 
@@ -29,5 +32,11 @@ router.get('/', getAllUsers);
 
 // Route to update the user profile
 router.put('/update', fetchUser, updateUser); 
+
+// Route to update profile picture (avatar)
+router.put('/update/avatar', fetchUser, upload.single('profilePicture'), updateUserAvatar);
+
+// Route to update cover image
+router.put('/update/cover', fetchUser, upload.single('coverImage'), updateUserCover);
 
 export default router;

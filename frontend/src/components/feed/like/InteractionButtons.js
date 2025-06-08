@@ -114,16 +114,17 @@ const InteractionButtons = ({
   useEffect(() => {
     const isBookmarked = savedItems.some((item) => item.post?._id === post._id);
     setOptimisticBookmarked(isBookmarked);
-  }, [savedItems, post]);
+  }, [savedItems, post._id]);
 
   // Fetch post likers
   useEffect(() => {
+    if (!post?._id) return;
     dispatch(getPostLikers(post._id)).then((action) => {
       if (action.payload?.data) {
         setLikers(action.payload.data);
       }
     });
-  }, [dispatch, post]);
+  }, [dispatch, post._id]);
 
   // Set initial like state based on actual state
   useEffect(() => {
@@ -132,8 +133,9 @@ const InteractionButtons = ({
 
   // Fetch comments for this post
   useEffect(() => {
+    if (!post?._id) return;
     dispatch(getCommentsByPost(post._id));
-  }, [dispatch, post]);
+  }, [dispatch, post._id]);
 
   return (
     <>

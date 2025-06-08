@@ -10,13 +10,14 @@ import {
   getPostLikers,
   votePollOption,
   getPollResults,
-  getPostById
+  getPostById,
 } from '../controllers/post.controllers.js';
+import upload from '../config/multer.js';
 
 const router = express.Router();
 
 // Route to create a new post
-router.post('/', fetchUser, createPost);
+router.post("/", fetchUser, upload.single("image"), createPost);
 
 // Route to get all posts of all users
 router.get('/', getAllPosts);

@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
   FaUserCog,
@@ -84,6 +84,11 @@ const SettingsPage = () => {
 
   const [errors, setErrors] = useState({});
 
+  const [newImagePreview, setNewImagePreview] = useState(null);
+  const [newImageFile, setNewImageFile] = useState(null);
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+
   const handleSave = async () => {
     try {
       const authToken = localStorage.getItem("authToken");
@@ -111,6 +116,65 @@ const SettingsPage = () => {
     }
   };
 
+  const handleFiles = useCallback((files) => {
+    const file = files && files[0];
+    if (!file) return;
+    setNewImageUrl("");
+    setNewImageFile(file);
+    const url = URL.createObjectURL(file);
+    setNewImagePreview(url);
+  }, []);
+
+  const onDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+      e.dataTransfer.clearData();
+    }
+  }, [handleFiles]);
+
+  const submitImageUpdate = async (field) => {
+    if (!field) return;
+    try {
+      const authToken = localStorage.getItem("authToken");
+      let response;
+      if (newImageFile) {
+        const formData = new FormData();
+        formData.append(field, newImageFile);
+        const endpoint = field === 'profilePicture' ? 'avatar' : 'cover';
+        response = await axios.put(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/update/${endpoint}`,
+          formData,
+          { headers: { "auth-token": authToken } }
+        );
+      } else if (newImageUrl) {
+        const payload = { [field]: newImageUrl };
+        const endpoint = field === 'profilePicture' ? 'avatar' : 'cover';
+        response = await axios.put(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/update/${endpoint}`,
+          payload,
+          { headers: { "auth-token": authToken } }
+        );
+      } else {
+        toast.error("Please choose an image or provide a URL");
+        return;
+      }
+      dispatch(updateUserDetails(response.data.data));
+      toast.success(`${field === 'profilePicture' ? 'Profile picture' : 'Cover image'} updated successfully!`);
+      // reset and close inline edit
+      setNewImagePreview(null);
+      setNewImageFile(null);
+      setNewImageUrl("");
+      setIsDragging(false);
+      setActiveField(null);
+    } catch (error) {
+      console.error("Image update error", error);
+      toast.error("Failed to update image. Please try again.");
+    }
+  };
+
   const renderEditForm = (field) => {
     if (activeField !== field) return null;
 
@@ -121,32 +185,85 @@ const SettingsPage = () => {
         exit={{ opacity: 0, y: -10 }}
         className="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner"
       >
-        <input
-          type={field === "password" ? "password" : "text"}
-          placeholder={`Enter new ${field} ${field === 'dob' ? 'DD/MM/YYYY' : ''}`}
-          className={`w-full p-3 mb-2 border ${errors[field] ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
-          value={formData[field]}
-          onChange={handleInputChange}
-        />
-        {errors[field] && <p className="text-red-500 text-sm">{errors[field].message}</p>}
-        <div className="flex gap-4 mt-4">
-          <motion.button
-            onClick={handleSave}
-            className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <FiSave className="inline mr-1" /> Save Changes
-          </motion.button>
-          <motion.button
-            onClick={handleCancel}
-            className="bg-gray-400 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <FiX className="inline mr-1" /> Cancel
-          </motion.button>
-        </div>
+        {(field === 'profilePicture' || field === 'coverImage') ? (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-600 mb-2">Current</p>
+                <div className="border rounded-lg overflow-hidden bg-white">
+                  <img
+                    src={field === 'profilePicture' ? (userDetails?.profilePicture || 'https://via.placeholder.com/150') : (userDetails?.coverImage || 'https://via.placeholder.com/300x120')}
+                    alt="Current"
+                    className="w-full h-40 object-cover"
+                  />
+                </div>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-2">New</p>
+                <div
+                  className={`border-2 border-dashed rounded-lg p-4 text-center ${isDragging ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 bg-white'}`}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={onDrop}
+                >
+                  {newImagePreview ? (
+                    <img src={newImagePreview} alt="New" className="w-full h-40 object-cover rounded" />
+                  ) : (
+                    <>
+                      <p className="text-gray-600 mb-2">Drag & drop image here, or</p>
+                      <label className="inline-block px-3 py-2 bg-indigo-600 text-white rounded cursor-pointer hover:bg-indigo-700">
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFiles(e.target.files)} />
+                        Choose file
+                      </label>
+                    </>
+                  )}
+                </div>
+                <div className="mt-3">
+                  <input
+                    type="text"
+                    placeholder="Or paste image URL"
+                    value={newImageUrl}
+                    onChange={(e) => { setNewImageUrl(e.target.value); setNewImageFile(null); setNewImagePreview(e.target.value || null); }}
+                    className="w-full border rounded-lg px-3 py-2"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <button onClick={() => submitImageUpdate(field)} className="px-4 py-2 rounded-lg bg-indigo-600 text-white">Update</button>
+              <button onClick={handleCancel} className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800">Cancel</button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <input
+              type={field === "password" ? "password" : "text"}
+              placeholder={`Enter new ${field} ${field === 'dob' ? 'DD/MM/YYYY' : ''}`}
+              className={`w-full p-3 mb-2 border ${errors[field] ? 'border-red-500' : 'border-gray-300'} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200`}
+              value={formData[field]}
+              onChange={handleInputChange}
+            />
+            {errors[field] && <p className="text-red-500 text-sm">{errors[field].message}</p>}
+            <div className="flex gap-4 mt-4">
+              <motion.button
+                onClick={handleSave}
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FiSave className="inline mr-1" /> Save Changes
+              </motion.button>
+              <motion.button
+                onClick={handleCancel}
+                className="bg-gray-400 text-white px-4 py-2 rounded-lg shadow-md hover:shadow-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FiX className="inline mr-1" /> Cancel
+              </motion.button>
+            </div>
+          </>
+        )}
       </motion.div>
     );
   };
@@ -170,14 +287,10 @@ const SettingsPage = () => {
                 className="w-full h-full object-cover"
               />
             </motion.div>
-            <motion.div
-              className="absolute -bottom-1 -right-1 bg-indigo-600 text-white p-1.5 rounded-full shadow-lg cursor-pointer"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => handleEdit("coverImage")}
-            >
+            {/* Camera icon kept only as a visual affordance; editing is inline below */}
+            <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white p-1.5 rounded-full shadow-lg">
               <FaCamera size={14} />
-            </motion.div>
+            </div>
           </div>
           <div className="flex flex-col ml-3">
             <span className="flex items-center gap-3 text-gray-700 font-medium">
@@ -222,14 +335,9 @@ const SettingsPage = () => {
                 className="w-full h-full object-cover"
               />
             </motion.div>
-            <motion.div
-              className="absolute -bottom-1 -right-1 bg-indigo-600 text-white p-1.5 rounded-full shadow-lg cursor-pointer"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => handleEdit("profilePicture")}
-            >
+            <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white p-1.5 rounded-full shadow-lg">
               <FaCamera size={14} />
-            </motion.div>
+            </div>
           </div>
           <div className="flex flex-col ml-3">
             <span className="flex items-center gap-3 text-gray-700 font-medium">
@@ -366,8 +474,7 @@ const SettingsPage = () => {
               field="bio"
               value={userDetails?.bio}
             />
-          </ul>
-          <AnimatePresence>
+          </ul>          <AnimatePresence>
             {renderEditForm("dob")}
             {renderEditForm("location")}
             {renderEditForm("bio")}

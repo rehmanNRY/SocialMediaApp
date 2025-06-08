@@ -30,6 +30,7 @@ const PostForm = () => {
   const { isLoggedIn, userDetails } = useSelector((state) => state.auth);
   const [content, setContent] = useState('');
   const [image, setImage] = useState('');
+  const [imageFile, setImageFile] = useState(null);
   const [showImageInput, setShowImageInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -140,9 +141,15 @@ const PostForm = () => {
         };
       }
 
-      await dispatch(createPost(postData)).unwrap();
+      // If a file is selected, send it via FormData through the thunk
+      if (imageFile) {
+        await dispatch(createPost({ ...postData, imageFile })).unwrap();
+      } else {
+        await dispatch(createPost(postData)).unwrap();
+      }
       setContent('');
       setImage('');
+      setImageFile(null);
       setPreviewImage(null);
       setShowImageInput(false);
       setShowPollOptions(false);
@@ -187,6 +194,7 @@ const PostForm = () => {
   const handleGifSelect = (gifUrl) => {
     setImage(gifUrl);
     setPreviewImage(gifUrl);
+    setImageFile(null);
     setShowGifSelector(false);
     textareaRef.current?.focus();
   };
@@ -403,6 +411,8 @@ const PostForm = () => {
               setShowImageInput={setShowImageInput}
               image={image}
               setImage={setImage}
+              setPreviewImage={setPreviewImage}
+              setImageFile={setImageFile}
             />
 
             {/* Image preview area */}
@@ -411,6 +421,7 @@ const PostForm = () => {
               image={image}
               setPreviewImage={setPreviewImage}
               setImage={setImage}
+              setImageFile={setImageFile}
             />
 
             {errors.api && (
