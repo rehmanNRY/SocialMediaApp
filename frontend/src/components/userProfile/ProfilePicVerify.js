@@ -38,6 +38,8 @@ const ProfilePicVerify = () => {
   const [customImageUrl, setCustomImageUrl] = useState('');
   const [customImageError, setCustomImageError] = useState('');
   const [isCustomImageValid, setIsCustomImageValid] = useState(false);
+  const [newImageFile, setNewImageFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   
   const previewRef = useRef(null);
 
@@ -45,16 +47,33 @@ const ProfilePicVerify = () => {
     try {
       setIsLoading(true);
       const authToken = localStorage.getItem("authToken");
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/update`,
-        { profilePicture: currentPic, isDpVerify: true },
-        {
-          headers: {
-            "auth-token": authToken,
-          },
-        }
-      );
-      dispatch(updateUserDetails(response.data.data));
+      if (newImageFile) {
+        // Upload via Cloudinary (multer) then set verify flag
+        const formData = new FormData();
+        formData.append('profilePicture', newImageFile);
+        const uploadRes = await axios.put(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/update/avatar`,
+          formData,
+          { headers: { 'auth-token': authToken } }
+        );
+        const verifyRes = await axios.put(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/update`,
+          { isDpVerify: true },
+          { headers: { 'auth-token': authToken } }
+        );
+        dispatch(updateUserDetails(verifyRes.data.data || uploadRes.data.data));
+      } else {
+        const response = await axios.put(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/update`,
+          { profilePicture: currentPic, isDpVerify: true },
+          {
+            headers: {
+              "auth-token": authToken,
+            },
+          }
+        );
+        dispatch(updateUserDetails(response.data.data));
+      }
       setSuccess(true);
       setTimeout(() => setSuccess(false), 2000);
     } catch (error) {
@@ -68,6 +87,7 @@ const ProfilePicVerify = () => {
     setCurrentPic(pic);
     setSelectedIndex(index);
     setCustomImageError('');
+    setNewImageFile(null);
   };
 
   const togglePreview = () => {
@@ -89,6 +109,17 @@ const ProfilePicVerify = () => {
     setIsCustomImageValid(true);
     setCurrentPic(customImageUrl);
     setCustomImageError('');
+    setNewImageFile(null);
+  };
+
+  const handleFiles = (files) => {
+    const file = files && files[0];
+    if (!file) return;
+    setNewImageFile(file);
+    setCustomImageUrl('');
+    setCustomImageError('');
+    const localUrl = URL.createObjectURL(file);
+    setCurrentPic(localUrl);
   };
 
   // Close preview when clicking outside
@@ -250,7 +281,7 @@ const ProfilePicVerify = () => {
                 whileTap={{ y: 1 }}
               >
                 <FiLink />
-                <span>Custom URL</span>
+                <span>Custom Image</span>
                 {activeTab === 'custom' && (
                   <motion.div 
                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
@@ -334,12 +365,29 @@ const ProfilePicVerify = () => {
                 exit={{ opacity: 0, y: -10 }}
               >
                 <div className="space-y-4">
-                  <div>
-                    <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">
-                      Image URL
-                    </label>
-                    <div className="flex space-x-2">
-                      <div className="relative flex-1">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Choose from device / Drag & drop
+                      </label>
+                      <div
+                        className={`border-2 border-dashed rounded-lg p-4 text-center ${isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300'}`}
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onDrop={(e) => { e.preventDefault(); setIsDragging(false); handleFiles(e.dataTransfer.files); }}
+                      >
+                        <p className="text-gray-600 mb-2">Drag & drop an image here, or</p>
+                        <label className="inline-block px-3 py-2 bg-blue-600 text-white rounded cursor-pointer hover:bg-blue-700">
+                          <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFiles(e.target.files)} />
+                          Choose file
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700 mb-1">
+                        Image URL
+                      </label>
+                      <div className="relative">
                         <input
                           type="text"
                           id="imageUrl"
@@ -351,65 +399,55 @@ const ProfilePicVerify = () => {
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                           <FiLink className="text-gray-400" />
                         </div>
-                        {customImageUrl && !customImageError && isCustomImageValid && (
-                          <div className="absolute inset-y-0 right-3 flex items-center">
-                            <IoCheckmarkCircle className="text-green-500" size={20} />
-                          </div>
-                        )}
                       </div>
-                      <motion.button
-                        onClick={handleCustomImageSubmit}
-                        className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        disabled={!isCustomImageValid && customImageUrl.trim() !== ''}
-                      >
-                        <IoImageOutline />
-                        <span>Apply</span>
-                      </motion.button>
+                      <div className="mt-2 flex gap-2">
+                        <motion.button
+                          onClick={handleCustomImageSubmit}
+                          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          disabled={!isCustomImageValid && customImageUrl.trim() !== ''}
+                        >
+                          <IoImageOutline />
+                          <span>Apply URL</span>
+                        </motion.button>
+                      </div>
+                      {customImageError && (
+                        <motion.p 
+                          className="mt-2 text-sm text-red-600"
+                          initial={{ opacity: 0, y: -5 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          {customImageError}
+                        </motion.p>
+                      )}
                     </div>
-                    {customImageError && (
-                      <motion.p 
-                        className="mt-2 text-sm text-red-600"
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        {customImageError}
-                      </motion.p>
-                    )}
                   </div>
-                  
-                  <div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Enter the URL of an image you'd like to use as your profile picture.
-                      Supported formats: JPG, PNG, GIF, WEBP.
-                    </p>
-                    
-                    {customImageUrl && isCustomImageValid && (
-                      <motion.div 
-                        className="mt-4 flex justify-center"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                      >
-                        <div className="relative inline-block">
-                          <img 
-                            src={customImageUrl} 
-                            alt="Custom profile picture" 
-                            className="h-40 w-40 object-cover rounded-lg shadow-md" 
+
+                  {(newImageFile || (customImageUrl && isCustomImageValid)) && (
+                    <motion.div 
+                      className="mt-4 flex justify-center"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                    >
+                      <div className="relative inline-block">
+                        <img 
+                          src={newImageFile ? currentPic : customImageUrl} 
+                          alt="Custom profile picture" 
+                          className="h-40 w-40 object-cover rounded-lg shadow-md" 
+                          onClick={togglePreview}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/30 transition-opacity rounded-lg">
+                          <button 
                             onClick={togglePreview}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-black/30 transition-opacity rounded-lg">
-                            <button 
-                              onClick={togglePreview}
-                              className="p-2 bg-white rounded-full"
-                            >
-                              <FiSearch size={18} className="text-blue-600" />
-                            </button>
-                          </div>
+                            className="p-2 bg-white rounded-full"
+                          >
+                            <FiSearch size={18} className="text-blue-600" />
+                          </button>
                         </div>
-                      </motion.div>
-                    )}
-                  </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </div>
               </motion.div>
             )}
