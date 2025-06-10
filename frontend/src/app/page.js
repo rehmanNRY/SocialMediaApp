@@ -2,7 +2,7 @@
 // payment
 // Login/Signup registeration
 // navigation
-// image
+// immediate update & speed up
 // responsive
 
 "use client";

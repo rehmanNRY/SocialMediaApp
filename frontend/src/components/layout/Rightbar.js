@@ -76,9 +76,9 @@ const Rightbar = () => {
           <div className="w-64 md:block z-20 mr-1 ml-auto">
             <div
               className="rightBar w-64 p-4 bg-white shadow-md flex flex-col gap-4 fixed overflow-y-auto rounded-xl border border-gray-100"
-              style={{ height: "calc(100vh - 4rem)"}}
+              style={{ height: "calc(100vh - 4rem)" }}
             >
-              {/* Premium Banner */}
+              {/* Story Banner */}
               <div>
                 <motion.div
                   className="p-3 bg-gradient-to-r from-blue-500 to-cyan-400 rounded-xl text-white relative overflow-hidden"
@@ -89,16 +89,18 @@ const Rightbar = () => {
                   <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full"></div>
                   <div className="absolute -right-1 -bottom-4 w-16 h-16 bg-white/10 rounded-full"></div>
 
-                  <h4 className="font-bold text-sm mb-1">Try Premium Features</h4>
-                  <p className="text-xs text-white/80 mb-2">Get unlimited access to all features</p>
+                  <h4 className="font-bold text-sm mb-1">Share Your Story!</h4>
+                  <p className="text-xs text-white/80 mb-2">Post a story and let your friends know what you're up to today.</p>
+                  <Link href={"/stories"}>
+                    <motion.button
+                      className="w-full py-1.5 bg-white text-blue-600 rounded-lg text-xs font-semibold hover:bg-opacity-90 transition"
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      Create Story
+                    </motion.button>
+                  </Link>
 
-                  <motion.button
-                    className="w-full py-1.5 bg-white text-blue-600 rounded-lg text-xs font-semibold hover:bg-opacity-90 transition"
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    Upgrade Now
-                  </motion.button>
                 </motion.div>
               </div>
 
@@ -172,7 +174,7 @@ const Rightbar = () => {
                       className="flex items-center justify-between bg-white p-2 rounded-lg hover:shadow-md transition-all duration-300 cursor-pointer"
                       variants={itemVariants}
                       whileHover={{ x: 3 }}
-                      onClick={()=> router.push(`/hashtags?hashtag=${hashtag.tag}`)}
+                      onClick={() => router.push(`/hashtags?hashtag=${hashtag.tag}`)}
                     >
                       <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-md" style={{ backgroundColor: `${hashtag.color}20` }}>

@@ -14,7 +14,8 @@ const PostFormImageInput = ({ showImageInput, setShowImageInput, image, setImage
       const objectUrl = URL.createObjectURL(file);
       setPreviewImage(objectUrl);
     }
-  }, [setImage, setImageFile, setPreviewImage]);
+    setShowImageInput(false); // Close the image input when a file is selected
+  }, [setImage, setImageFile, setPreviewImage, setShowImageInput]);
 
   const onDrop = useCallback((e) => {
     e.preventDefault();

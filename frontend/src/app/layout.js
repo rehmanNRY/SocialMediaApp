@@ -1,5 +1,6 @@
 import RootLayoutClient from "@/components/RootLayoutClient";
 import "./globals.css";
+import NextTopLoader from "nextjs-toploader";
 
 export const metadata = {
   title: "Social Networking Site - Abdul Rehman",
@@ -10,6 +11,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="min-h-screen m-0 bg-[#F5F6FA]">
+        <NextTopLoader
+          color="#8b5cf6"
+          showSpinner={false}
+        />
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>
     </html>
