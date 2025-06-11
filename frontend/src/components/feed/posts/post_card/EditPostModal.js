@@ -84,7 +84,7 @@ const EditPostModal = ({ isOpen, onClose, post }) => {
                 >
                   <img
                     className="w-16 h-16 object-cover rounded-full shadow-lg ring-3 ring-indigo-100"
-                    src={userDetails?.profilePicture || '/default-avatar.png'}
+                    src={userDetails?.profilePicture || 'https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg'}
                     alt={userDetails?.fullName}
                   />
                   <motion.div 

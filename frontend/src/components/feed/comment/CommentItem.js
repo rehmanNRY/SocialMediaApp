@@ -100,7 +100,7 @@ const CommentItem = ({ comment }) => {
             >
               <div className="w-9 h-9 rounded-full overflow-hidden ring-2 ring-indigo-100 ring-offset-2">
                 <motion.img
-                  src={comment.user.profilePicture || '/default-avatar.png'}
+                  src={comment.user.profilePicture || 'https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg'}
                   alt={comment.user.fullName}
                   className="w-full h-full object-cover"
                   whileHover={{ scale: 1.15 }}

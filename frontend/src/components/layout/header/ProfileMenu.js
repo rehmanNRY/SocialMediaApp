@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { logout } from '@/redux/auth/authSlice'
+import { performLogout, clearAuthState } from '@/redux/auth/authSlice'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -65,10 +65,24 @@ const ProfileMenu = ({ userDetails }) => {
     }
   }, [isOpen])
 
-  const handleLogout = () => {
-    dispatch(logout())
-    router.push('/login')
-  }
+  const handleLogout = async () => {
+    try {
+      // Use the async thunk for complete logout
+      await dispatch(performLogout()).unwrap();
+
+      // Redirect to home page or login page
+      router.push('/login');
+
+      // Optional: Force refresh to ensure clean state
+      // window.location.reload();
+
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Even if there's an error, clear the auth state
+      dispatch(clearAuthState());
+      router.push('/');
+    }
+  };
 
   // Dummy data for notifications and messages
   const notifications = [

@@ -8,7 +8,7 @@ const PostFormHeader = ({ userDetails, isDraftSaved = false }) => {
         <div className="relative">
           <img
             className="w-12 h-12 object-cover rounded-full shadow-md ring-2 ring-indigo-100 border border-white"
-            src={userDetails?.profilePicture || '/default-avatar.png'}
+            src={userDetails?.profilePicture || 'https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg'}
             alt={userDetails?.fullName}
           />
           <div className="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>

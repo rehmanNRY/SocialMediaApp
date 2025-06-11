@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import UnAuthRedirect from "@/components/UnAuthRedirect";
@@ -23,9 +23,13 @@ import {
   HiOutlineSparkles,
   HiOutlineHeart
 } from "react-icons/hi";
+import { IoLogoGithub } from "react-icons/io5";
+import { signIn, useSession } from "next-auth/react";
+import { setLoggedIn } from "@/redux/auth/authSlice";
 
 export default function SignupForm() {
   const router = useRouter();
+  const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const [formData, setFormData] = useState({
@@ -43,6 +47,13 @@ export default function SignupForm() {
   const [step, setStep] = useState(1);
   const [strength, setStrength] = useState(0);
   const [isButtonHovered, setIsButtonHovered] = useState(false);
+
+  const { data: session, status } = useSession();
+
+  const [validationStatus, setValidationStatus] = useState({
+    username: { checked: false, available: true },
+    email: { checked: false, available: true }
+  });
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -64,6 +75,56 @@ export default function SignupForm() {
     }
   }, [formData.password]);
 
+  // Debounced username validation
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (formData.username && formData.username.length >= 3) {
+        checkUsernameAvailability();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.username]);
+
+  // Debounced email validation
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (formData.email && /\S+@\S+\.\S+/.test(formData.email)) {
+        checkEmailAvailability();
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [formData.email]);
+
+  const checkUsernameAvailability = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/check-username/${formData.username}`
+      );
+      setValidationStatus(prev => ({
+        ...prev,
+        username: { checked: true, available: response.data.data.available }
+      }));
+    } catch (error) {
+      console.error("Error checking username:", error);
+    }
+  };
+
+  const checkEmailAvailability = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/check-email/${formData.email}`
+      );
+      setValidationStatus(prev => ({
+        ...prev,
+        email: { checked: true, available: response.data.data.available }
+      }));
+    } catch (error) {
+      console.error("Error checking email:", error);
+    }
+  };
+
   const validate = (currentStep) => {
     let stepErrors = {};
 
@@ -72,6 +133,8 @@ export default function SignupForm() {
         stepErrors.username = "Username is required";
       } else if (formData.username.length < 3) {
         stepErrors.username = "Username must be at least 3 characters";
+      } else if (validationStatus.username.checked && !validationStatus.username.available) {
+        stepErrors.username = "Username already exists";
       }
 
       if (!formData.fullName) {
@@ -86,6 +149,8 @@ export default function SignupForm() {
         stepErrors.email = "Email is required";
       } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
         stepErrors.email = "Please enter a valid email";
+      } else if (validationStatus.email.checked && !validationStatus.email.available) {
+        stepErrors.email = "Email already exists";
       }
     }
 
@@ -105,6 +170,70 @@ export default function SignupForm() {
 
     setErrors(stepErrors);
     return Object.keys(stepErrors).length === 0;
+  };
+
+  // Handle session changes for Google authentication
+  useEffect(() => {
+    if (session?.user && !isLoggedIn && status === 'authenticated') {
+      handleGoogleBackendIntegration(session.user);
+    }
+  }, [session, isLoggedIn, status]);
+
+  const handleGoogleBackendIntegration = async (user) => {
+    try {
+      // Check if user exists in our database
+      const checkResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/check-email/${user.email}`
+      );
+
+      if (checkResponse.data.data.exists) {
+        // User exists, generate token
+        const loginResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/register/google`,
+          {
+            username: user.email.split('@')[0] + Math.floor(Math.random() * 1000),
+            fullName: user.name,
+            email: user.email,
+            profilePicture: user.image,
+          }
+        );
+
+        // Store the token and update Redux
+        localStorage.setItem("authToken", loginResponse.data.data.token);
+        dispatch(setLoggedIn(true));
+        router.push("/");
+      } else {
+        // User doesn't exist, create new account
+        const registerResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/register/google`,
+          {
+            username: user.email.split('@')[0] + Math.floor(Math.random() * 1000),
+            fullName: user.name,
+            email: user.email,
+            profilePicture: user.image,
+          }
+        );
+
+        // Store the token and update Redux
+        localStorage.setItem("authToken", registerResponse.data.data.token);
+        dispatch(setLoggedIn(true));
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Error during Google backend integration:", error);
+      setErrors({ general: "Failed to integrate with backend. Please try again." });
+    }
+  };
+
+  // Handle Google sign in
+  const handleGoogleSignIn = async () => {
+    try {
+      setErrors((prev) => ({ ...prev, general: "" }));
+      await signIn("google", { callbackUrl: "/", redirect: true });
+    } catch (error) {
+      console.error("Google sign in error:", error);
+      setErrors({ general: "Google sign in failed. Please try again." });
+    }
   };
 
   const handleChange = (e) => {
@@ -138,13 +267,42 @@ export default function SignupForm() {
           password: formData.password,
         }
       );
-      console.log("User registered successfully:", response.data);
-      router.push("/login");
+      const token = response?.data?.data?.token;
+      if (token) {
+        localStorage.setItem("authToken", token);
+        dispatch(setLoggedIn(true));
+        router.push("/");
+      } else {
+        // Fallback: try logging in with provided credentials
+        const loginResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/login`,
+          {
+            email: formData.email,
+            password: formData.password,
+          }
+        );
+        const loginToken = loginResponse?.data?.data?.token;
+        if (loginToken) {
+          localStorage.setItem("authToken", loginToken);
+          dispatch(setLoggedIn(true));
+          router.push("/");
+        } else {
+          router.push("/login");
+        }
+      }
     } catch (error) {
       console.error("Registration failed:", error.response?.data?.message);
-      setErrors({
-        email: error.response?.data?.message || "User with this email or username already exists",
-      });
+      const errorMessage = error.response?.data?.message;
+
+      if (errorMessage?.includes("username")) {
+        setStep(1);
+        setErrors({ username: errorMessage });
+      } else if (errorMessage?.includes("email")) {
+        setStep(2);
+        setErrors({ email: errorMessage });
+      } else {
+        setErrors({ general: errorMessage || "Registration failed. Please try again." });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -208,10 +366,23 @@ export default function SignupForm() {
                     onChange={handleChange}
                     className={`w-full px-4 py-4 pl-12 pr-10 bg-transparent border-2 rounded-lg focus:outline-none transition-all ${errors.username
                       ? "border-red-500 focus:border-red-500"
-                      : "border-gray-200 focus:border-blue-500"
+                      : validationStatus.username.checked && !validationStatus.username.available
+                        ? "border-red-500 focus:border-red-500"
+                        : validationStatus.username.checked && validationStatus.username.available
+                          ? "border-green-500 focus:border-green-500"
+                          : "border-gray-200 focus:border-blue-500"
                       }`}
                   />
                 </div>
+                {validationStatus.username.checked && (
+                  <div className="mt-1 flex items-center">
+                    {validationStatus.username.available ? (
+                      <span className="text-green-500 text-sm">✓ Username available</span>
+                    ) : (
+                      <span className="text-red-500 text-sm">✗ Username taken</span>
+                    )}
+                  </div>
+                )}
               </div>
               {errors.username && (
                 <p className="text-red-500 text-sm ml-2">{errors.username}</p>
@@ -246,7 +417,8 @@ export default function SignupForm() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={nextStep}
-                className="w-full py-4 bg-gradient-to-r from-blue-500 to-violet-500 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none transition-all"
+                disabled={!validationStatus.username.checked || !validationStatus.username.available}
+                className="w-full py-4 bg-gradient-to-r from-blue-500 to-violet-500 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue
               </motion.button>
@@ -283,10 +455,23 @@ export default function SignupForm() {
                     onChange={handleChange}
                     className={`w-full px-4 py-4 pl-12 bg-transparent border-2 rounded-lg focus:outline-none transition-all ${errors.email
                       ? "border-red-500 focus:border-red-500"
-                      : "border-gray-200 focus:border-blue-500"
+                      : validationStatus.email.checked && !validationStatus.email.available
+                        ? "border-red-500 focus:border-red-500"
+                        : validationStatus.email.checked && validationStatus.email.available
+                          ? "border-green-500 focus:border-green-500"
+                          : "border-gray-200 focus:border-blue-500"
                       }`}
                   />
                 </div>
+                {validationStatus.email.checked && (
+                  <div className="mt-1 flex items-center">
+                    {validationStatus.email.available ? (
+                      <span className="text-green-500 text-sm">✓ Email available</span>
+                    ) : (
+                      <span className="text-red-500 text-sm">✗ Email already registered</span>
+                    )}
+                  </div>
+                )}
               </div>
               {errors.email && (
                 <p className="text-red-500 text-sm ml-2">{errors.email}</p>
@@ -306,7 +491,8 @@ export default function SignupForm() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={nextStep}
-                className="w-2/3 py-4 bg-gradient-to-r from-blue-500 to-violet-500 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none transition-all"
+                disabled={!validationStatus.email.checked || !validationStatus.email.available}
+                className="w-2/3 py-4 bg-gradient-to-r from-blue-500 to-violet-500 text-white font-medium rounded-lg shadow-md hover:shadow-lg focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continue
               </motion.button>
@@ -409,6 +595,12 @@ export default function SignupForm() {
                 <p className="text-red-500 text-sm ml-2">{errors.confirmPassword}</p>
               )}
             </div>
+
+            {errors.general && (
+              <div className="p-4 rounded-lg bg-red-50 text-red-600 text-sm">
+                {errors.general}
+              </div>
+            )}
 
             <div className="flex space-x-4 pt-6">
               <motion.button
@@ -568,38 +760,47 @@ export default function SignupForm() {
               </div>
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <div className="flex items-center justify-center space-x-6 mb-6">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-red-50 hover:bg-red-100 transition-colors"
-                >
-                  <FaGoogle className="text-red-600" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 hover:bg-blue-100 transition-colors"
-                >
-                  <FaFacebookF className="text-blue-600" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-sky-50 hover:bg-sky-100 transition-colors"
-                >
-                  <FaTwitter className="text-sky-500" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 hover:bg-gray-100 transition-colors"
-                >
-                  <FaApple className="text-gray-800" />
-                </motion.button>
+            <div className="mt-8">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">
+                    Or continue with
+                  </span>
+                </div>
               </div>
 
+              <div className="mt-6 grid grid-cols-3 gap-3">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  className="w-full inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <FaGoogle className="h-5 w-5 text-red-500" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  className="w-full cursor-not-allowed inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <FaApple className="h-5 w-5 text-black" />
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  className="w-full cursor-not-allowed inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+                >
+                  <IoLogoGithub className="h-5 w-5" />
+                </motion.button>
+              </div>
+            </div>
+            <div className="mt-4">
               <p className="text-center text-sm text-gray-500">
                 By signing up, you agree to our{" "}
                 <Link href="/terms" className="text-blue-600 hover:text-blue-700 transition-colors">

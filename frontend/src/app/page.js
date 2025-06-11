@@ -1,7 +1,5 @@
 // TODO:
-// payment
 // Login/Signup registeration
-// navigation
 // immediate update & speed up
 // responsive
 

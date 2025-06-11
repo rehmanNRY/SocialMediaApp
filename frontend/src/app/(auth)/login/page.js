@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
 import axios from "axios";
 import { setLoggedIn } from "@/redux/auth/authSlice";
 import Link from "next/link";
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const { data: session, status } = useSession();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -24,12 +26,14 @@ export default function LoginPage() {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     // Redirect to home if already logged in
     if (isLoggedIn) {
       router.push("/");
     }
+    setIsMounted(true);
     
     // Animation for background elements
     const interval = setInterval(() => {
@@ -43,6 +47,70 @@ export default function LoginPage() {
     
     return () => clearInterval(interval);
   }, [isLoggedIn, router]);
+
+  // Handle session changes for Google authentication
+  useEffect(() => {
+    if (session?.user && !isLoggedIn && status === 'authenticated') {
+      handleGoogleBackendIntegration(session.user);
+    }
+  }, [session, isLoggedIn, status]);
+
+  const handleGoogleBackendIntegration = async (user) => {
+    try {
+      // Check if user exists in our database
+      const checkResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/check-email/${user.email}`
+      );
+
+      if (checkResponse.data.data.exists) {
+        // User exists, generate token
+        const loginResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/register/google`,
+          {
+            username: user.email.split('@')[0] + Math.floor(Math.random() * 1000),
+            fullName: user.name,
+            email: user.email,
+            profilePicture: user.image,
+          }
+        );
+        
+        // Store the token and update Redux
+        localStorage.setItem("authToken", loginResponse.data.data.token);
+        dispatch(setLoggedIn(true, loginResponse.data.data.token));
+        router.push("/");
+      } else {
+        // User doesn't exist, create new account
+        const registerResponse = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_API}/api/user/register/google`,
+          {
+            username: user.email.split('@')[0] + Math.floor(Math.random() * 1000),
+            fullName: user.name,
+            email: user.email,
+            profilePicture: user.image,
+          }
+        );
+        
+        // Store the token and update Redux
+        localStorage.setItem("authToken", registerResponse.data.data.token);
+        dispatch(setLoggedIn(true, registerResponse.data.data.token));
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Error during Google backend integration:", error);
+      setErrors({ general: "Failed to integrate with backend. Please try again." });
+    }
+  };
+
+  // Handle Google sign in
+  const handleGoogleSignIn = async () => {
+    try {
+      setErrors((prev) => ({ ...prev, general: "" }));
+      await signIn("google", { callbackUrl: "/", redirect: true });
+    } catch (error) {
+      console.error("Google sign in error:", error);
+      setErrors({ general: "Google sign in failed. Please try again." });
+    }
+  };
 
   const validate = () => {
     let errors = {};
@@ -100,23 +168,25 @@ export default function LoginPage() {
   return (
     <UnAuthRedirect>
       <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 transition-all duration-300 bg-gray-50">
-        {/* Floating background elements */}
-        <div className="absolute inset-0 overflow-hidden z-0">
-          {[...Array(6)].map((_, i) => (
-            <div 
-              key={i}
-              className="floating-shape absolute rounded-full transition-transform duration-3000 ease-in-out bg-indigo-600/5"
-              style={{
-                width: `${Math.random() * 400 + 100}px`,
-                height: `${Math.random() * 400 + 100}px`,
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${i * 0.5}s`,
-                animationDuration: `${Math.random() * 20 + 10}s`
-              }}
-            ></div>
-          ))}
-        </div>
+        {/* Floating background elements (client-only to avoid hydration mismatch) */}
+        {isMounted && (
+          <div className="absolute inset-0 overflow-hidden z-0">
+            {[...Array(6)].map((_, i) => (
+              <div 
+                key={i}
+                className="floating-shape absolute rounded-full transition-transform duration-3000 ease-in-out bg-indigo-600/5"
+                style={{
+                  width: `${Math.random() * 400 + 100}px`,
+                  height: `${Math.random() * 400 + 100}px`,
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  animationDelay: `${i * 0.5}s`,
+                  animationDuration: `${Math.random() * 20 + 10}s`
+                }}
+              ></div>
+            ))}
+          </div>
+        )}
         
         {/* Main container */}
         <motion.div 
@@ -275,6 +345,7 @@ export default function LoginPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="button"
+                  onClick={handleGoogleSignIn}
                   className="w-full inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
                 >
                   <FaGoogle className="h-5 w-5 text-red-500" />
@@ -283,7 +354,7 @@ export default function LoginPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="button"
-                  className="w-full inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+                  className="w-full cursor-not-allowed inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
                 >
                   <FaApple className="h-5 w-5 text-black" />
                 </motion.button>
@@ -291,7 +362,7 @@ export default function LoginPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   type="button"
-                  className="w-full inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+                  className="w-full cursor-not-allowed inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
                 >
                   <IoLogoGithub className="h-5 w-5" />
                 </motion.button>
@@ -406,8 +477,8 @@ export default function LoginPage() {
               </div>
             </div>
             
-            {/* Animated floating social media elements */}
-            {[...Array(10)].map((_, i) => {
+            {/* Animated floating social media elements (client-only) */}
+            {isMounted && [...Array(10)].map((_, i) => {
               const icons = [
                 <svg key="like" className="h-full w-full text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" />

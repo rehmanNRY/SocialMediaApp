@@ -34,6 +34,31 @@ const coverImages = [
   "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsb2ZmaWNlMjBfM2RfbW9kZXJuX3dhdmVfY3VydmVfYWJzdHJhY3RfaGFsZnRvbmVfZ3JhZGllbl8xZTJhY2M3Mi1jZTU3LTQ0NjItOGQzNS1lOTI4YzI5NzcxMTdfMS5qcGc.jpg"
 ];
 
+// Check if username exists
+export const checkUsernameExists = asyncHandler(async (req, res, next) => {
+  const { username } = req.params;
+  
+  const existingUser = await User.findOne({ username });
+  
+  res.status(200).json(new ApiResponse(200, 'Username check completed', { 
+    exists: !!existingUser,
+    available: !existingUser 
+  }));
+});
+
+// Check if email exists
+export const checkEmailExists = asyncHandler(async (req, res, next) => {
+  const { email } = req.params;
+  
+  const existingUser = await User.findOne({ email });
+  
+  res.status(200).json(new ApiResponse(200, 'Email check completed', { 
+    exists: !!existingUser,
+    available: !existingUser,
+    loggedInVia: existingUser ? existingUser.loggedInVia : null
+  }));
+});
+
 // Register a new user
 export const registerUser = asyncHandler(async (req, res, next) => {
   const { username, fullName, email, password } = req.body;
@@ -42,6 +67,12 @@ export const registerUser = asyncHandler(async (req, res, next) => {
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return next(new ApiError(400, 'User with this email already exists'));
+  }
+
+  // Check if username already exists
+  const existingUsername = await User.findOne({ username });
+  if (existingUsername) {
+    return next(new ApiError(400, 'Username already exists'));
   }
 
   // Get the current count of users to determine profile picture assignment
@@ -62,6 +93,7 @@ export const registerUser = asyncHandler(async (req, res, next) => {
     fullName,
     email,
     password: hashedPassword,
+    loggedInVia: 'email',
     profilePicture: assignedProfilePicture || "https://res.cloudinary.com/datvbo0ey/image/upload/v1726651745/3d%20avatar/1_ijpza2.png",
     coverImage: assignedCoverPicture || "https://t3.ftcdn.net/jpg/05/38/74/02/360_F_538740200_HNOc2ABQarAJshNsLB4c3DXAuiCLl2QI.jpg",
   });
@@ -73,6 +105,55 @@ export const registerUser = asyncHandler(async (req, res, next) => {
   return res.status(201).json(new ApiResponse(201, 'User registered successfully', { id: user._id }));
 });
 
+// Register user via Google
+export const registerGoogleUser = asyncHandler(async (req, res, next) => {
+  const { username, fullName, email, profilePicture } = req.body;
+
+  // Check if the user already exists
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    // If user exists, generate token and return
+    const token = jwt.sign({ id: existingUser._id }, process.env.JWT_SECRET, {
+      expiresIn: '30d',
+    });
+    return res.status(200).json(new ApiResponse(200, 'User logged in successfully', { token }));
+  }
+
+  // Check if username already exists
+  const existingUsername = await User.findOne({ username });
+  if (existingUsername) {
+    return next(new ApiError(400, 'Username already exists'));
+  }
+
+  // Get the current count of users to determine profile picture assignment
+  const userCount = await User.countDocuments();
+
+  // Calculate the cover index
+  const coverIndex = userCount % coverImages.length;
+  const assignedCoverPicture = coverImages[coverIndex];
+
+  // Create a new user
+  const user = await User.create({
+    username,
+    fullName,
+    email,
+    loggedInVia: 'google',
+    profilePicture: profilePicture || profilePictures[userCount % profilePictures.length],
+    coverImage: assignedCoverPicture,
+  });
+
+  if (!user) {
+    throw new ApiError(500, "Something went wrong while registering a user");
+  }
+
+  // Generate JWT token
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: '30d',
+  });
+
+  return res.status(201).json(new ApiResponse(201, 'User registered successfully', { token }));
+});
+
 // Login a user
 export const loginUser = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
@@ -80,6 +161,11 @@ export const loginUser = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email });
   if (!user) {
     return next(new ApiError(400, 'Invalid credentials'));
+  }
+
+  // Check if user registered via Google
+  if (user.loggedInVia === 'google') {
+    return next(new ApiError(400, 'Account created via Google. Please login using Google.'));
   }
 
   // Check the password

@@ -90,7 +90,7 @@ const CommentForm = ({ postId }) => {
                 className="relative shrink-0"
               >
                 <img
-                  src={userDetails?.profilePicture || '/default-avatar.png'}
+                  src={userDetails?.profilePicture || 'https://img.freepik.com/free-psd/3d-illustration-human-avatar-profile_23-2150671142.jpg'}
                   alt="Profile"
                   className="w-10 h-10 rounded-full object-cover border-2 border-indigo-100 shadow-sm"
                 />

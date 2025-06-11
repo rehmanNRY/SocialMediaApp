@@ -1,4 +1,5 @@
 import RootLayoutClient from "@/components/RootLayoutClient";
+import { Providers } from "./Providers";
 import "./globals.css";
 import NextTopLoader from "nextjs-toploader";
 
@@ -15,7 +16,9 @@ export default function RootLayout({ children }) {
           color="#8b5cf6"
           showSpinner={false}
         />
-        <RootLayoutClient>{children}</RootLayoutClient>
+        <Providers>
+          <RootLayoutClient>{children}</RootLayoutClient>
+        </Providers>
       </body>
     </html>
   );

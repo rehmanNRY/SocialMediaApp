@@ -10,6 +10,9 @@ import {
   updateUser,
   updateUserAvatar,
   updateUserCover,
+  checkUsernameExists,
+  checkEmailExists,
+  registerGoogleUser,
 } from '../controllers/user.controllers.js';
 import upload from '../config/multer.js';
 
@@ -20,6 +23,15 @@ router.post('/register', registerUser);
 
 // Route to login a user
 router.post('/login', loginUser);
+
+// Route to check if username exists
+router.get('/check-username/:username', checkUsernameExists);
+
+// Route to check if email exists
+router.get('/check-email/:email', checkEmailExists);
+
+// Route to register user via Google
+router.post('/register/google', registerGoogleUser);
 
 // Route to get details of the logged-in user
 router.get('/me', fetchUser, getUserDetails);
