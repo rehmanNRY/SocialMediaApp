@@ -22,11 +22,14 @@ function LayoutWrapper({ children }) {
   const toggleSidebar = () => {
     setisSidebar(!isSidebar);
   }
+  const closeSidebar = () => {
+    setisSidebar(false);
+  }
   return (
     <>
       <Header toggleSidebar={toggleSidebar} />
       <div className="flex w-full h-full">
-        <Sidebar isSidebar={isSidebar} />
+        <Sidebar isSidebar={isSidebar} onClose={closeSidebar} />
         <div className="flex flex-col flex-1 max-w-full overflow-hidden">
           {children}
         </div>

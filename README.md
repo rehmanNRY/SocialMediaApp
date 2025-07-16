@@ -57,6 +57,10 @@ To run the project locally, follow these steps:
     PORT =
     CORS_ORIGIN=
     JWT_SECRET=
+
+    CLOUDINARY_CLOUD_NAME=
+    CLOUDINARY_API_KEY=
+    CLOUDINARY_API_SECRET=
     ```
 
 4. **Start the development server**:

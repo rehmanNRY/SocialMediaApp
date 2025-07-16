@@ -1,10 +1,7 @@
-# NextAuth.js Configuration
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-nextauth-secret-key-here
+NEXT_PUBLIC_BACKEND_API=https://dummyapi.com/backend
 
-# Google OAuth Configuration
-GOOGLE_CLIENT_ID=your-google-client-id-here
-GOOGLE_CLIENT_SECRET=your-google-client-secret-here
+NEXTAUTH_URL=https://dummyapi.com/auth
+GOOGLE_CLIENT_ID=dummy-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=dummy-google-client-secret
 
-# Backend API URL
-NEXT_PUBLIC_BACKEND_API=http://localhost:5000
+NEXTAUTH_SECRET=dummy-secret-key

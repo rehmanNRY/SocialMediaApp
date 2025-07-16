@@ -18,6 +18,7 @@ const Notification = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [showConfirmClear, setShowConfirmClear] = useState(false);
   const [expandedNotification, setExpandedNotification] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const notificationRef = useRef(null);
   const dispatch = useDispatch();
   const router = useRouter();
@@ -87,6 +88,18 @@ const Notification = () => {
       dispatch(getUserNotifications());
     }
   }, [dispatch, showNotifications]);
+
+  // Detect screen size for responsive behavior
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
 
   const handleClickOutside = (e) => {
     if (notificationRef.current && !notificationRef.current.contains(e.target)) {
@@ -193,10 +206,15 @@ const Notification = () => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="absolute right-0 mt-4 w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-40"
+            className={`absolute mt-4 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-40 ${
+              isMobile 
+                ? 'w-[calc(100vw-2rem)] left-1/2 transform -translate-x-1/2' 
+                : 'w-96 right-0'
+            }`}
             style={{ 
               boxShadow: '0 10px 40px -5px rgba(0, 0, 0, 0.15), 0 20px 20px -10px rgba(0, 0, 0, 0.05)',
-              maxHeight: 'calc(100vh - 100px)'
+              maxHeight: 'calc(100vh - 100px)',
+              maxWidth: isMobile ? 'calc(100vw - 2rem)' : '24rem'
             }}
           >
             <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50">

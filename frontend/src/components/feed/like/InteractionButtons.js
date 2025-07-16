@@ -121,7 +121,11 @@ const InteractionButtons = ({
     if (!post?._id) return;
     dispatch(getPostLikers(post._id)).then((action) => {
       if (action.payload?.data) {
-        setLikers(action.payload.data);
+        // Deduplicate likers by _id to prevent duplicate keys
+        const uniqueLikers = action.payload.data.filter((liker, index, self) => 
+          index === self.findIndex(l => l._id === liker._id)
+        );
+        setLikers(uniqueLikers);
       }
     });
   }, [dispatch, post._id]);
@@ -146,9 +150,9 @@ const InteractionButtons = ({
           onClick={handleShowLikers}
         >
           <div className="flex -space-x-3">
-            {likers.slice(0, 3).map((liker) => (
+            {likers.slice(0, 3).map((liker, index) => (
               <img
-                key={liker._id}
+                key={`${liker._id}-${index}`}
                 src={liker.profilePicture}
                 alt={liker.fullName}
                 className="w-7 h-7 rounded-full border-2 border-white object-cover shadow-md"

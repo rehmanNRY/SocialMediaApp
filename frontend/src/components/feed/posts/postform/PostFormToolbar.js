@@ -106,14 +106,14 @@ const PostFormToolbar = ({
 
   return (
     <div className="mt-2">
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="flex items-center flex-wrap gap-1">
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center flex-wrap gap-1 justify-center sm:justify-start">
           {toolbarButtons.map((button) => (
             <button
               key={button.name}
               type="button"
               onClick={() => handleButtonClick(button.name, button.showState, button.setShowState)}
-              className={`relative p-2 rounded-lg transition-all duration-200 ${
+              className={`relative p-2 sm:p-2 rounded-lg transition-all duration-200 ${
                 button.showState
                   ? 'bg-indigo-100 text-indigo-700 shadow-sm'
                   : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600'
@@ -128,27 +128,29 @@ const PostFormToolbar = ({
           ))}
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          {isDraftSaved && (
+        <div className="flex flex-col sm:flex-row items-center gap-2 w-full">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {isDraftSaved && (
+              <button
+                type="button"
+                onClick={discardDraft}
+                className="flex items-center gap-1 px-2 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
+                title="Discard draft"
+              >
+                <RiDeleteBin6Line className="w-4 h-4" />
+                <span className="hidden sm:inline">Discard</span>
+              </button>
+            )}
+
             <button
               type="button"
-              onClick={discardDraft}
-              className="flex items-center gap-1 px-2 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-              title="Discard draft"
+              onClick={saveDraft}
+              className="flex items-center gap-1 px-3 py-2 text-sm font-medium border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-200 shadow-sm flex-1 sm:flex-none"
             >
-              <RiDeleteBin6Line className="w-4 h-4" />
-              <span className="hidden sm:inline">Discard</span>
+              <IoSaveOutline className="w-4 h-4" />
+              <span>Save draft</span>
             </button>
-          )}
-
-          <button
-            type="button"
-            onClick={saveDraft}
-            className="flex items-center gap-1 px-3 py-2 text-sm font-medium border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-100 transition-all duration-200 shadow-sm w-full sm:w-auto"
-          >
-            <IoSaveOutline className="w-4 h-4" />
-            <span>Save draft</span>
-          </button>
+          </div>
 
           <button
             type="submit"

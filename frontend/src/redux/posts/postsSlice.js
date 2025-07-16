@@ -173,11 +173,18 @@ const postsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(getAllPosts.fulfilled, (state, action) => {
-        state.posts = action.payload.data;
+        // Deduplicate posts by _id to prevent duplicate keys
+        const uniquePosts = action.payload.data.filter((post, index, self) => 
+          index === self.findIndex(p => p._id === post._id)
+        );
+        state.posts = uniquePosts;
       })
       .addCase(createPost.fulfilled, (state, action) => {
-        // Add the new post to the posts array
-        state.posts.unshift(action.payload.data); // Prepend the new post to the array
+        // Add the new post to the posts array, but check for duplicates first
+        const existingPostIndex = state.posts.findIndex(post => post._id === action.payload.data._id);
+        if (existingPostIndex === -1) {
+          state.posts.unshift(action.payload.data); // Prepend the new post to the array
+        }
       })
       .addCase(editPost.fulfilled, (state, action) => {
         const index = state.posts.findIndex((post) => post._id === action.payload.data._id);

@@ -34,7 +34,7 @@ export default function LoginPage() {
       router.push("/");
     }
     setIsMounted(true);
-    
+
     // Animation for background elements
     const interval = setInterval(() => {
       const shapes = document.querySelectorAll('.floating-shape');
@@ -44,7 +44,7 @@ export default function LoginPage() {
         shape.style.transform = `translate(${newX}px, ${newY}px)`;
       });
     }, 3000);
-    
+
     return () => clearInterval(interval);
   }, [isLoggedIn, router]);
 
@@ -73,7 +73,7 @@ export default function LoginPage() {
             profilePicture: user.image,
           }
         );
-        
+
         // Store the token and update Redux
         localStorage.setItem("authToken", loginResponse.data.data.token);
         dispatch(setLoggedIn(true, loginResponse.data.data.token));
@@ -89,7 +89,7 @@ export default function LoginPage() {
             profilePicture: user.image,
           }
         );
-        
+
         // Store the token and update Redux
         localStorage.setItem("authToken", registerResponse.data.data.token);
         dispatch(setLoggedIn(true, registerResponse.data.data.token));
@@ -172,7 +172,7 @@ export default function LoginPage() {
         {isMounted && (
           <div className="absolute inset-0 overflow-hidden z-0">
             {[...Array(6)].map((_, i) => (
-              <div 
+              <div
                 key={i}
                 className="floating-shape absolute rounded-full transition-transform duration-3000 ease-in-out bg-indigo-600/5"
                 style={{
@@ -187,9 +187,9 @@ export default function LoginPage() {
             ))}
           </div>
         )}
-        
+
         {/* Main container */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -204,18 +204,18 @@ export default function LoginPage() {
                 </svg>
               </div>
             </div>
-            
+
             <h1 className="text-3xl lg:text-4xl font-bold mb-4 text-gray-800">
               Welcome back
             </h1>
-            
+
             <p className="mb-8 text-base text-gray-600">
               Log in to your account to connect with friends and explore content tailored just for you.
             </p>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               {errors.general && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="p-4 rounded-lg bg-red-50 text-red-600 text-sm"
@@ -223,7 +223,7 @@ export default function LoginPage() {
                   {errors.general}
                 </motion.div>
               )}
-              
+
               <div className="space-y-1">
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                   Email
@@ -244,7 +244,7 @@ export default function LoginPage() {
                   />
                 </div>
                 {errors.email && (
-                  <motion.p 
+                  <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="mt-1 text-sm text-red-500"
@@ -253,7 +253,7 @@ export default function LoginPage() {
                   </motion.p>
                 )}
               </div>
-              
+
               <div className="space-y-1">
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                   Password
@@ -281,7 +281,7 @@ export default function LoginPage() {
                   </button>
                 </div>
                 {errors.password && (
-                  <motion.p 
+                  <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     className="mt-1 text-sm text-red-500"
@@ -290,7 +290,7 @@ export default function LoginPage() {
                   </motion.p>
                 )}
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <input
@@ -309,7 +309,7 @@ export default function LoginPage() {
                   </Link>
                 </div>
               </div>
-              
+
               <div>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -327,8 +327,8 @@ export default function LoginPage() {
                 </motion.button>
               </div>
             </form>
-            
-            <div className="mt-8">
+
+            <div className="mt-4">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200"></div>
@@ -339,36 +339,19 @@ export default function LoginPage() {
                   </span>
                 </div>
               </div>
-              
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  className="w-full inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <FaGoogle className="h-5 w-5 text-red-500" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="w-full cursor-not-allowed inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <FaApple className="h-5 w-5 text-black" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="w-full cursor-not-allowed inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <IoLogoGithub className="h-5 w-5" />
-                </motion.button>
-              </div>
+
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={handleGoogleSignIn}
+                className="mt-4 w-full inline-flex justify-center items-center gap-2 py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+              >
+                <FaGoogle className="size-4 text-red-500" />
+                <span>Continue with Google</span>
+              </motion.button>
             </div>
-            
+
             <p className="mt-8 text-center text-sm text-gray-500">
               Don't have an account?{' '}
               <Link href="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
@@ -376,27 +359,27 @@ export default function LoginPage() {
               </Link>
             </p>
           </div>
-          
+
           {/* Right side - Interactive 3D social media visualization */}
           <div className="w-full lg:w-7/12 relative overflow-hidden bg-indigo-600">
             <div className="absolute inset-0 z-0">
               <svg className="absolute" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                   <pattern id="smallGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1"/>
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
                   </pattern>
                   <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
-                    <rect width="100" height="100" fill="url(#smallGrid)"/>
-                    <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+                    <rect width="100" height="100" fill="url(#smallGrid)" />
+                    <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
                   </pattern>
                 </defs>
                 <rect width="100%" height="100%" fill="url(#grid)" />
               </svg>
             </div>
-            
+
             <div className="absolute inset-0 z-10 flex items-center justify-center">
               <div className="w-full max-w-md px-8 py-12 text-white">
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
@@ -405,7 +388,7 @@ export default function LoginPage() {
                   <h2 className="text-3xl font-extrabold mb-4">Connect with the world</h2>
                   <p className="text-lg opacity-80">Share your moments, discover trending content, engage with your community.</p>
                 </motion.div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                   {[
                     {
@@ -458,8 +441,8 @@ export default function LoginPage() {
                     </motion.div>
                   ))}
                 </div>
-                
-                <motion.div 
+
+                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ duration: 1, delay: 0.8 }}
@@ -476,7 +459,7 @@ export default function LoginPage() {
                 </motion.div>
               </div>
             </div>
-            
+
             {/* Animated floating social media elements (client-only) */}
             {isMounted && [...Array(10)].map((_, i) => {
               const icons = [
@@ -496,34 +479,34 @@ export default function LoginPage() {
                   <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
                 </svg>
               ];
-              
+
               const size = Math.random() * 30 + 20;
               const icon = icons[Math.floor(Math.random() * icons.length)];
               const delay = Math.random() * 5;
               const duration = Math.random() * 20 + 10;
               const opacity = Math.random() * 0.5 + 0.2;
-              
+
               const windowWidth = typeof window !== 'undefined' ? window.innerWidth : 0;
               const windowHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
 
               return (
                 <motion.div
                   key={i}
-                  initial={{ 
-                    x: Math.random() * windowWidth / 2, 
+                  initial={{
+                    x: Math.random() * windowWidth / 2,
                     y: Math.random() * windowHeight,
                     opacity: 0,
                     scale: 0
                   }}
-                  animate={{ 
+                  animate={{
                     x: [
-                      Math.random() * windowWidth / 2, 
+                      Math.random() * windowWidth / 2,
                       Math.random() * windowWidth / 2 + 100,
                       Math.random() * windowWidth / 2 - 100,
                       Math.random() * windowWidth / 2
                     ],
                     y: [
-                      Math.random() * windowHeight, 
+                      Math.random() * windowHeight,
                       Math.random() * windowHeight - 100,
                       Math.random() * windowHeight + 100,
                       Math.random() * windowHeight
@@ -532,7 +515,7 @@ export default function LoginPage() {
                     scale: 1,
                     rotate: [0, 10, -10, 0]
                   }}
-                  transition={{ 
+                  transition={{
                     duration: duration,
                     delay: delay,
                     repeat: Infinity,
@@ -547,7 +530,7 @@ export default function LoginPage() {
             })}
           </div>
         </motion.div>
-        
+
         {/* Footer */}
         <div className="mt-8 text-center text-xs text-gray-400">
           <p>© {new Date().getFullYear()} SocialApp. All rights reserved.</p>

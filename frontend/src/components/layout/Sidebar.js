@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchUserDetails } from '@/redux/auth/authSlice';
 import { FiMail } from 'react-icons/fi';
 
-const Sidebar = ({ isSidebar }) => {
+const Sidebar = ({ isSidebar, onClose }) => {
   const dispatch = useDispatch();
   const [isClient, setIsClient] = useState(false);
   const [minimize, setMinimize] = useState(false);
@@ -22,6 +22,9 @@ const Sidebar = ({ isSidebar }) => {
       // Use the async thunk for complete logout
       await dispatch(performLogout()).unwrap();
       
+      // Close sidebar on mobile after logout
+      if (onClose) onClose();
+      
       // Redirect to home page or login page
       router.push('/login');
       
@@ -34,6 +37,11 @@ const Sidebar = ({ isSidebar }) => {
       dispatch(clearAuthState());
       router.push('/');
     }
+  };
+
+  // Handle link clicks to close sidebar on mobile
+  const handleLinkClick = () => {
+    if (onClose) onClose();
   };
 
 
@@ -105,20 +113,53 @@ const Sidebar = ({ isSidebar }) => {
     <>
       {isLoggedIn &&
         <motion.div
-          className={`${isSidebar ? 'block' : 'hidden md:block md:relative fixed z-20'}`}
+          className={`${isSidebar ? 'block' : 'hidden md:block md:relative fixed z-20 md:w-auto m-screen'}`}
           initial={false}
           animate={minimize ? "collapsed" : "expanded"}
           variants={sidebarVariants}
         >
+          {/* Mobile overlay */}
+          {isSidebar && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+              onClick={onClose}
+            />
+          )}
+          
           <motion.div
-            className={`sidebar fixed overflow-y-auto bg-white text-gray-900 flex flex-col border-r border-gray-200 shadow-lg`}
-            style={{ height: "calc(100vh - 4rem)" }}
+            className={`sidebar fixed overflow-y-auto bg-white text-gray-900 flex flex-col border-r border-gray-200 shadow-lg
+              ${isSidebar ? 'w-screen md:w-auto' : ''}
+              ${isSidebar ? 'top-0 left-0 md:top-auto md:left-auto' : ''}
+            `}
+            style={{ 
+              height: isSidebar ? "100vh" : "calc(100vh - 4rem)",
+              zIndex: isSidebar ? 30 : 20
+            }}
             animate={minimize ? "collapsed" : "expanded"}
             variants={sidebarVariants}
           >
-            {/* Enhanced Toggle Button */}
+            {/* Mobile Close Button */}
+            {isSidebar && (
+              <motion.button
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="absolute top-4 right-4 z-20 md:hidden bg-gray-100 hover:bg-gray-200 text-gray-600 p-2 rounded-full shadow-sm"
+                onClick={onClose}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </motion.button>
+            )}
+
+            {/* Enhanced Toggle Button - Hidden on mobile */}
             <motion.button
-              className="absolute right-0 bottom-32 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-2.5 rounded-l-lg z-10 shadow-lg overflow-hidden"
+              className="absolute right-0 bottom-32 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-2.5 rounded-l-lg z-10 shadow-lg overflow-hidden hidden md:block"
               onClick={toggleSidebar}
               whileHover={{ 
                 scale: 1.05,
@@ -173,7 +214,7 @@ const Sidebar = ({ isSidebar }) => {
 
             {/* Enhanced Profile Section */}
             <div>
-              <Link href={`/profile/${userDetails?._id}`} className="relative overflow-hidden group">
+              <Link href={`/profile/${userDetails?._id}`} className="relative overflow-hidden group" onClick={handleLinkClick}>
                 <motion.div
                   className={`flex items-center space-x-2.5 border-b border-gray-200 bg-white relative ${minimize ? 'justify-center py-6' : 'px-5 py-4'}`}
                   whileHover={{ backgroundColor: "#fafbff" }}
@@ -248,6 +289,7 @@ const Sidebar = ({ isSidebar }) => {
                     >
                       <Link
                         href={item.myProfile ? `/profile/${userDetails?._id}` : item.href}
+                        onClick={handleLinkClick}
                         className={`flex items-center rounded-xl transition-all duration-300 relative overflow-hidden group
                           ${isActive
                             ? 'bg-indigo-600 text-white shadow-md'
@@ -377,6 +419,7 @@ const Sidebar = ({ isSidebar }) => {
                 >
                   <Link
                     href="/contact"
+                    onClick={handleLinkClick}
                     className={`flex items-center text-sm font-medium rounded-xl transition-all duration-300 relative overflow-hidden group
                       ${pathname === '/contact' ? 'bg-blue-50 text-blue-700' : ''}  
                       ${minimize ? 'py-3 justify-center' : 'p-3 hover:bg-blue-50 hover:text-blue-700'}`}
@@ -508,6 +551,7 @@ const Sidebar = ({ isSidebar }) => {
                     <Link
                       className="w-full text-xs font-medium text-white bg-gradient-to-r from-indigo-600 to-blue-500 px-3 py-2 rounded-lg shadow-sm flex items-center justify-center relative overflow-hidden group/button"
                       href={"/contact"}
+                      onClick={handleLinkClick}
                     >
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover/button:opacity-100"

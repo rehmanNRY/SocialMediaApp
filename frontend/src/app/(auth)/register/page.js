@@ -760,7 +760,7 @@ export default function SignupForm() {
               </div>
             </div>
 
-            <div className="mt-8">
+            <div className="">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-200"></div>
@@ -772,33 +772,16 @@ export default function SignupForm() {
                 </div>
               </div>
 
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  className="w-full inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <FaGoogle className="h-5 w-5 text-red-500" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="w-full cursor-not-allowed inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <FaApple className="h-5 w-5 text-black" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="w-full cursor-not-allowed inline-flex justify-center py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
-                >
-                  <IoLogoGithub className="h-5 w-5" />
-                </motion.button>
-              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={handleGoogleSignIn}
+                className="mt-4 w-full inline-flex justify-center items-center gap-2 py-3 px-4 rounded-lg shadow-sm bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors duration-200"
+              >
+                <FaGoogle className="size-4 text-red-500" />
+                <span>Continue with Google</span>
+              </motion.button>
             </div>
             <div className="mt-4">
               <p className="text-center text-sm text-gray-500">

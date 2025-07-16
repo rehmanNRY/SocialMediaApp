@@ -8,7 +8,12 @@ const LikersModal = ({ likers, closeModal }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [hoveredUser, setHoveredUser] = useState(null);
 
-  const filteredLikers = likers.filter(liker =>
+  // Deduplicate likers and then filter by search term
+  const uniqueLikers = likers.filter((liker, index, self) => 
+    index === self.findIndex(l => l._id === liker._id)
+  );
+  
+  const filteredLikers = uniqueLikers.filter(liker =>
     liker.fullName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -152,7 +157,7 @@ const LikersModal = ({ likers, closeModal }) => {
               {filteredLikers.length > 0 ? (
                 filteredLikers.map((liker, index) => (
                   <motion.div
-                    key={liker._id}
+                    key={`${liker._id}-${index}`}
                     custom={index}
                     variants={listItemVariants}
                     initial="hidden"

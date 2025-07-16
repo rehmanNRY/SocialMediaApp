@@ -1,5 +1,4 @@
 // TODO:
-// Login/Signup registeration
 // immediate update & speed up
 // responsive
 

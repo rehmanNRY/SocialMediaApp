@@ -71,7 +71,7 @@ const Rightbar = () => {
   return (
     <>
       {isLoggedIn && (
-        <div className="flex">
+        <div className="md:flex hidden">
           {/* Main Full Rightbar */}
           <div className="w-64 md:block z-20 mr-1 ml-auto">
             <div
